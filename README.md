@@ -42,14 +42,18 @@ Infrastructure
 │ ├─ services/
 │ │ └─ apiClient.ts
 │ ├─ composables/
-│ │ └─ useHealthCheck.ts
 │ └─ ...
 ├─ backend/
 │ ├─ Dockerfile
 │ ├─ .dockerignore
+│ ├─ Commerce.sln
 │ └─ src/
-│ └─ Commerce.Api/
-│ └─ Program.cs
+│ │ └─ Commerce.Api/
+│ │ └─ Commerce.Repositories/
+│ │ └─ Commerce.Services/
+│ │ └─ Commerce.Shared/
+│ └─ tests/
+│   └─ Commerce.UnitTests/
 ├─ docker-compose.yml
 └─ README.md
 ```
