@@ -19,6 +19,7 @@
 *.suo
 *.ntvs*
 *.njsproj
+backend/src/Commerce.Api/appsettings.*
 
 # =====================
 # Logs

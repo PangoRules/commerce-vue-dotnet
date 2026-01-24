@@ -1,4 +1,6 @@
 using System.Reflection;
+using Commerce.Repositories.Context;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +29,16 @@ builder.Services.AddSwaggerGen(options =>
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     options.IncludeXmlComments(xmlPath);
 });
+
+builder.Services.AddDbContext<CommerceDbContext>(options =>
+{
+    var cs = builder.Configuration.GetConnectionString("DefaultConnection");
+    options.UseNpgsql(cs);
+});
+
+// services / repos
+builder.Services.AddScoped<Commerce.Services.IHealthService, Commerce.Services.HealthService>();
+
 
 var app = builder.Build();
 

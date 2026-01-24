@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="../Commerce.Repositories/Commerce.Repositories.csproj" />
     <ProjectReference Include="..\Commerce.Shared\Commerce.Shared.csproj" />
   </ItemGroup>
 
