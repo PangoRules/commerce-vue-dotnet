@@ -227,15 +227,27 @@ Host=postgres;Port=5432;Database=commerce_db;Username=commerce;Password=commerce
 
 ---
 
-### Resetting the Database
+### Resetting the Database (Dev Only)
 
-To stop all services and remove database data:
+To fully reset the local database and reapply all migrations and seed data:
 
-```
+```bash
 docker compose down -v
+#This runs all the items to be tested production like
+docker compose up --build
+#This only builds the items
+docker compose build
+#this so database gets initialized on the background ready to use dockerized
+docker compose up -d postgres
 ```
 
-This deletes the PostgreSQL volume and recreates a fresh database on the next startup.
+This will:
+
+- Stop all services
+- Delete the PostgreSQL Docker volume
+- Recreate a fresh database
+- Automatically apply EF Core migrations
+- Reinsert seed data (categories, products, etc.)
 
 ---
 
