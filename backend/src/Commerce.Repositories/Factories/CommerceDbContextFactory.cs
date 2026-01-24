@@ -8,11 +8,14 @@ namespace Commerce.Repositories.Factories
     {
         public CommerceDbContext CreateDbContext(string[] args)
         {
-            // Used ONLY by dotnet-ef at design time.
-            // Keep it simple and predictable.
-            var cs =
-                Environment.GetEnvironmentVariable("ConnectionStrings__Postgres")
-                ?? "Host=localhost;Port=5432;Database=commerce;Username=postgres;Password=postgres";
+            var cs = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(cs))
+            {
+                throw new InvalidOperationException(
+                    "Connection string 'ConnectionStrings__DefaultConnection' is not configured.");
+            }
+
 
             var options = new DbContextOptionsBuilder<CommerceDbContext>()
                 .UseNpgsql(cs)
