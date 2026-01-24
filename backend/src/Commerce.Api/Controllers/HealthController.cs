@@ -13,7 +13,7 @@ namespace Commerce.Api.Controllers;
 public class HealthController : ControllerBase
 {
     /// <summary>
-    /// Health check endpoint for service availability.
+    /// Health check endpoint for service availability. Also checks db for completeness.
     /// </summary>
     /// <remarks>
     /// Used by Docker, load balancers, and monitoring systems to verify
@@ -22,11 +22,23 @@ public class HealthController : ControllerBase
     /// <response code="200">Service is healthy</response>
     [HttpGet]
     [ProducesResponseType(typeof(HealthResponse), StatusCodes.Status200OK)]
-    public IActionResult Get() => new OkObjectResult(new HealthResponse
+    public async Task<IActionResult> GetAsync(
+        [FromServices] IHealthService healthService,
+        CancellationToken ct)
     {
-        Status = "Healthy",
-        Timestamp = DateTime.UtcNow
-    });
+        var (ok, message) = await healthService.CheckDbAsync(ct);
+
+        return Ok(new HealthResponse
+        {
+            Status = ok ? HealthStatus.Healthy : HealthStatus.Unhealthy,
+            Timestamp = DateTime.UtcNow,
+            Db = new DbHealthResponse
+            {
+                Status = ok ? HealthStatus.Healthy : HealthStatus.Unhealthy,
+                Message = message
+            }
+        });
+    }
 
     /// <summary>
     /// Health check endpoint for database connectivity.
@@ -48,7 +60,7 @@ public class HealthController : ControllerBase
         {
             return Ok(new HealthResponse
             {
-                Status = "DB Healthy",
+                Status = HealthStatus.Healthy,
                 Timestamp = DateTime.UtcNow
             });
         }
