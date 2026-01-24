@@ -1,0 +1,7 @@
+**/bin
+**/obj
+.git
+.vscode
+Dockerfile
+docker-compose.yml
+.env
