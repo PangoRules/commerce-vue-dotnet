@@ -1,5 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Commerce.Shared.Responses;
 
+
+[ExcludeFromCodeCoverage]
 public class ProductResponse
 {
     public int Id { get; init; }

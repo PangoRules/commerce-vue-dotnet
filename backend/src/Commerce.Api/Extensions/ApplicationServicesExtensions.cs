@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Commerce.Repositories;
 using Commerce.Services;
 
 namespace Commerce.Api.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class ApplicationServicesExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)

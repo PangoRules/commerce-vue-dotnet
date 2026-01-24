@@ -1,0 +1,261 @@
+using Commerce.Repositories;
+using Commerce.Repositories.Entities;
+using Commerce.Services;
+using Commerce.Shared.Requests;
+
+namespace Commerce.UnitTests.Services;
+
+public class ProductsServicesTests
+{
+    [Fact]
+    public async Task GetProductByIdAsync_WhenRepoReturnsNull_ReturnsNull()
+    {
+        // Arrange
+        var repo = new FakeProductsRepository
+        {
+            ProductById = null
+        };
+        var sut = new ProductsServices(repo);
+
+        // Act
+        var result = await sut.GetProductByIdAsync(productId: 123);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetProductByIdAsync_WhenRepoReturnsProduct_ReturnsMappedResponse()
+    {
+        // Arrange
+        var repo = new FakeProductsRepository
+        {
+            ProductById = new Product
+            {
+                Id = 10,
+                CategoryId = 2,
+                Name = "Laptop",
+                Description = "Lightweight laptop",
+                Price = 1199.99m,
+                StockQuantity = 20,
+                IsActive = true
+            }
+        };
+        var sut = new ProductsServices(repo);
+
+        // Act
+        var result = await sut.GetProductByIdAsync(productId: 10);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(10, result!.Id);
+        Assert.Equal(2, result.CategoryId);
+        Assert.Equal("Laptop", result.Name);
+        Assert.Equal("Lightweight laptop", result.Description);
+        Assert.Equal(1199.99m, result.Price);
+        Assert.Equal(20, result.StockQuantity);
+        Assert.True(result.IsActive);
+    }
+
+    [Fact]
+    public async Task GetAllActiveProductsAsync_MapsAllProducts()
+    {
+        // Arrange
+        var repo = new FakeProductsRepository
+        {
+            ActiveProducts = new()
+            {
+                new Product { Id = 1, CategoryId = 1, Name = "A", Price = 1m, StockQuantity = 1, IsActive = true },
+                new Product { Id = 2, CategoryId = 1, Name = "B", Price = 2m, StockQuantity = 2, IsActive = true },
+            }
+        };
+        var sut = new ProductsServices(repo);
+
+        // Act
+        var results = await sut.GetAllActiveProductsAsync();
+
+        // Assert
+        Assert.Equal(2, results.Count);
+        Assert.Equal(1, results[0].Id);
+        Assert.Equal("A", results[0].Name);
+        Assert.Equal(2, results[1].Id);
+        Assert.Equal("B", results[1].Name);
+    }
+
+    [Fact]
+    public async Task GetAllActiveProductsByCategoryIdAsync_MapsAllProducts()
+    {
+        // Arrange
+        var repo = new FakeProductsRepository
+        {
+            ActiveProductsByCategory = new()
+            {
+                new Product { Id = 3, CategoryId = 99, Name = "C", Price = 3m, StockQuantity = 3, IsActive = true }
+            }
+        };
+        var sut = new ProductsServices(repo);
+
+        // Act
+        var results = await sut.GetAllActiveProductsByCategoryIdAsync(categoryId: 99);
+
+        // Assert
+        Assert.Single(results);
+        Assert.Equal(3, results[0].Id);
+        Assert.Equal(99, results[0].CategoryId);
+        Assert.Equal("C", results[0].Name);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task AddProductAsync_ReturnsRepoResult(bool repoResult)
+    {
+        // Arrange
+        var repo = new FakeProductsRepository
+        {
+            AddProductResult = repoResult
+        };
+        var sut = new ProductsServices(repo);
+
+        var request = new CreateProductRequest
+        {
+            CategoryId = 1,
+            Name = "New",
+            Description = null,
+            Price = 9.99m,
+            StockQuantity = 5
+        };
+
+        // Act
+        var result = await sut.AddProductAsync(request);
+
+        // Assert
+        Assert.Equal(repoResult, result);
+        Assert.Same(request, repo.LastCreateRequest); // proves it passed through
+    }
+
+    [Fact]
+    public async Task UpdateProductAsync_WhenRepoReturnsNull_ReturnsNull()
+    {
+        // Arrange
+        var repo = new FakeProductsRepository
+        {
+            UpdatedProduct = null
+        };
+        var sut = new ProductsServices(repo);
+
+        // Act
+        var result = await sut.UpdateProductAsync(
+            new UpdateProductRequest { CategoryId = 1, Name = "X", Description = null, Price = 1m, StockQuantity = 1 },
+            productId: 123);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task UpdateProductAsync_WhenRepoReturnsProduct_ReturnsMappedResponse()
+    {
+        // Arrange
+        var repo = new FakeProductsRepository
+        {
+            UpdatedProduct = new Product
+            {
+                Id = 5,
+                CategoryId = 2,
+                Name = "Updated",
+                Description = "Updated Desc",
+                Price = 50m,
+                StockQuantity = 7,
+                IsActive = true
+            }
+        };
+        var sut = new ProductsServices(repo);
+
+        var request = new UpdateProductRequest
+        {
+            CategoryId = 2,
+            Name = "Updated",
+            Description = "Updated Desc",
+            Price = 50m,
+            StockQuantity = 7
+        };
+
+        // Act
+        var result = await sut.UpdateProductAsync(request, productId: 5);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(5, result!.Id);
+        Assert.Equal("Updated", result.Name);
+        Assert.Same(request, repo.LastUpdateRequest);
+        Assert.Equal(5, repo.LastUpdateProductId);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task ToggleProductAsync_ReturnsRepoResult(bool repoResult)
+    {
+        // Arrange
+        var repo = new FakeProductsRepository
+        {
+            ToggleResult = repoResult
+        };
+        var sut = new ProductsServices(repo);
+
+        // Act
+        var result = await sut.ToggleProductAsync(productId: 77);
+
+        // Assert
+        Assert.Equal(repoResult, result);
+        Assert.Equal(77, repo.LastToggleProductId);
+    }
+
+    /// <summary>
+    /// Minimal fake for unit tests (no Moq needed).
+    /// </summary>
+    private sealed class FakeProductsRepository : IProductsRepository
+    {
+        public Product? ProductById { get; set; }
+        public List<Product> ActiveProducts { get; set; } = new();
+        public List<Product> ActiveProductsByCategory { get; set; } = new();
+
+        public bool AddProductResult { get; set; }
+        public bool ToggleResult { get; set; }
+        public Product? UpdatedProduct { get; set; }
+
+        public CreateProductRequest? LastCreateRequest { get; private set; }
+        public UpdateProductRequest? LastUpdateRequest { get; private set; }
+        public int? LastUpdateProductId { get; private set; }
+        public int? LastToggleProductId { get; private set; }
+
+        public Task<Product?> GetProductByIdAsync(int productId) =>
+            Task.FromResult(ProductById);
+
+        public Task<List<Product>> GetAllActiveProductsByCategoryIdAsync(int categoryId) =>
+            Task.FromResult(ActiveProductsByCategory);
+
+        public Task<List<Product>> GetAllActiveProductsAsync() =>
+            Task.FromResult(ActiveProducts);
+
+        public Task<bool> AddProductAsync(CreateProductRequest product)
+        {
+            LastCreateRequest = product;
+            return Task.FromResult(AddProductResult);
+        }
+
+        public Task<Product?> UpdateProductAsync(UpdateProductRequest product, int productId)
+        {
+            LastUpdateRequest = product;
+            LastUpdateProductId = productId;
+            return Task.FromResult(UpdatedProduct);
+        }
+
+        public Task<bool> ToggleProductAsync(int productId)
+        {
+            LastToggleProductId = productId;
+            return Task.FromResult(ToggleResult);
+        }
+    }
+}

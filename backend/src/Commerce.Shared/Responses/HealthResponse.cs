@@ -1,5 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Commerce.Shared.Responses;
 
+
+[ExcludeFromCodeCoverage]
 public class HealthResponse
 {
     /// <summary>
@@ -16,6 +20,7 @@ public class HealthResponse
 }
 
 
+[ExcludeFromCodeCoverage]
 public class DbHealthResponse
 {
     public HealthStatus Status { get; set; } = default!;   // "Healthy" / "Unhealthy"

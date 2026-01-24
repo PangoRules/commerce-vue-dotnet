@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using Commerce.Repositories.Context;
 using Commerce.Repositories.Entities;
 using Commerce.Shared.Requests;
 using Microsoft.EntityFrameworkCore;
 
 namespace Commerce.Repositories;
+
 public interface IProductsRepository
 {
     /// <summary>
@@ -49,6 +51,7 @@ public interface IProductsRepository
     public Task<bool> ToggleProductAsync(int productId);
 }
 
+[ExcludeFromCodeCoverage]
 public class ProductsRepository(CommerceDbContext context) : IProductsRepository
 {
     public async Task<Product?> GetProductByIdAsync(int productId)

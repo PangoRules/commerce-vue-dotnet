@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Commerce.Repositories.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace Commerce.Api.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class PersistenceExtensions
 {
     public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration config)

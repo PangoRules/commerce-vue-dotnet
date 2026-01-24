@@ -1,9 +1,7 @@
-using System.Diagnostics.CodeAnalysis;
 using Commerce.Shared.Requests;
 
 namespace Commerce.Repositories.Entities;
 
-[ExcludeFromCodeCoverage]
 public class Product
 {
     public int Id { get; set; }

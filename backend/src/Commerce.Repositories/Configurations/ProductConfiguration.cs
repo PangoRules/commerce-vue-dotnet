@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using Commerce.Repositories.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Commerce.Repositories.Configurations;
 
+[ExcludeFromCodeCoverage]
 public class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)

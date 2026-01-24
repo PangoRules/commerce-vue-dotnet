@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Commerce.Services;
 using Commerce.Shared.Requests;
 using Commerce.Shared.Responses;
@@ -11,6 +12,7 @@ namespace Commerce.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
+[ExcludeFromCodeCoverage]
 public class ProductsController(IProductsServices productsServices) : ControllerBase
 {
     /// <summary>

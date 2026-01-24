@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Commerce.Services;
 using Commerce.Shared.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ namespace Commerce.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
+[ExcludeFromCodeCoverage]
 public class HealthController(IHealthService healthService) : ControllerBase
 {
     /// <summary>
