@@ -1,8 +1,9 @@
-﻿using System;
+﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
+
 
 namespace Commerce.Repositories.Migrations
 {

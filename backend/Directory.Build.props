@@ -6,12 +6,8 @@
       **/Extensions/*.cs;
       **/*DbContext.cs;
       **/*Configuration.cs;
-      **/Migrations/*.cs
+      **/Migrations/*.cs;
+      **/*ModelSnapshot.cs
     </ExcludeByFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <Threshold>80</Threshold>
-    <ThresholdType>line</ThresholdType>
-    <ThresholdStat>total</ThresholdStat>
   </PropertyGroup>
 </Project>
