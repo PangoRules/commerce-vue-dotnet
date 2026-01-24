@@ -103,6 +103,7 @@ This command builds the frontend and backend images, starts frontend, backend, a
 - Backend API: [http://localhost:8080](http://localhost:8080)
 - Swagger UI (Development only): [http://localhost:8080/swagger](http://localhost:8080/swagger)
 - Health endpoint: [http://localhost:8080/api/health](http://localhost:8080/api/health)
+- Db endpoint: [http://localhost:8080/api/health/db](http://localhost:8080/api/health/db)
 
 ---
 
