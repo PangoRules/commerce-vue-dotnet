@@ -1,12 +1,19 @@
+using Commerce.Repositories;
+using Commerce.Services;
+
 namespace Commerce.Api.Extensions;
 
 public static class ApplicationServicesExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        // services / repos
-        services.AddScoped<Commerce.Services.IHealthService, Commerce.Services.HealthService>();
-
+        #region Services Registration
+        services.AddScoped<IHealthService, HealthService>();
+        services.AddScoped<IProductsServices, ProductsServices>();
+        #endregion
+        #region Repositories Registration
+        services.AddScoped<IProductsRepository, ProductsRepository>();
+        #endregion
         return services;
     }
 }

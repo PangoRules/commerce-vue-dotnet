@@ -1,4 +1,4 @@
-namespace Commerce.Shared.Models;
+namespace Commerce.Shared.Responses;
 
 public class HealthResponse
 {

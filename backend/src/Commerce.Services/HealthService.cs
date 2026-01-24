@@ -12,6 +12,10 @@ public interface IHealthService
     Task<(bool ok, string message)> CheckDbAsync(CancellationToken ct);
 }
 
+/// <summary>
+/// Service for health checks.
+/// </summary>
+/// <param name="db">The database context to use for health checks.</param>
 public class HealthService(CommerceDbContext db) : IHealthService
 {
     public async Task<(bool ok, string message)> CheckDbAsync(CancellationToken ct)

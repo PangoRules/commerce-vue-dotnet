@@ -1,5 +1,5 @@
 using Commerce.Services;
-using Commerce.Shared.Models;
+using Commerce.Shared.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Commerce.Api.Controllers;
@@ -10,7 +10,7 @@ namespace Commerce.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-public class HealthController : ControllerBase
+public class HealthController(IHealthService healthService) : ControllerBase
 {
     /// <summary>
     /// Health check endpoint for service availability. Also checks db for completeness.
@@ -23,7 +23,6 @@ public class HealthController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(HealthResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAsync(
-        [FromServices] IHealthService healthService,
         CancellationToken ct)
     {
         var (ok, message) = await healthService.CheckDbAsync(ct);
@@ -43,16 +42,13 @@ public class HealthController : ControllerBase
     /// <summary>
     /// Health check endpoint for database connectivity.
     /// </summary>
-    /// <param name="healthService">The health service instance to use for checking database connectivity.</param>
     /// <param name="ct">The cancellation token to cancel the operation.</param>
     /// <returns code="200">Database is healthy</returns>
     /// <returns code="500">Database is unhealthy</returns>
     [HttpGet("db")]
     [ProducesResponseType(typeof(HealthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status503ServiceUnavailable)]
-    public async Task<IActionResult> GetDbAsync(
-        [FromServices] IHealthService healthService,
-        CancellationToken ct)
+    public async Task<IActionResult> GetDbAsync(CancellationToken ct)
     {
         var (ok, message) = await healthService.CheckDbAsync(ct);
 
