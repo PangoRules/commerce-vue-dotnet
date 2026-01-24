@@ -10,12 +10,14 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.23" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Configurations/" />
     <Folder Include="Context/" />
-    <Folder Include="Factories/" />
+    <Folder Include="Entities/" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -13,6 +13,6 @@ public class CommerceDbContext(DbContextOptions<CommerceDbContext> options) : Db
         base.OnModelCreating(modelBuilder);
 
         // Apply configurations if you add them later:
-        // modelBuilder.ApplyConfigurationsFromAssembly(typeof(CommerceDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(CommerceDbContext).Assembly);
     }
 }
