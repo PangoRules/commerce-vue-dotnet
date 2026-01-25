@@ -14,6 +14,14 @@ public static class ProductMapper
             Description = product.Description,
             Price = product.Price,
             StockQuantity = product.StockQuantity,
-            IsActive = product.IsActive
+            IsActive = product.IsActive,
+            Category = product.Category != null
+                ? new CategoryResponse
+                {
+                    Id = product.Category.Id,
+                    Name = product.Category.Name,
+                    Description = product.Category.Description
+                }
+                : null
         };
 }

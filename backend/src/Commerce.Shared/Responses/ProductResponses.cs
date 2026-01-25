@@ -13,4 +13,5 @@ public class ProductResponse
     public decimal Price { get; init; }
     public int StockQuantity { get; init; }
     public bool IsActive { get; init; }
+    public CategoryResponse? Category { get; set; } = null!;
 }
