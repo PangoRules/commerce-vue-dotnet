@@ -2,6 +2,7 @@ using Commerce.Repositories;
 using Commerce.Repositories.Entities;
 using Commerce.Services;
 using Commerce.Shared.Requests;
+using Commerce.Shared.Responses;
 
 namespace Commerce.UnitTests.Services;
 
@@ -72,39 +73,16 @@ public class ProductsServicesTests
         var sut = new ProductsServices(repo);
 
         // Act
-        var results = await sut.GetAllActiveProductsAsync();
+        var results = await sut.GetAllProductsAsync(new GetProductsQueryParams());
 
         // Assert
-        Assert.Equal(2, results.Count);
-        Assert.Equal(1, results[0].Id);
-        Assert.Equal("A", results[0].Name);
-        Assert.Equal(2, results[1].Id);
-        Assert.Equal("B", results[1].Name);
+        Assert.Equal(2, results.Items.Count);
+        Assert.Equal(1, results.Items[0].Id);
+        Assert.Equal("A", results.Items[0].Name);
+        Assert.Equal(2, results.Items[1].Id);
+        Assert.Equal("B", results.Items[1].Name);
     }
-
-    [Fact]
-    public async Task GetAllActiveProductsByCategoryIdAsync_MapsAllProducts()
-    {
-        // Arrange
-        var repo = new FakeProductsRepository
-        {
-            ActiveProductsByCategory = new()
-            {
-                new Product { Id = 3, CategoryId = 99, Name = "C", Price = 3m, StockQuantity = 3, IsActive = true }
-            }
-        };
-        var sut = new ProductsServices(repo);
-
-        // Act
-        var results = await sut.GetAllActiveProductsByCategoryIdAsync(categoryId: 99);
-
-        // Assert
-        Assert.Single(results);
-        Assert.Equal(3, results[0].Id);
-        Assert.Equal(99, results[0].CategoryId);
-        Assert.Equal("C", results[0].Name);
-    }
-
+    
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
@@ -213,7 +191,7 @@ public class ProductsServicesTests
     }
 
     /// <summary>
-    /// Minimal fake for unit tests (no Moq needed).
+    /// Minimal fake for unit tests
     /// </summary>
     private sealed class FakeProductsRepository : IProductsRepository
     {
@@ -236,9 +214,6 @@ public class ProductsServicesTests
         public Task<List<Product>> GetAllActiveProductsByCategoryIdAsync(int categoryId) =>
             Task.FromResult(ActiveProductsByCategory);
 
-        public Task<List<Product>> GetAllActiveProductsAsync() =>
-            Task.FromResult(ActiveProducts);
-
         public Task<bool> AddProductAsync(CreateProductRequest product)
         {
             LastCreateRequest = product;
@@ -256,6 +231,11 @@ public class ProductsServicesTests
         {
             LastToggleProductId = productId;
             return Task.FromResult(ToggleResult);
+        }
+
+        public Task<PagedResult<Product>> GetAllProductsAsync(GetProductsQueryParams queryParams, CancellationToken ct = default)
+        {
+            return Task.FromResult(new PagedResult<Product>(ActiveProducts, 1, 10, ActiveProducts.Count));
         }
     }
 }

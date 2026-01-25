@@ -1,16 +1,31 @@
 @host = http://localhost:5001
 @contentType = application/json
 
-### Get all active products (200 or 204)
-GET {{host}}/api/products/active
+### Get all products (200 or 204)
+# Response headers:
+#   X-Total-Count: total number of products matching filters
+#   X-Page: current page number
+#   X-Page-Size: number of items per page
+#   X-Skip: number of skipped records
+#   X-Take: number of taken records
+GET {{host}}/api/products
 Accept: {{contentType}}
 
-### Get all active products by category (200 or 204)
-GET {{host}}/api/products/category/1
+### Get all products – paged
+GET {{host}}/api/products?page=1&pageSize=10
 Accept: {{contentType}}
+
+### Get all products – active only
+GET {{host}}/api/products?isActive=true&page=1&pageSize=10
+Accept: {{contentType}}
+
+### Get all products – search + sort
+GET {{host}}/api/products?searchTerm=laptop&sortBy=Name&sortDescending=false&page=1&pageSize=5
+Accept: {{contentType}}
+
 
 ### Get product by id (200 or 404)
-GET {{host}}/api/products/5004
+GET {{host}}/api/products/3001
 Accept: {{contentType}}
 
 ### Add product (204 or 400)

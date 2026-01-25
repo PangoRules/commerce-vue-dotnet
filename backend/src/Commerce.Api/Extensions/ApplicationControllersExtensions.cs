@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using Commerce.Api.Validation;
 
 namespace Commerce.Api.Extensions;
 
@@ -8,7 +9,11 @@ public static class ApiControllersExtensions
 {
     public static IServiceCollection AddApiControllers(this IServiceCollection services)
     {
-        services.AddControllers()
+        services.AddControllers( opts =>
+            {
+                opts.Filters.Add<PagingHeadersFilter>();
+                opts.Filters.AddService<FluentValidationActionFilter>();
+            })
             .AddJsonOptions(o =>
             {
                 o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
