@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Commerce.Repositories.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Commerce.Repositories.Context;
@@ -7,6 +8,7 @@ namespace Commerce.Repositories.Context;
 public class CommerceDbContext(DbContextOptions<CommerceDbContext> options) : DbContext(options)
 {
     //DBSets go here later
+    public DbSet<Product> Products { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

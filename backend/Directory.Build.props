@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <ExcludeByFile>
+      **/Program.cs;
+      **/*Extensions.cs;
+      **/Extensions/*.cs;
+      **/*DbContext.cs;
+      **/*Configuration.cs;
+      **/Migrations/*.cs;
+      **/*ModelSnapshot.cs
+    </ExcludeByFile>
+  </PropertyGroup>
+</Project>

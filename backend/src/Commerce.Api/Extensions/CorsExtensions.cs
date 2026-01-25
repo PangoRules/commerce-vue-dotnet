@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Commerce.Api.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class CorsExtensions
 {
     public const string FrontendDevPolicy = "FrontendDev";

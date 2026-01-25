@@ -1,14 +1,18 @@
+using System.Diagnostics.CodeAnalysis;
 using Commerce.Repositories.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Commerce.Repositories.Configurations;
 
+[ExcludeFromCodeCoverage]
 public class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
     {
         #region Keys and Properties
+        builder.ToTable("Product");
+
         builder.HasKey(p => p.Id);
 
         builder.Property(p => p.Name)

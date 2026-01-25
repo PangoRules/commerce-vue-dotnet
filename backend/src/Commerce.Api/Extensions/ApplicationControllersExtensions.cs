@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace Commerce.Api.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class ApiControllersExtensions
 {
     public static IServiceCollection AddApiControllers(this IServiceCollection services)
