@@ -52,7 +52,7 @@ public class ProductsRepository(CommerceDbContext context) : IProductsRepository
 {
     public async Task<Product?> GetProductByIdAsync(int productId)
     {
-        return await context.Products.FindAsync(productId);
+        return await context.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == productId);
     }
 
     public async Task<PagedResult<Product>> GetAllProductsAsync(GetProductsQueryParams queryParams, CancellationToken ct)

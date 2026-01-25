@@ -17,7 +17,7 @@ namespace Commerce.Api.Controllers;
 public class ProductsController(IProductsServices productsServices) : ControllerBase
 {
     /// <summary>
-    /// Gets a product by its identifier.
+    /// Gets a product by its identifier (with category information).
     /// </summary>
     /// <param name="productId">The unique identifier of the product to retrieve.</param>
     /// <returns>The product response if found, otherwise a 404 Not Found response.</returns>
