@@ -14,10 +14,12 @@ public static class ApplicationServicesExtensions
     {
         #region Services Registration
         services.AddScoped<IHealthService, HealthService>();
-        services.AddScoped<IProductsServices, ProductsServices>();
+        services.AddScoped<IProductsService, ProductsService>();
+        services.AddScoped<ICategoryService, CategoryService>();
         #endregion
         #region Repositories Registration
         services.AddScoped<IProductsRepository, ProductsRepository>();
+        services.AddScoped<ICategoriesRepository, CategoriesRepository>();
         #endregion
         #region Validators Registration
         services.AddValidatorsFromAssemblyContaining<GetProductsQueryParams>();

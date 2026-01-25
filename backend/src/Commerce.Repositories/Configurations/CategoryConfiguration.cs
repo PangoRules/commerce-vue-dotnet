@@ -11,6 +11,8 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
     public void Configure(EntityTypeBuilder<Category> builder)
     {
         #region Keys and Properties
+        builder.ToTable("Category");
+
         builder.HasKey(c => c.Id);
 
         builder.Property(c => c.Name)

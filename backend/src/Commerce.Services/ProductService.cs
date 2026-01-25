@@ -4,7 +4,7 @@ using Commerce.Shared.Responses;
 
 namespace Commerce.Services;
 
-public interface IProductsServices
+public interface IProductsService
 {
     /// <summary>
     /// Gets a product by its identifier.
@@ -42,7 +42,7 @@ public interface IProductsServices
     public Task<bool> ToggleProductAsync(int productId);
 }
 
-public class ProductsServices(IProductsRepository repository) : IProductsServices
+public class ProductsService(IProductsRepository repository) : IProductsService
 {
     public async Task<ProductResponse?> GetProductByIdAsync(int productId)
     {
@@ -58,7 +58,7 @@ public class ProductsServices(IProductsRepository repository) : IProductsService
     {
         var productsPagedResult = await repository.GetAllProductsAsync(queryParams);
         return new PagedResult<ProductResponse>(
-            productsPagedResult.Items.Select(Mappers.ProductMapper.ToResponse).ToList(),
+            [.. productsPagedResult.Items.Select(Mappers.ProductMapper.ToResponse)],
             productsPagedResult.Page,
             productsPagedResult.PageSize,
             productsPagedResult.TotalCount
