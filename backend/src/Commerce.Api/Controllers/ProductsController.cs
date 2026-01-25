@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Commerce.Api.Extensions;
 using Commerce.Services;
 using Commerce.Shared.Requests;
 using Commerce.Shared.Responses;
@@ -34,31 +35,22 @@ public class ProductsController(IProductsServices productsServices) : Controller
     }
 
     /// <summary>
-    /// Gets all active products by category identifier.
+    /// Gets all products filtered by query parameters.
     /// </summary>
-    /// <param name="categoryId">The unique identifier of the category to filter products.</param>
-    /// <returns>A list of active product responses in the specified category.</returns>
-    [HttpGet("category/{categoryId:int}")]
+    /// <param name="queryParams">The query parameters to filter products.</param>
+    /// <returns>A list of product responses.</returns>
+    [HttpGet("")]
     [ProducesResponseType(typeof(List<ProductResponse>), 200)]
     [ProducesResponseType(204)]
-    public async Task<IActionResult> GetAllActiveProductsByCategoryId(int categoryId)
-    {
-        var products = await productsServices.GetAllActiveProductsByCategoryIdAsync(categoryId);
-        return products.Count > 0 ? Ok(products) : NoContent();
-    }
+    public async Task<IActionResult> GetAllProducts([FromQuery] GetProductsQueryParams queryParams)
+{
+    var page = await productsServices.GetAllProductsAsync(queryParams);
 
-    /// <summary>
-    /// Gets all active products.
-    /// </summary>
-    /// <returns>A list of active product responses.</returns>
-    [HttpGet("active")]
-    [ProducesResponseType(typeof(List<ProductResponse>), 200)]
-    [ProducesResponseType(204)]
-    public async Task<IActionResult> GetAllActiveProducts()
-    {
-        var products = await productsServices.GetAllActiveProductsAsync();
-        return products.Count > 0 ? Ok(products) : NoContent();
-    }
+    HttpContext.SetPaging(page);
+
+    return page.Items.Count > 0 ? Ok(page.Items) : NoContent();
+}
+
 
     /// <summary>
     /// Adds a new product.

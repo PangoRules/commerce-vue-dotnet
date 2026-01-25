@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Commerce.Repositories.Context;
 using Commerce.Repositories.Entities;
 using Commerce.Shared.Requests;
+using Commerce.Shared.Responses;
 using Microsoft.EntityFrameworkCore;
 
 namespace Commerce.Repositories;
@@ -16,17 +17,12 @@ public interface IProductsRepository
     public Task<Product?> GetProductByIdAsync(int productId);
 
     /// <summary>
-    /// Get all active products by category ID.
+    /// Get all products filtered by query parameters.
     /// </summary>
-    /// <param name="categoryId">The ID of the category to retrieve products for.</param>
-    /// <returns>A list of active products in the specified category.</returns>
-    public Task<List<Product>> GetAllActiveProductsByCategoryIdAsync(int categoryId);
-
-    /// <summary>
-    /// Get all active products.
-    /// </summary>
-    /// <returns>A list of all active products.</returns>
-    public Task<List<Product>> GetAllActiveProductsAsync();
+    /// <param name="queryParams">The query parameters to filter products.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A paged result of products.</returns>
+    public Task<PagedResult<Product>> GetAllProductsAsync(GetProductsQueryParams queryParams, CancellationToken ct = default);
 
     /// <summary>
     /// Add a new product.
@@ -59,14 +55,68 @@ public class ProductsRepository(CommerceDbContext context) : IProductsRepository
         return await context.Products.FindAsync(productId);
     }
 
-    public async Task<List<Product>> GetAllActiveProductsByCategoryIdAsync(int categoryId)
+    public async Task<PagedResult<Product>> GetAllProductsAsync(GetProductsQueryParams queryParams, CancellationToken ct)
     {
-        return await context.Products.AsNoTracking().Where(p => p.CategoryId == categoryId && p.IsActive).ToListAsync();
+        var query = context.Products.AsNoTracking().AsQueryable();
+
+        if (queryParams.CategoryId.HasValue)
+        {
+            query = query.Where(p => p.CategoryId == queryParams.CategoryId.Value);
+        }
+
+        if (queryParams.IsActive.HasValue)
+        {
+            query = query.Where(p => p.IsActive == queryParams.IsActive.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(queryParams.SearchTerm))
+        {
+            var term = queryParams.SearchTerm.Trim();
+
+            // SQL LIKE pattern
+            var pattern = $"%{term}%";
+
+            query = query.Where(p =>
+                EF.Functions.Like(p.Name, pattern) ||
+                (p.Description != null && EF.Functions.Like(p.Description, pattern)));
+        }
+
+        // Total count AFTER filters, BEFORE pagination
+        var totalCount = await query.CountAsync(ct);
+
+        // Stable ordering (always deterministic)
+        query = ApplyOrdering(query, queryParams);
+
+        // Pagination
+        var items = await query
+            .Skip((queryParams.Page - 1) * queryParams.PageSize)
+            .Take(queryParams.PageSize)
+            .ToListAsync(ct);
+
+        return new PagedResult<Product>(items, queryParams.Page, queryParams.PageSize, totalCount);
     }
 
-    public async Task<List<Product>> GetAllActiveProductsAsync()
+    private static IQueryable<Product> ApplyOrdering(IQueryable<Product> query, GetProductsQueryParams q)
     {
-        return await context.Products.AsNoTracking().Where(p => p.IsActive).ToListAsync();
+        // Primary sort
+        query = (q.SortBy, q.SortDescending) switch
+        {
+            (ProductSortBy.Name, false) => query.OrderBy(p => p.Name),
+            (ProductSortBy.Name, true) => query.OrderByDescending(p => p.Name),
+
+            (ProductSortBy.Price, false) => query.OrderBy(p => p.Price),
+            (ProductSortBy.Price, true) => query.OrderByDescending(p => p.Price),
+
+            (ProductSortBy.StockQuantity, false) => query.OrderBy(p => p.StockQuantity),
+            (ProductSortBy.StockQuantity, true) => query.OrderByDescending(p => p.StockQuantity),
+
+            (ProductSortBy.CategoryId, false) => query.OrderBy(p => p.CategoryId),
+            (ProductSortBy.CategoryId, true) => query.OrderByDescending(p => p.CategoryId),
+
+            _ => query.OrderBy(p => p.Name)
+        };
+
+        return ((IOrderedQueryable<Product>)query).ThenBy(p => p.Id);
     }
 
     public async Task<bool> AddProductAsync(CreateProductRequest product)

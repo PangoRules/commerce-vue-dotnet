@@ -14,17 +14,10 @@ public interface IProductsServices
     public Task<ProductResponse?> GetProductByIdAsync(int productId);
 
     /// <summary>
-    /// Gets all active products by category identifier.
+    /// Gets all products filtered by query parameters.
     /// </summary>
-    /// <param name="categoryId">The unique identifier of the category to filter products.</param>
-    /// <returns>A list of active product responses in the specified category.</returns>
-    public Task<List<ProductResponse>> GetAllActiveProductsByCategoryIdAsync(int categoryId);
-
-    /// <summary>
-    /// Gets all active products.
-    /// </summary>
-    /// <returns>A list of all active product responses.</returns>
-    public Task<List<ProductResponse>> GetAllActiveProductsAsync();
+    /// <returns>A paged result of product responses.</returns>
+    public Task<PagedResult<ProductResponse>> GetAllProductsAsync(GetProductsQueryParams queryParams);
 
     /// <summary>
     /// Adds a new product.
@@ -61,16 +54,15 @@ public class ProductsServices(IProductsRepository repository) : IProductsService
         return Mappers.ProductMapper.ToResponse(product);
     }
 
-    public async Task<List<ProductResponse>> GetAllActiveProductsByCategoryIdAsync(int categoryId)
+    public async Task<PagedResult<ProductResponse>> GetAllProductsAsync(GetProductsQueryParams queryParams)
     {
-        var products = await repository.GetAllActiveProductsByCategoryIdAsync(categoryId);
-        return [.. products.Select(Mappers.ProductMapper.ToResponse)];
-    }
-
-    public async Task<List<ProductResponse>> GetAllActiveProductsAsync()
-    {
-        var products = await repository.GetAllActiveProductsAsync();
-        return [.. products.Select(Mappers.ProductMapper.ToResponse)];
+        var productsPagedResult = await repository.GetAllProductsAsync(queryParams);
+        return new PagedResult<ProductResponse>(
+            productsPagedResult.Items.Select(Mappers.ProductMapper.ToResponse).ToList(),
+            productsPagedResult.Page,
+            productsPagedResult.PageSize,
+            productsPagedResult.TotalCount
+        );
     }
 
     public async Task<bool> AddProductAsync(CreateProductRequest product)
