@@ -1,0 +1,44 @@
+@host = http://localhost:5001
+@contentType = application/json
+
+### Get all active products (200 or 204)
+GET {{host}}/api/products/active
+Accept: {{contentType}}
+
+### Get all active products by category (200 or 204)
+GET {{host}}/api/products/category/1
+Accept: {{contentType}}
+
+### Get product by id (200 or 404)
+GET {{host}}/api/products/5004
+Accept: {{contentType}}
+
+### Add product (204 or 400)
+POST {{host}}/api/products
+Content-Type: {{contentType}}
+Accept: {{contentType}}
+
+{
+  "categoryId": 1,
+  "name": "New Product From HTTP",
+  "description": "Created via .http file",
+  "price": 12.34,
+  "stockQuantity": 10
+}
+
+### Update product (200 or 404)
+PUT {{host}}/api/products/5004
+Content-Type: {{contentType}}
+Accept: {{contentType}}
+
+{
+  "categoryId": 1,
+  "name": "Updated Name From HTTP",
+  "description": "Updated via .http file",
+  "price": 88.88,
+  "stockQuantity": 99
+}
+
+### Toggle product active status (200 or 404)
+PATCH {{host}}/api/products/toggle/5004
+Accept: {{contentType}}
