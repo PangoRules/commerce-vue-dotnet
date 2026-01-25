@@ -7,8 +7,6 @@ public sealed class PostgresContainerFixture : IAsyncLifetime
     private readonly PostgreSqlContainer _container =
         new PostgreSqlBuilder("postgres:16-alpine")
             .WithDatabase("commerce_itest")
-            .WithUsername("postgres")
-            .WithPassword("postgres")
             .Build();
 
     public string ConnectionString => _container.GetConnectionString();
