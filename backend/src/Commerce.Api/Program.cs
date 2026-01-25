@@ -30,3 +30,5 @@ app
     .MapApiControllers();
 
 app.Run();
+
+public partial class Program { }
