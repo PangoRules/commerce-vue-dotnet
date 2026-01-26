@@ -14,7 +14,7 @@ public static class ApplicationServicesExtensions
     {
         #region Services Registration
         services.AddScoped<IHealthService, HealthService>();
-        services.AddScoped<IProductsService, ProductsService>();
+        services.AddScoped<IProductService, ProductService>();
         services.AddScoped<ICategoryService, CategoryService>();
         #endregion
         #region Repositories Registration

@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using Commerce.Api.Extensions;
+using Commerce.Api.Mappers;
 using Commerce.Services;
+using Commerce.Shared.Enums;
 using Commerce.Shared.Requests;
 using Commerce.Shared.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -14,96 +16,87 @@ namespace Commerce.Api.Controllers;
 [Route("api/[controller]")]
 [Produces("application/json")]
 [ExcludeFromCodeCoverage]
-public class ProductController(IProductsService productsServices) : ControllerBase
+public class ProductController(IProductService productService) : ControllerBase
 {
     /// <summary>
     /// Gets a product by its identifier (with category information).
     /// </summary>
-    /// <param name="productId">The unique identifier of the product to retrieve.</param>
-    /// <returns>The product response if found, otherwise a 404 Not Found response.</returns>
     [HttpGet("{productId:int}")]
     [ProducesResponseType(typeof(ProductResponse), 200)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> GetProductById(int productId)
+    public async Task<IActionResult> GetProductById(int productId, CancellationToken ct)
     {
-        var product = await productsServices.GetProductByIdAsync(productId);
-        if (product is null)
-        {
-            return NotFound();
-        }
-        return Ok(product);
+        var product = await productService.GetProductByIdAsync(productId, ct);
+        return product is not null ? Ok(product) : NotFound();
     }
 
     /// <summary>
     /// Gets all products filtered by query parameters.
     /// </summary>
-    /// <param name="queryParams">The query parameters to filter products.</param>
-    /// <returns>A list of product responses.</returns>
     [HttpGet("")]
     [ProducesResponseType(typeof(List<ProductResponse>), 200)]
     [ProducesResponseType(204)]
-    public async Task<IActionResult> GetAllProducts([FromQuery] GetProductsQueryParams queryParams)
-{
-    var page = await productsServices.GetAllProductsAsync(queryParams);
+    public async Task<IActionResult> GetAllProducts([FromQuery] GetProductsQueryParams queryParams, CancellationToken ct)
+    {
+        var page = await productService.GetAllProductsAsync(queryParams, ct);
 
-    HttpContext.SetPaging(page);
+        HttpContext.SetPaging(page);
 
-    return page.Items.Count > 0 ? Ok(page.Items) : NoContent();
-}
-
+        return page.Items.Count > 0 ? Ok(page.Items) : NoContent();
+    }
 
     /// <summary>
     /// Adds a new product.
     /// </summary>
-    /// <param name="product">The product data to be added.</param>
-    /// <returns>No content if successful, otherwise a 400 Bad Request response.</returns>
     [HttpPost]
-    [ProducesResponseType(204)]
+    [ProducesResponseType(201)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> AddProduct([FromBody] CreateProductRequest product)
+    [ProducesResponseType(404)]
+    [ProducesResponseType(409)]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> AddProduct([FromBody] CreateProductRequest product, CancellationToken ct)
     {
-        var result = await productsServices.AddProductAsync(product);
-        if (!result)
-        {
-            return BadRequest("Failed to add product.");
-        }
-        return NoContent();
+        var (result, productId) = await productService.AddProductAsync(product, ct);
+
+        return this.ToActionResult(
+            result,
+            onSuccess: () => CreatedAtAction(nameof(GetProductById), new { productId }, null)
+        );
     }
 
     /// <summary>
     /// Updates an existing product.
     /// </summary>
-    /// <param name="productId">The unique identifier of the product to update.</param>
-    /// <param name="product">The updated product data.</param>
-    /// <returns>The updated product response if successful, otherwise a 404 Not Found response.</returns>
     [HttpPut("{productId:int}")]
     [ProducesResponseType(typeof(ProductResponse), 200)]
+    [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> UpdateProduct(int productId, [FromBody] UpdateProductRequest product)
+    [ProducesResponseType(409)]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> UpdateProduct(int productId, [FromBody] UpdateProductRequest product, CancellationToken ct)
     {
-        var updatedProduct = await productsServices.UpdateProductAsync(product, productId);
-        if (updatedProduct is null)
-        {
-            return NotFound();
-        }
-        return Ok(updatedProduct);
+        var (result, updated) = await productService.UpdateProductAsync(product, productId, ct);
+
+        if (result == DbResultOption.Success && updated is null)
+            return StatusCode(500, "Update succeeded but no product was returned.");
+
+        return this.ToActionResult(
+            result,
+            onSuccess: () => Ok(updated)
+        );
     }
 
     /// <summary>
     /// Toggles the active status of a product.
     /// </summary>
-    /// <param name="productId">The unique identifier of the product to toggle.</param>
-    /// <returns>No content if successful, otherwise a 404 Not Found response.</returns>
     [HttpPatch("toggle/{productId:int}")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(204)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> ToggleProduct(int productId)
+    [ProducesResponseType(409)]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> ToggleProduct(int productId, CancellationToken ct)
     {
-        var result = await productsServices.ToggleProductAsync(productId);
-        if (!result)
-        {
-            return NotFound();
-        }
-        return Ok();
+        var result = await productService.ToggleProductAsync(productId, ct);
+        return this.ToActionResult(result, onSuccess: NoContent);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Commerce.Repositories.Migrations
 {
     /// <inheritdoc />
+    [ExcludeFromCodeCoverage]
     public partial class AddCategoryHierarchy : Migration
     {
         /// <inheritdoc />

@@ -359,6 +359,7 @@ public class CategoryServiceTests
         // Captured args
         public GetCategoriesQueryParams? LastQueryParams { get; private set; }
         public int? LastGraphCategoryId { get; private set; }
+        public int? LastSimpleCategoryId {get; private set; }
 
         public bool? LastRootsIncludeInactive { get; private set; }
         public int? LastChildrenParentId { get; private set; }
@@ -439,6 +440,12 @@ public class CategoryServiceTests
             LastDetachParentId = parentCategoryId;
             LastDetachChildId = childCategoryId;
             return Task.FromResult(DetachResult);
+        }
+
+        public Task<Category?> GetByIdAsync(int id, CancellationToken ct = default)
+        {
+            LastSimpleCategoryId = id;
+            return Task.FromResult<Category?>(CategoryGraphById);
         }
     }
 }

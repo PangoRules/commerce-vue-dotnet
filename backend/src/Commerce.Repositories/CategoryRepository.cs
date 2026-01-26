@@ -26,6 +26,14 @@ public interface ICategoryRepository
     /// <returns>The category admin details response if found, otherwise null.</returns>
     Task<Category?> GetCategoryGraphByIdAsync(int id, CancellationToken ct = default);
 
+    /// <summary>
+    /// Simple get category by ID.
+    /// </summary>
+    /// <param name="id">The ID of the category to retrieve.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>The category if found, otherwise null.</returns>
+    Task<Category?> GetByIdAsync(int id, CancellationToken ct = default);
+
 
     /// <summary>
     /// Get all root categories (categories without parents).
@@ -135,6 +143,13 @@ public class CategoryRepository(CommerceDbContext context) : ICategoryRepository
             .AsNoTracking()
             .Include(c => c.ParentLinks).ThenInclude(l => l.ParentCategory)
             .Include(c => c.ChildLinks).ThenInclude(l => l.ChildCategory)
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
+    }
+
+    public Task<Category?> GetByIdAsync(int id, CancellationToken ct = default)
+    {
+        return context.Categories
+            .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == id, ct);
     }
 

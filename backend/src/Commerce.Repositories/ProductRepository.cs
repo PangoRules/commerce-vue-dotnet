@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Commerce.Repositories.Context;
 using Commerce.Repositories.Entities;
+using Commerce.Shared.Enums;
 using Commerce.Shared.Requests;
 using Commerce.Shared.Responses;
 using Microsoft.EntityFrameworkCore;
@@ -13,8 +14,9 @@ public interface IProductRepository
     /// Get product by its ID.
     /// </summary>
     /// <param name="productId">The ID of the product to retrieve.</param>
+    /// <param name="ct">The cancellation token.</param>
     /// <returns>The product if found, otherwise null.</returns>
-    public Task<Product?> GetProductByIdAsync(int productId);
+    Task<Product?> GetProductByIdAsync(int productId, CancellationToken ct = default);
 
     /// <summary>
     /// Get all products filtered by query parameters.
@@ -22,37 +24,43 @@ public interface IProductRepository
     /// <param name="queryParams">The query parameters to filter products.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A paged result of products.</returns>
-    public Task<PagedResult<Product>> GetAllProductsAsync(GetProductsQueryParams queryParams, CancellationToken ct = default);
+    Task<PagedResult<Product>> GetAllProductsAsync(GetProductsQueryParams queryParams, CancellationToken ct = default);
 
     /// <summary>
     /// Add a new product.
     /// </summary>
     /// <param name="product">The product request to add.</param>
-    /// <returns>True if the product was added successfully, otherwise false.</returns>
-    public Task<bool> AddProductAsync(CreateProductRequest product);
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>The result of the operation and the new product ID.</returns>
+    Task<(DbResultOption Result, int ProductId)> AddProductAsync(CreateProductRequest product, CancellationToken ct = default);
 
     /// <summary>
     /// Update an existing product.
     /// </summary>
     /// <param name="product">The product request to update.</param>
     /// <param name="productId">The ID of the product to update.</param>
-    /// <returns>The updated product if successful, otherwise null.</returns>
-    public Task<Product?> UpdateProductAsync(UpdateProductRequest product, int productId);
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>The result of the operation and the updated product if successful, otherwise null.</returns>
+    Task<(DbResultOption Result, Product? Product)> UpdateProductAsync(UpdateProductRequest product, int productId, CancellationToken ct = default);
 
     /// <summary>
     /// Toggle the active status of a product.
     /// </summary>
     /// <param name="productId">The ID of the product to toggle.</param>
-    /// <returns>True if the product was toggled successfully, otherwise false.</returns>
-    public Task<bool> ToggleProductAsync(int productId);
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>The result of the operation.</returns>
+    Task<DbResultOption> ToggleProductAsync(int productId, CancellationToken ct = default);
 }
 
 [ExcludeFromCodeCoverage]
 public class ProductRepository(CommerceDbContext context) : IProductRepository
 {
-    public async Task<Product?> GetProductByIdAsync(int productId)
+    public Task<Product?> GetProductByIdAsync(int productId, CancellationToken ct = default)
     {
-        return await context.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == productId);
+        return context.Products
+            .AsNoTracking()
+            .Include(p => p.Category)
+            .FirstOrDefaultAsync(p => p.Id == productId, ct);
     }
 
     public async Task<PagedResult<Product>> GetAllProductsAsync(GetProductsQueryParams queryParams, CancellationToken ct)
@@ -119,37 +127,57 @@ public class ProductRepository(CommerceDbContext context) : IProductRepository
         return ((IOrderedQueryable<Product>)query).ThenBy(p => p.Id);
     }
 
-    public async Task<bool> AddProductAsync(CreateProductRequest product)
+    public async Task<(DbResultOption Result, int ProductId)> AddProductAsync(CreateProductRequest product, CancellationToken ct = default)
     {
         var entity = Product.FromCreateRequest(product);
-        await context.Products.AddAsync(entity);
-        var result = await context.SaveChangesAsync();
-        return result > 0;
+
+        try
+        {
+            await context.Products.AddAsync(entity, ct);
+            await context.SaveChangesAsync(ct);
+            return (DbResultOption.Success, entity.Id);
+        }
+        catch (DbUpdateException)
+        {
+            // FK violation (bad CategoryId) or unique constraint, etc.
+            return (DbResultOption.Conflict, 0);
+        }
     }
 
-    public async Task<Product?> UpdateProductAsync(UpdateProductRequest product, int productId)
+    public async Task<(DbResultOption Result, Product? Product)> UpdateProductAsync(UpdateProductRequest product, int productId, CancellationToken ct = default)
     {
-        var existingProduct = await context.Products.FindAsync(productId);
-        if (existingProduct == null)
-        {
-            return null;
-        }
+        var existing = await context.Products.FirstOrDefaultAsync(p => p.Id == productId, ct);
+        if (existing is null) return (DbResultOption.NotFound, null);
 
-        existingProduct.UpdateProduct(product);
-        var result = await context.SaveChangesAsync();
-        return result > 0 ? existingProduct : null;
+        existing.UpdateProduct(product);
+
+        try
+        {
+            var changed = await context.SaveChangesAsync(ct);
+            return changed > 0
+                ? (DbResultOption.Success, existing)
+                : (DbResultOption.Error, null);
+        }
+        catch (DbUpdateException)
+        {
+            return (DbResultOption.Conflict, null);
+        }
     }
 
-    public async Task<bool> ToggleProductAsync(int productId)
+    public async Task<DbResultOption> ToggleProductAsync(int productId, CancellationToken ct = default)
     {
-        var existingProduct = await context.Products.FindAsync(productId);
-        if (existingProduct == null)
-        {
-            return false;
-        }
+        var existing = await context.Products.FirstOrDefaultAsync(p => p.Id == productId, ct);
+        if (existing is null) return DbResultOption.NotFound;
 
-        existingProduct.ToggleProduct();
-        var result = await context.SaveChangesAsync();
-        return result > 0;
+        existing.ToggleProduct();
+
+        try
+        {
+            return await context.SaveChangesAsync(ct) > 0 ? DbResultOption.Success : DbResultOption.Error;
+        }
+        catch (DbUpdateException)
+        {
+            return DbResultOption.Conflict;
+        }
     }
 }
