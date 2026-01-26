@@ -11,27 +11,30 @@ public class Category
     public string? Description { get; set; }
     public DateTime CreatedAt { get; set; }
     public bool IsActive { get; set; }
+
     public ICollection<Product> Products { get; set; } = [];
 
-    public void ToggleCategory()
-    {
-        this.IsActive = !this.IsActive;
-    }
+    // Graph links:
+    // Parents of this category (incoming edges)
+    public ICollection<CategoryLink> ParentLinks { get; set; } = [];
+
+    // Children of this category (outgoing edges)
+    public ICollection<CategoryLink> ChildLinks { get; set; } = [];
+
+    public void ToggleCategory() => IsActive = !IsActive;
 
     public static Category FromCreateRequest(CreateCategoryRequest request)
-    {
-        return new Category
+        => new()
         {
             Name = request.Name,
             Description = request.Description,
             CreatedAt = DateTime.UtcNow,
             IsActive = true
         };
-    }
 
     public void UpdateCategory(CreateCategoryRequest request)
     {
-        this.Name = request.Name;
-        this.Description = request.Description;
+        Name = request.Name;
+        Description = request.Description;
     }
 }

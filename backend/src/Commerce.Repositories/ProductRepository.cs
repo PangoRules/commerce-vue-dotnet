@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Commerce.Repositories;
 
-public interface IProductsRepository
+public interface IProductRepository
 {
     /// <summary>
     /// Get product by its ID.
@@ -48,7 +48,7 @@ public interface IProductsRepository
 }
 
 [ExcludeFromCodeCoverage]
-public class ProductsRepository(CommerceDbContext context) : IProductsRepository
+public class ProductRepository(CommerceDbContext context) : IProductRepository
 {
     public async Task<Product?> GetProductByIdAsync(int productId)
     {

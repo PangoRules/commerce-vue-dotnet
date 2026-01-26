@@ -42,7 +42,7 @@ public interface IProductsService
     public Task<bool> ToggleProductAsync(int productId);
 }
 
-public class ProductsService(IProductsRepository repository) : IProductsService
+public class ProductsService(IProductRepository repository) : IProductsService
 {
     public async Task<ProductResponse?> GetProductByIdAsync(int productId)
     {

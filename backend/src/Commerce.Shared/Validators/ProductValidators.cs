@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Commerce.Shared.Requests;
 using FluentValidation;
 
 namespace Commerce.Shared.Validators;
 
+[ExcludeFromCodeCoverage]
 public class CreateProductRequestValidator : AbstractValidator<CreateProductRequest>
 {
     public CreateProductRequestValidator()
@@ -22,6 +24,7 @@ public class CreateProductRequestValidator : AbstractValidator<CreateProductRequ
     }
 }
 
+[ExcludeFromCodeCoverage]
 public class GetProductsQueryParamsValidator : AbstractValidator<GetProductsQueryParams>
 {
     public GetProductsQueryParamsValidator()

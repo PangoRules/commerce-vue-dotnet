@@ -18,8 +18,8 @@ public static class ApplicationServicesExtensions
         services.AddScoped<ICategoryService, CategoryService>();
         #endregion
         #region Repositories Registration
-        services.AddScoped<IProductsRepository, ProductsRepository>();
-        services.AddScoped<ICategoriesRepository, CategoriesRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
         #endregion
         #region Validators Registration
         services.AddValidatorsFromAssemblyContaining<GetProductsQueryParams>();

@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Commerce.Shared.Requests;
 using FluentValidation;
 
 namespace Commerce.Shared.Validators;
 
+[ExcludeFromCodeCoverage]
 public class GetCategoriesQueryParamsValidator : AbstractValidator<GetCategoriesQueryParams>
 {
     public GetCategoriesQueryParamsValidator()

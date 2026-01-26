@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Commerce.Shared.Responses;
 
 public interface IPagedResult
@@ -9,6 +11,7 @@ public interface IPagedResult
     int Take { get; }
 }
 
+[ExcludeFromCodeCoverage]
 public sealed record PagedResult<T>(
     IReadOnlyList<T> Items,
     int Page,
