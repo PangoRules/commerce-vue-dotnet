@@ -5,6 +5,7 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    "module": "preserve",
     "moduleResolution": "bundler",
     "types": ["vuetify"]
   }

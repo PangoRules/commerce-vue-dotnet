@@ -26,15 +26,24 @@ export type ApiFail = {
 
 export type ApiResult<T> = ApiOk<T> | ApiFail;
 
+export type QueryValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Array<string | number | boolean>;
+
 export type RequestOptions = {
   method?: HttpMethod;
   headers?: Record<string, string>;
-  query?: Record<string, string | number | boolean | null | undefined>;
+  query?: Record<string, QueryValue>;
   body?: unknown; // will JSON.stringify unless it's FormData/Blob/string
   timeoutMs?: number;
   signal?: AbortSignal;
   // if you want to override baseURL per call
   baseUrl?: string;
+  silent?: boolean;
 };
 
 function buildUrl(
@@ -47,7 +56,11 @@ function buildUrl(
   if (query) {
     for (const [k, v] of Object.entries(query)) {
       if (v === null || v === undefined) continue;
-      url.searchParams.set(k, String(v));
+      if (Array.isArray(v)) {
+        for (const item of v) url.searchParams.append(k, String(item));
+      } else {
+        url.searchParams.set(k, String(v));
+      }
     }
   }
 
@@ -92,6 +105,7 @@ export function createHttpClient(config?: {
   defaultHeaders?: Record<string, string>;
   // allow attaching auth tokens later
   getAuthHeader?: () => string | null;
+  onError?: (err: ApiError) => void;
 }) {
   const baseUrl =
     config?.baseUrl ??
@@ -190,34 +204,50 @@ export function createHttpClient(config?: {
         ? await safeReadJson(res)
         : await safeReadText(res);
 
+      const message =
+        typeof errPayload === "string"
+          ? errPayload
+          : ((errPayload as any)?.message ??
+            (errPayload as any)?.title ??
+            `Request failed (${res.status})`);
+
+      const apiError: ApiError = {
+        kind: "http",
+        message,
+        status: res.status,
+        url,
+        method,
+        requestId,
+        data: errPayload,
+      };
+
+      if (!opts.silent) config?.onError?.(apiError);
+
       return {
         ok: false,
         status: res.status,
         headers: res.headers,
-        error: {
-          kind: "http",
-          message: `Request failed (${res.status})`,
-          status: res.status,
-          url,
-          method,
-          requestId,
-          data: errPayload,
-        },
+        error: apiError,
       };
     } catch (e) {
       window.clearTimeout(timeout);
 
       const isAbort = e instanceof DOMException && e.name === "AbortError";
+
+      const apiError: ApiError = {
+        kind: isAbort ? "timeout" : "network",
+        message: isAbort
+          ? `Request timed out after ${timeoutMs}ms`
+          : "Network error",
+        url,
+        method,
+      };
+
+      if (!opts.silent) config?.onError?.(apiError);
+
       return {
         ok: false,
-        error: {
-          kind: isAbort ? "timeout" : "network",
-          message: isAbort
-            ? `Request timed out after ${timeoutMs}ms`
-            : "Network error",
-          url,
-          method,
-        },
+        error: apiError,
       };
     }
   }
@@ -243,6 +273,13 @@ export function createHttpClient(config?: {
       opts?: Omit<RequestOptions, "method" | "body">,
     ) {
       return request<T>(path, { ...opts, method: "PUT", body });
+    },
+    patch<T = unknown, B = unknown>(
+      path: string,
+      body?: B,
+      opts?: Omit<RequestOptions, "method" | "body">,
+    ) {
+      return request<T>(path, { ...opts, method: "PATCH", body });
     },
     del<T = unknown>(
       path: string,
