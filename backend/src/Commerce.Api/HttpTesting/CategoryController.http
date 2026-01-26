@@ -1,0 +1,117 @@
+@host = http://localhost:5001
+@contentType = application/json
+
+### Get all categories (200 or 204)
+# Response headers (paging):
+#   X-Total-Count: total number of categories matching filters
+#   X-Page: current page number
+#   X-Page-Size: number of items per page
+#   X-Skip: number of skipped records
+#   X-Take: number of taken records
+GET {{host}}/api/category
+Accept: {{contentType}}
+
+### Get all categories – paged
+GET {{host}}/api/category?page=1&pageSize=5
+Accept: {{contentType}}
+
+### Get all categories – active only (explicit)
+GET {{host}}/api/category?isActive=true&page=1&pageSize=10
+Accept: {{contentType}}
+
+### Get all categories – active + inactive (admin)
+# NOTE: your controller comment says admin can pass isActive=null
+# In querystring, you achieve that by omitting isActive entirely.
+# (If you truly need "null", you'll need custom binding; otherwise omit it.)
+GET {{host}}/api/category?page=1&pageSize=20
+Accept: {{contentType}}
+
+### Get all categories – inactive only (admin)
+GET {{host}}/api/category?isActive=false&page=1&pageSize=20
+Accept: {{contentType}}
+
+### Get all categories – search + sort
+GET {{host}}/api/category?searchTerm=cloth&sortDescending=false&page=1&pageSize=10
+Accept: {{contentType}}
+
+### Get admin category details by id (200 or 404)
+# Includes parents + children (Id + Name)
+GET {{host}}/api/category/4
+Accept: {{contentType}}
+
+### Get root categories for navigation (200 or 204)
+GET {{host}}/api/category/roots
+Accept: {{contentType}}
+
+### Get root categories – include inactive (admin) (200 or 204)
+GET {{host}}/api/category/roots?includeInactive=true
+Accept: {{contentType}}
+
+### Get children of a parent category (200 or 204)
+# Example: Clothing(4) -> Men/Women
+GET {{host}}/api/category/4/children
+Accept: {{contentType}}
+
+### Get children of a parent – include inactive (admin) (200 or 204)
+GET {{host}}/api/category/4/children?includeInactive=true
+Accept: {{contentType}}
+
+### Add category as ROOT (201 | 400 | 404 | 409 | 500)
+POST {{host}}/api/category
+Content-Type: {{contentType}}
+Accept: {{contentType}}
+
+{
+  "name": "Garden",
+  "description": "Garden and outdoor supplies",
+  "parentCategoryIds": []
+}
+
+### Add category under ONE parent (201 | 400 | 404 | 409 | 500)
+# Example: Electronics(1) -> Phones
+POST {{host}}/api/category
+Content-Type: {{contentType}}
+Accept: {{contentType}}
+
+{
+  "name": "Phones",
+  "description": "Smartphones and accessories",
+  "parentCategoryIds": [1]
+}
+
+### Add category under MULTIPLE parents (shared node) (201 | 400 | 404 | 409 | 500)
+# Example: Shirts under Men(8) and Women(9)
+POST {{host}}/api/category
+Content-Type: {{contentType}}
+Accept: {{contentType}}
+
+{
+  "name": "Shirts",
+  "description": "Shirts & tops",
+  "parentCategoryIds": [8, 9]
+}
+
+### Update category (204 | 400 | 404 | 409 | 500)
+PUT {{host}}/api/category/10
+Content-Type: {{contentType}}
+Accept: {{contentType}}
+
+{
+  "name": "Shirts",
+  "description": "Shirts, tees, and tops",
+  "parentCategoryIds": null
+}
+
+### Toggle category active status (204 | 404 | 500)
+PATCH {{host}}/api/category/toggle/10
+Accept: {{contentType}}
+
+### Attach child to parent (204 | 400 | 404 | 409 | 500)
+# Example: Clothing(4) -> Shirts(10) (if you want that direct link too)
+POST {{host}}/api/category/4/children/10
+Accept: {{contentType}}
+
+### Detach child from parent (204 | 400 | 404 | 409 | 500)
+# Example: Remove Men(8) -> Shirts(10)
+DELETE {{host}}/api/category/8/children/10
+Accept: {{contentType}}

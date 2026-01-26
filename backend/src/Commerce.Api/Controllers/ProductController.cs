@@ -14,7 +14,7 @@ namespace Commerce.Api.Controllers;
 [Route("api/[controller]")]
 [Produces("application/json")]
 [ExcludeFromCodeCoverage]
-public class ProductsController(IProductsServices productsServices) : ControllerBase
+public class ProductController(IProductsService productsServices) : ControllerBase
 {
     /// <summary>
     /// Gets a product by its identifier (with category information).

@@ -6,7 +6,7 @@ using Commerce.Shared.Responses;
 
 namespace Commerce.UnitTests.Services;
 
-public class ProductsServicesTests
+public class ProductServiceTests
 {
     [Fact]
     public async Task GetProductByIdAsync_WhenRepoReturnsNull_ReturnsNull()
@@ -16,7 +16,7 @@ public class ProductsServicesTests
         {
             ProductById = null
         };
-        var sut = new ProductsServices(repo);
+        var sut = new ProductsService(repo);
 
         // Act
         var result = await sut.GetProductByIdAsync(productId: 123);
@@ -42,7 +42,7 @@ public class ProductsServicesTests
                 IsActive = true
             }
         };
-        var sut = new ProductsServices(repo);
+        var sut = new ProductsService(repo);
 
         // Act
         var result = await sut.GetProductByIdAsync(productId: 10);
@@ -70,7 +70,7 @@ public class ProductsServicesTests
                 new Product { Id = 2, CategoryId = 1, Name = "B", Price = 2m, StockQuantity = 2, IsActive = true },
             }
         };
-        var sut = new ProductsServices(repo);
+        var sut = new ProductsService(repo);
 
         // Act
         var results = await sut.GetAllProductsAsync(new GetProductsQueryParams());
@@ -93,7 +93,7 @@ public class ProductsServicesTests
         {
             AddProductResult = repoResult
         };
-        var sut = new ProductsServices(repo);
+        var sut = new ProductsService(repo);
 
         var request = new CreateProductRequest
         {
@@ -120,7 +120,7 @@ public class ProductsServicesTests
         {
             UpdatedProduct = null
         };
-        var sut = new ProductsServices(repo);
+        var sut = new ProductsService(repo);
 
         // Act
         var result = await sut.UpdateProductAsync(
@@ -148,7 +148,7 @@ public class ProductsServicesTests
                 IsActive = true
             }
         };
-        var sut = new ProductsServices(repo);
+        var sut = new ProductsService(repo);
 
         var request = new UpdateProductRequest
         {
@@ -180,7 +180,7 @@ public class ProductsServicesTests
         {
             ToggleResult = repoResult
         };
-        var sut = new ProductsServices(repo);
+        var sut = new ProductsService(repo);
 
         // Act
         var result = await sut.ToggleProductAsync(productId: 77);
@@ -193,11 +193,10 @@ public class ProductsServicesTests
     /// <summary>
     /// Minimal fake for unit tests
     /// </summary>
-    private sealed class FakeProductsRepository : IProductsRepository
+    private sealed class FakeProductsRepository : IProductRepository
     {
         public Product? ProductById { get; set; }
-        public List<Product> ActiveProducts { get; set; } = new();
-        public List<Product> ActiveProductsByCategory { get; set; } = new();
+        public List<Product> ActiveProducts { get; set; } = [];
 
         public bool AddProductResult { get; set; }
         public bool ToggleResult { get; set; }
@@ -210,9 +209,6 @@ public class ProductsServicesTests
 
         public Task<Product?> GetProductByIdAsync(int productId) =>
             Task.FromResult(ProductById);
-
-        public Task<List<Product>> GetAllActiveProductsByCategoryIdAsync(int categoryId) =>
-            Task.FromResult(ActiveProductsByCategory);
 
         public Task<bool> AddProductAsync(CreateProductRequest product)
         {

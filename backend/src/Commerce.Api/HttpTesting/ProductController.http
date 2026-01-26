@@ -8,28 +8,28 @@
 #   X-Page-Size: number of items per page
 #   X-Skip: number of skipped records
 #   X-Take: number of taken records
-GET {{host}}/api/products
+GET {{host}}/api/product
 Accept: {{contentType}}
 
 ### Get all products – paged
-GET {{host}}/api/products?page=1&pageSize=10
+GET {{host}}/api/product?page=1&pageSize=10
 Accept: {{contentType}}
 
 ### Get all products – active only
-GET {{host}}/api/products?isActive=true&page=1&pageSize=10
+GET {{host}}/api/product?isActive=true&page=1&pageSize=10
 Accept: {{contentType}}
 
 ### Get all products – search + sort
-GET {{host}}/api/products?searchTerm=laptop&sortBy=Name&sortDescending=false&page=1&pageSize=5
+GET {{host}}/api/product?searchTerm=laptop&sortBy=Name&sortDescending=false&page=1&pageSize=5
 Accept: {{contentType}}
 
 
 ### Get product by id (200 or 404)
-GET {{host}}/api/products/3001
+GET {{host}}/api/product/3001
 Accept: {{contentType}}
 
 ### Add product (204 or 400)
-POST {{host}}/api/products
+POST {{host}}/api/product
 Content-Type: {{contentType}}
 Accept: {{contentType}}
 
@@ -42,7 +42,7 @@ Accept: {{contentType}}
 }
 
 ### Update product (200 or 404)
-PUT {{host}}/api/products/5004
+PUT {{host}}/api/product/5004
 Content-Type: {{contentType}}
 Accept: {{contentType}}
 
@@ -55,5 +55,5 @@ Accept: {{contentType}}
 }
 
 ### Toggle product active status (200 or 404)
-PATCH {{host}}/api/products/toggle/5004
+PATCH {{host}}/api/product/toggle/5004
 Accept: {{contentType}}

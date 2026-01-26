@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Requests/" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="FluentValidation" Version="8.3.0" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="8.3.0" />
   </ItemGroup>

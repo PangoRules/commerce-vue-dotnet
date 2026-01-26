@@ -18,7 +18,7 @@ namespace Commerce.IntegrationTests
         [Fact]
         public async Task GetAllProducts_NoParams_Returns200Or204_AndListIf200()
         {
-            var res = await _client.GetAsync("/api/products");
+            var res = await _client.GetAsync("/api/product");
             var body = await res.Content.ReadAsStringAsync();
 
             Assert.True(res.StatusCode is HttpStatusCode.OK or HttpStatusCode.NoContent,
@@ -36,7 +36,7 @@ namespace Commerce.IntegrationTests
         [Fact]
         public async Task GetAllProducts_WithPagination_ReturnsPagedItems_AndPagingHeaders()
         {
-            var res = await _client.GetAsync("/api/products?page=1&pageSize=2");
+            var res = await _client.GetAsync("/api/product?page=1&pageSize=2");
             var body = await res.Content.ReadAsStringAsync();
 
             Assert.True(res.StatusCode is HttpStatusCode.OK or HttpStatusCode.NoContent,
@@ -67,7 +67,7 @@ namespace Commerce.IntegrationTests
         [Fact]
         public async Task GetAllProducts_FilterIsActiveTrue_ReturnsOnlyActive()
         {
-            var res = await _client.GetAsync("/api/products?isActive=true");
+            var res = await _client.GetAsync("/api/product?isActive=true");
             var body = await res.Content.ReadAsStringAsync();
 
             Assert.True(res.StatusCode is HttpStatusCode.OK or HttpStatusCode.NoContent,
@@ -87,7 +87,7 @@ namespace Commerce.IntegrationTests
         {
             const int categoryId = 1;
 
-            var res = await _client.GetAsync($"/api/products?categoryId={categoryId}");
+            var res = await _client.GetAsync($"/api/product?categoryId={categoryId}");
             var body = await res.Content.ReadAsStringAsync();
 
             Assert.True(res.StatusCode is HttpStatusCode.OK or HttpStatusCode.NoContent,
@@ -107,7 +107,7 @@ namespace Commerce.IntegrationTests
         {
             const string term = "laptop"; // adjust to your seed
 
-            var res = await _client.GetAsync($"/api/products?searchTerm={Uri.EscapeDataString(term)}");
+            var res = await _client.GetAsync($"/api/product?searchTerm={Uri.EscapeDataString(term)}");
             var body = await res.Content.ReadAsStringAsync();
 
             Assert.True(res.StatusCode is HttpStatusCode.OK or HttpStatusCode.NoContent,
@@ -128,7 +128,7 @@ namespace Commerce.IntegrationTests
         [Fact]
         public async Task GetAllProducts_SortByNameAscending_IsSorted()
         {
-            var res = await _client.GetAsync("/api/products?sortBy=Name&sortDescending=false&page=1&pageSize=50");
+            var res = await _client.GetAsync("/api/product?sortBy=Name&sortDescending=false&page=1&pageSize=50");
             var body = await res.Content.ReadAsStringAsync();
 
             Assert.True(res.StatusCode is HttpStatusCode.OK or HttpStatusCode.NoContent,
@@ -149,7 +149,7 @@ namespace Commerce.IntegrationTests
         [Fact]
         public async Task GetAllProducts_InvalidPage_Returns400ValidationProblem()
         {
-            var res = await _client.GetAsync("/api/products?page=0&pageSize=10");
+            var res = await _client.GetAsync("/api/product?page=0&pageSize=10");
             var body = await res.Content.ReadAsStringAsync();
 
             Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
@@ -162,7 +162,7 @@ namespace Commerce.IntegrationTests
         [Fact]
         public async Task GetProductById_SeededId_Returns200()
         {
-            var res = await _client.GetAsync("/api/products/1001");
+            var res = await _client.GetAsync("/api/product/1001");
             var body = await res.Content.ReadAsStringAsync();
 
             Assert.True(res.IsSuccessStatusCode, $"Status: {(int)res.StatusCode}\n{body}");
