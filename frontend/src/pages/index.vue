@@ -13,21 +13,28 @@
     <!-- Products -->
     <div class="mt-6">
       <h2>Products</h2>
+      <v-btn color="primary" class="mt-4" @click="createProductBtn">
+        Create Test Product
+      </v-btn>
 
       <!-- Loading -->
-      <v-progress-linear v-if="isListLoading" indeterminate class="mb-2" />
+      <v-progress-linear
+        v-if="isProductListLoading"
+        indeterminate
+        class="mb-2"
+      />
 
       <!-- Error -->
       <v-alert
-        v-else-if="listResult && !listResult.ok"
+        v-else-if="listProductResult && !listProductResult.ok"
         type="error"
         variant="tonal"
       >
-        {{ listResult.error.message }}
+        {{ listProductResult.error.message }}
       </v-alert>
 
       <!-- Success -->
-      <v-list v-else-if="listResult?.ok">
+      <v-list v-else-if="listProductResult?.ok">
         <v-list-item v-for="product in products" :key="product.id">
           <v-list-item-title>
             {{ product.name }}
@@ -51,7 +58,11 @@
 import { useHealthCheck } from "@/composables/useHealthCheck";
 import { computed, onMounted } from "vue";
 import { useProducts } from "@/composables/useProducts";
-import type { ProductResponse } from "@/types/api/products";
+import type {
+  ProductListQuery,
+  ProductRequest,
+  ProductResponse,
+} from "@/types/api/products";
 
 const { result, check } = useHealthCheck();
 
@@ -62,15 +73,46 @@ const statusText = computed(() => {
     : result.value.error.message;
 });
 
-const { loadList, listResult, isListLoading } = useProducts();
+const {
+  loadProductList,
+  listProductResult,
+  isProductListLoading,
+  createProduct,
+  createdProductResult,
+} = useProducts();
 
 const products = computed<ProductResponse[]>(() => {
-  if (!listResult.value?.ok) return [];
-  return Object.values(listResult.value.data);
+  if (!listProductResult.value?.ok) return [];
+  return Object.values(listProductResult.value.data);
 });
+
+const createProductBtn = async () => {
+  const request: ProductRequest = {
+    name: "Test Product",
+    description: "Created from Vue UI",
+    price: 19.99,
+    stockQuantity: 10,
+    categoryId: 1,
+  };
+
+  await createProduct(request);
+
+  if (createdProductResult.value?.ok) {
+    // reload products after create
+    await localLoadList();
+  }
+};
+
+const localLoadList = async () => {
+  const getProductsQuery: ProductListQuery = {
+    pageSize: 50,
+  };
+
+  await loadProductList(getProductsQuery);
+};
 
 onMounted(async () => {
   check();
-  await loadList();
+  await localLoadList();
 });
 </script>

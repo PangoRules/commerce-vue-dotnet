@@ -1,4 +1,5 @@
-import { defineConfig } from "vite";
+/// <reference types="vitest" />
+import { defineConfig } from "vitest/config"; // 👈 change this
 import vue from "@vitejs/plugin-vue";
 import vuetify from "vite-plugin-vuetify";
 import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
@@ -17,6 +18,55 @@ export default defineConfig({
     vue(),
     vuetify({ autoImport: true }),
   ],
+  ssr: {
+    noExternal: ["vuetify"],
+  },
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: ["./src/tests/setup.ts"],
+    include: ["src/**/*.{test,spec}.ts", "src/**/*.{test,spec}.tsx"],
+    css: true,
+    restoreMocks: true,
+    clearMocks: true,
+    mockReset: true,
+    deps: {
+      optimizer: {
+        web: {
+          include: ["vuetify"],
+        },
+      },
+    },
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html", "json-summary"],
+      reportsDirectory: "./coverage",
+
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 80,
+        statements: 80,
+      },
+
+      include: ["src/**/*.{ts,tsx,vue}"],
+
+      exclude: [
+        "src/main.ts",
+        "src/plugins/**",
+        "src/router/**",
+        "src/i18n/**",
+        "src/types/**",
+        "src/tests/**",
+        "**/*.d.ts",
+        "**/*.config.*",
+        "**/vite.config.*",
+        "src/config/**",
+        "src/App.vue",
+        "src/services/apiClient.ts",
+      ],
+    },
+  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

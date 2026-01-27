@@ -19,3 +19,11 @@ export type ProductListQuery = {
 };
 
 export type ProductMap = Record<string, ProductResponse>;
+
+export type ProductRequest = {
+  categoryId: number;
+  name: string;
+  description: string;
+  price: number;
+  stockQuantity: number;
+};

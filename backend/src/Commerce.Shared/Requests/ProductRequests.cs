@@ -12,7 +12,7 @@ public class CreateProductRequest
     public int StockQuantity { get; init; }
 }
 
-
+//TODO: Maybe refactor, this looks extremely like Create, there is space for DRY here
 [ExcludeFromCodeCoverage]
 public class UpdateProductRequest
 {
