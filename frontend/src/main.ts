@@ -1,5 +1,28 @@
-import { createApp } from "vue";
-import App from "./App.vue";
-import { vuetify } from "./plugins/vuetify";
+import { createApp, watch } from "vue";
+import App from "@/App.vue";
+import { pinia } from "@/plugins/pinia";
+import { router } from "@/router/index";
+import { i18n } from "@/i18n/index";
+import { vuetify } from "@/plugins/vuetify";
+import { initNotify } from "@/lib/notify";
 
-createApp(App).use(vuetify).mount("#app");
+const app = createApp(App);
+
+app.use(pinia);
+initNotify(pinia);
+app.use(router);
+app.use(i18n);
+app.use(vuetify);
+app.mount("#app");
+
+const setTitle = () => {
+  document.title = i18n.global.t("app.title");
+};
+
+setTitle();
+
+watch(
+  () => i18n.global.locale,
+  () => setTitle(),
+  { immediate: true },
+);

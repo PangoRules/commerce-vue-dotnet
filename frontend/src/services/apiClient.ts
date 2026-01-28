@@ -1,8 +1,10 @@
 import { createHttpClient } from "@/lib/http";
+import { notifyApiError } from "@/lib/notify";
 
 export const api = createHttpClient({
-  // baseUrl defaults to VITE_API_BASE_URL already
-  defaultHeaders: {
-    Accept: "application/json",
-  },
+  defaultHeaders: { Accept: "application/json" },
+  onError: (err) => notifyApiError(err),
 });
+
+//If you want to suppress a toast for a specific call:
+//await api.get("/api/health", { silent: true });
