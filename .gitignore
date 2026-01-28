@@ -5,6 +5,7 @@
 **/dist/
 **/.vite/
 **/dist-ssr/
+**/coverage/
 
 # Env files
 .env
