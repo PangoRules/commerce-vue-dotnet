@@ -5,7 +5,7 @@ import type {
   ProductListQuery,
   ProductMap,
   ProductRequest,
-} from "@/types/api/products";
+} from "@/types/api/productTypes";
 
 export const productsApi = {
   getProducts(query?: ProductListQuery) {

@@ -5,7 +5,7 @@ import type {
   ProductListQuery,
   ProductMap,
   ProductRequest,
-} from "@/types/api/products";
+} from "@/types/api/productTypes";
 import { productsApi } from "@/services/productsApi";
 
 export function useProducts() {

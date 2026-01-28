@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { productsApi } from "./productsApi";
 import { apiRoutes } from "@/config/apiRoutes";
-import type { ProductRequest } from "@/types/api/products";
+import type { ProductRequest } from "@/types/api/productTypes";
 
 vi.mock("@/services/apiClient", () => ({
   api: {
@@ -13,6 +13,7 @@ vi.mock("@/services/apiClient", () => ({
 }));
 
 import { api } from "@/services/apiClient";
+import { DEFAULT_QUERY } from "@/types/api/sharedApiTypes";
 
 describe("productsApi", () => {
   beforeEach(() => {
@@ -20,10 +21,14 @@ describe("productsApi", () => {
   });
 
   it("getProducts calls api.get with list route + query", async () => {
-    await productsApi.getProducts({ search: "lap", page: 1 });
+    await productsApi.getProducts({
+      searchTerm: "lap",
+      page: 1,
+      ...DEFAULT_QUERY,
+    });
 
     expect(api.get).toHaveBeenCalledWith(apiRoutes.products.list, {
-      query: { search: "lap", page: 1 },
+      query: { searchTerm: "lap", page: 1, ...DEFAULT_QUERY },
     });
   });
 

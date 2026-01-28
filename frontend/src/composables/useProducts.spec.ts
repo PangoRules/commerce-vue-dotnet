@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useProducts } from "./useProducts";
 import type { ApiResult } from "@/lib/http";
-import type { ProductMap, ProductResponse } from "@/types/api/products";
+import type { ProductMap, ProductResponse } from "@/types/api/productTypes";
 
 vi.mock("@/services/productsApi", () => ({
   productsApi: {
@@ -32,9 +32,11 @@ describe("useProducts", () => {
 
     const sut = useProducts();
 
-    await sut.loadProductList({ search: "laptop" });
+    await sut.loadProductList({ searchTerm: "laptop" });
 
-    expect(productsApi.getProducts).toHaveBeenCalledWith({ search: "laptop" });
+    expect(productsApi.getProducts).toHaveBeenCalledWith({
+      searchTerm: "laptop",
+    });
     expect(sut.listProductResult.value?.ok).toBe(true);
     expect(sut.isProductListLoading.value).toBe(false);
   });

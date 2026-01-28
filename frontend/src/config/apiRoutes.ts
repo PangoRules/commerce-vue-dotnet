@@ -1,4 +1,3 @@
-// src/config/apiRoutes.ts
 export const apiRoutes = {
   health: "/health",
 
@@ -15,6 +14,12 @@ export const apiRoutes = {
     byId: (categoryId: number) => `/api/Category/${categoryId}`,
     create: "/api/Category",
     update: (categoryId: number) => `/api/Category/${categoryId}`,
-    // add more as you build them
+    roots: "/api/Category/roots",
+    children: (parentId: number) => `/api/Category/${parentId}/children`,
+    toggle: (categoryId: number) => `/api/Category/toggle/${categoryId}`,
+    attachChild: (parentId: number, childId: number) =>
+      `/api/Category/${parentId}/children/${childId}`,
+    detachChild: (parentId: number, childId: number) =>
+      `/api/Category/${parentId}/children/${childId}`,
   },
 } as const;

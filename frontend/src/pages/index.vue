@@ -62,7 +62,7 @@ import type {
   ProductListQuery,
   ProductRequest,
   ProductResponse,
-} from "@/types/api/products";
+} from "@/types/api/productTypes";
 
 const { result, check } = useHealthCheck();
 

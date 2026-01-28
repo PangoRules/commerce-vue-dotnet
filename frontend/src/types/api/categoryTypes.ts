@@ -1,3 +1,5 @@
+import type { QueryDefaults } from "@/types/api/sharedApiTypes";
+
 export type CategoryResponse = {
   id: number;
   name: string;
@@ -16,4 +18,12 @@ export type CategoryAdminDetailsResponse = {
   isActive: boolean;
   parents: CategoryNameIdPair[];
   children: CategoryNameIdPair[];
+};
+
+export type CategoryListQuery = QueryDefaults;
+
+export type CategoryRequest = {
+  name: string;
+  description: string;
+  parentCategoryIds: number[];
 };

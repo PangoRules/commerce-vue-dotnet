@@ -1,4 +1,5 @@
-import type { CategoryResponse } from "./categories";
+import type { CategoryResponse } from "./categoryTypes";
+import type { QueryDefaults } from "./sharedApiTypes";
 
 export type ProductResponse = {
   id: number;
@@ -11,11 +12,8 @@ export type ProductResponse = {
   category: CategoryResponse | null | undefined;
 };
 
-export type ProductListQuery = {
-  search?: string;
+export type ProductListQuery = QueryDefaults & {
   categoryId?: number;
-  page?: number;
-  pageSize?: number;
 };
 
 export type ProductMap = Record<string, ProductResponse>;
