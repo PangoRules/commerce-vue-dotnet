@@ -8,10 +8,11 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PRODUCTS_DIR="$SCRIPT_DIR/products"
 
-# MinIO configuration (adjust if needed)
+# MinIO configuration
+# Port 9000 = S3 API (for mc), Port 9001 = Web Console (for browser)
 MINIO_ENDPOINT="${MINIO_ENDPOINT:-http://localhost:9000}"
-MINIO_ACCESS_KEY="${MINIO_ACCESS_KEY:-minioadmin}"
-MINIO_SECRET_KEY="${MINIO_SECRET_KEY:-minioadmin}"
+MINIO_ACCESS_KEY="${MINIO_ROOT_USER:-minioadmin}"
+MINIO_SECRET_KEY="${MINIO_ROOT_PASSWORD:-minioadmin123}"
 BUCKET="${MINIO_BUCKET:-commerce-assets}"
 
 echo "=== MinIO Seed Image Uploader ==="
@@ -60,11 +61,14 @@ if command -v mc &> /dev/null; then
 else
     echo "mc CLI not found, using Docker..."
 
+    # Note: minio/mc has 'mc' as entrypoint, so we override with --entrypoint
+    # Also need to use host network to reach localhost:9000
     docker run --rm \
         --network host \
+        --entrypoint /bin/sh \
         -v "$PRODUCTS_DIR:/products:ro" \
         minio/mc:latest \
-        /bin/sh -c "
+        -c "
             mc alias set seedupload $MINIO_ENDPOINT $MINIO_ACCESS_KEY $MINIO_SECRET_KEY --api S3v4 &&
             mc cp --recursive /products/ seedupload/$BUCKET/products/
         "
@@ -74,5 +78,5 @@ else
 fi
 
 echo ""
-echo "Verify at: ${MINIO_ENDPOINT/9000/9001} (MinIO Console)"
+echo "Verify at: http://localhost:9001 (MinIO Console)"
 echo "Or via API: $MINIO_ENDPOINT/$BUCKET/products/"
