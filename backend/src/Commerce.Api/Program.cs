@@ -9,7 +9,8 @@ builder.Services
     .AddApiCors()
     .AddApiDocs()
     .AddPersistence(builder.Configuration)
-    .AddApplicationServices();
+    .AddApplicationServices()
+    .AddStorage(builder.Configuration);
 
 var app = builder.Build();
 

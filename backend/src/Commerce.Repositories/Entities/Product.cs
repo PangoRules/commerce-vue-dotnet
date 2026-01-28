@@ -14,6 +14,11 @@ public class Product
     public bool IsActive { get; set; }
     public Category Category { get; set; } = null!;
 
+    /// <summary>
+    /// Navigation property to the product's images.
+    /// </summary>
+    public ICollection<ProductImage> Images { get; set; } = [];
+
     public void ToggleProduct()
     {
         this.IsActive = !this.IsActive;

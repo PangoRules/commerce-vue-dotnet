@@ -10,6 +10,7 @@ public class CommerceDbContext(DbContextOptions<CommerceDbContext> options) : Db
     //DBSets go here later
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
+    public DbSet<ProductImage> ProductImages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
