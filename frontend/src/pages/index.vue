@@ -1,118 +1,93 @@
-<template>
-  <div>
-    <h1>Vue 3 + Vite + Vuetify ✅</h1>
-
-    <v-alert type="success" variant="tonal" class="mt-4">
-      Frontend scaffold is running.
-    </v-alert>
-
-    <v-alert type="info" class="mt-2">
-      {{ statusText }}
-    </v-alert>
-
-    <!-- Products -->
-    <div class="mt-6">
-      <h2>Products</h2>
-      <v-btn color="primary" class="mt-4" @click="createProductBtn">
-        Create Test Product
-      </v-btn>
-
-      <!-- Loading -->
-      <v-progress-linear
-        v-if="isProductListLoading"
-        indeterminate
-        class="mb-2"
-      />
-
-      <!-- Error -->
-      <v-alert
-        v-else-if="listProductResult && !listProductResult.ok"
-        type="error"
-        variant="tonal"
-      >
-        {{ listProductResult.error.message }}
-      </v-alert>
-
-      <!-- Success -->
-      <v-list v-else-if="listProductResult?.ok">
-        <v-list-item v-for="product in products" :key="product.id">
-          <v-list-item-title>
-            {{ product.name }}
-          </v-list-item-title>
-
-          <v-list-item-subtitle>
-            ${{ product.price }} · Stock: {{ product.stockQuantity }}
-          </v-list-item-subtitle>
-        </v-list-item>
-      </v-list>
-
-      <!-- Empty -->
-      <v-alert v-else type="warning" variant="tonal">
-        No products found
-      </v-alert>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { useHealthCheck } from "@/composables/useHealthCheck";
 import { computed, onMounted } from "vue";
-import { useProducts } from "@/composables/useProducts";
-import type {
-  ProductListQuery,
-  ProductRequest,
-  ProductResponse,
-} from "@/types/api/productTypes";
+import { useCategories } from "@/composables/useCategories";
+import type { CategoryResponse } from "@/types/api/categoryTypes";
+import type { ProductResponse } from "@/types/api/productTypes";
+import { ProductCategorySection } from "@/components/products";
+import { LoadingSpinner, EmptyState } from "@/components/shared";
 
-const { result, check } = useHealthCheck();
+const { loadRoots, rootsResult, isRootsLoading } = useCategories();
 
-const statusText = computed(() => {
-  if (!result.value) return "not checked";
-  return result.value.ok
-    ? result.value.data.status
-    : result.value.error.message;
+const categories = computed<CategoryResponse[]>(() => {
+  if (!rootsResult.value?.ok) return [];
+  return rootsResult.value.data;
 });
 
-const {
-  loadProductList,
-  listProductResult,
-  isProductListLoading,
-  createProduct,
-  createdProductResult,
-} = useProducts();
+const hasCategories = computed(() => categories.value.length > 0);
+const isLoading = computed(() => isRootsLoading.value);
+const hasError = computed(() => rootsResult.value && !rootsResult.value.ok);
 
-const products = computed<ProductResponse[]>(() => {
-  if (!listProductResult.value?.ok) return [];
-  return Object.values(listProductResult.value.data);
-});
-
-const createProductBtn = async () => {
-  const request: ProductRequest = {
-    name: "Test Product",
-    description: "Created from Vue UI",
-    price: 19.99,
-    stockQuantity: 10,
-    categoryId: 1,
-  };
-
-  await createProduct(request);
-
-  if (createdProductResult.value?.ok) {
-    // reload products after create
-    await localLoadList();
-  }
+const handleAddToCart = (product: ProductResponse) => {
+  // TODO: Implement cart functionality
+  console.log("Add to cart:", product);
 };
 
-const localLoadList = async () => {
-  const getProductsQuery: ProductListQuery = {
-    pageSize: 50,
-  };
-
-  await loadProductList(getProductsQuery);
-};
-
-onMounted(async () => {
-  check();
-  await localLoadList();
+onMounted(() => {
+  loadRoots();
 });
 </script>
+
+<template>
+  <v-container class="py-8">
+    <!-- Hero Section -->
+    <section class="hero-section text-center mb-12">
+      <h1 class="text-h3 text-md-h2 font-weight-bold mb-4">
+        Welcome to Commerce
+      </h1>
+      <p class="text-h6 text-medium-emphasis mx-auto" style="max-width: 600px">
+        Discover amazing products across all categories.
+        Quality items at great prices.
+      </p>
+    </section>
+
+    <!-- Loading State -->
+    <LoadingSpinner v-if="isLoading" text="Loading categories..." />
+
+    <!-- Error State -->
+    <v-alert v-else-if="hasError" type="error" variant="tonal" class="my-8">
+      <template #title>Failed to load categories</template>
+      <template #text>
+        {{ rootsResult?.ok === false ? rootsResult.error.message : 'Unknown error' }}
+      </template>
+      <template #append>
+        <v-btn variant="text" @click="loadRoots()">
+          Retry
+        </v-btn>
+      </template>
+    </v-alert>
+
+    <!-- Empty State -->
+    <EmptyState
+      v-else-if="!hasCategories"
+      title="No categories yet"
+      description="Check back later for amazing products!"
+      icon="mdi-store-outline"
+    />
+
+    <!-- Category Sections -->
+    <template v-else>
+      <ProductCategorySection
+        v-for="category in categories"
+        :key="category.id"
+        :category="category"
+        :limit="4"
+        @add-to-cart="handleAddToCart"
+      />
+    </template>
+
+    <!-- Footer CTA -->
+    <section v-if="hasCategories" class="text-center mt-12 py-8">
+      <h2 class="text-h5 mb-4">Can't find what you're looking for?</h2>
+      <v-btn color="primary" size="large" to="/products">
+        Browse All Products
+        <v-icon end icon="mdi-arrow-right" />
+      </v-btn>
+    </section>
+  </v-container>
+</template>
+
+<style scoped>
+.hero-section {
+  padding: 2rem 0;
+}
+</style>

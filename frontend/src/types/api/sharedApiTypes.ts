@@ -10,6 +10,7 @@ export type QueryDefaults = {
   pageSize?: number;
   searchTerm?: string;
   sortDescending?: boolean;
+  isActive?: boolean;
 };
 
 export const DEFAULT_QUERY: Required<Pick<QueryDefaults, "sortDescending">> = {
