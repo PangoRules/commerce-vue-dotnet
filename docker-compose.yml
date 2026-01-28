@@ -1,7 +1,6 @@
-version: "3.9"
-
 services:
   postgres:
+    profiles: ["infra"]
     image: postgres:16-alpine
     container_name: commerce-postgres
     environment:
@@ -21,6 +20,7 @@ services:
       - commerce-net
 
   backend:
+    profiles: ["app"]
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -44,11 +44,14 @@ services:
       postgres:
         condition: service_healthy
       minio:
-        condition: service_healthy
+        condition: service_started
+      minio-init:
+        condition: service_completed_successfully
     networks:
       - commerce-net
 
   frontend:
+    profiles: ["app"]
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -64,6 +67,7 @@ services:
       - commerce-net
 
   minio:
+    profiles: ["infra"]
     image: minio/minio:latest
     container_name: commerce-minio
     command: server /data --console-address ":9001"
@@ -75,27 +79,21 @@ services:
       - "9001:9001"
     volumes:
       - commerce_minio_data:/data
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "wget -qO- http://localhost:9000/minio/health/live > /dev/null 2>&1 || exit 1",
-        ]
-      interval: 5s
-      timeout: 3s
-      retries: 20
     networks:
       - commerce-net
 
   minio-init:
+    profiles: ["infra"]
     image: minio/mc:latest
     container_name: commerce-minio-init
     depends_on:
       minio:
-        condition: service_healthy
+        condition: service_started
     entrypoint: >
       /bin/sh -c "
-      mc alias set local http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} &&
+      until mc alias set local http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}; do
+        echo 'Waiting for MinIO...'; sleep 2;
+      done &&
       mc mb -p local/${MINIO_BUCKET} || true &&
       mc anonymous set download local/${MINIO_BUCKET} || true
       "

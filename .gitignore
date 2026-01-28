@@ -44,6 +44,9 @@ lerna-debug.log*
 .vscode/*
 !.vscode/extensions.json
 .idea/
+commerce-vue-dotnet.code-workspace
+commerce-vue-dotnet.codeBackend-workspace.code-workspace
+.claude-code.json
 
 # =====================
 # OS
