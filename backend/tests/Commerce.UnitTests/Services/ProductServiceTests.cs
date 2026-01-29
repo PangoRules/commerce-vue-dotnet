@@ -14,8 +14,9 @@ public class ProductServiceTests
     {
         var productsRepo = new FakeProductsRepository { ProductById = null };
         var categoriesRepo = new FakeCategoryRepository();
+        var imagesRepo = new FakeProductImageRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
         var result = await sut.GetProductByIdAsync(productId: 123);
 
@@ -40,8 +41,9 @@ public class ProductServiceTests
             }
         };
         var categoriesRepo = new FakeCategoryRepository();
+        var imagesRepo = new FakeProductImageRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
         var result = await sut.GetProductByIdAsync(productId: 10);
 
@@ -71,8 +73,9 @@ public class ProductServiceTests
                 TotalCount: 2)
         };
         var categoriesRepo = new FakeCategoryRepository();
+        var imagesRepo = new FakeProductImageRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
         var queryParams = new GetProductsQueryParams { Page = 1, PageSize = 10 };
 
         var results = await sut.GetAllProductsAsync(queryParams);
@@ -95,8 +98,9 @@ public class ProductServiceTests
     {
         var productsRepo = new FakeProductsRepository();
         var categoriesRepo = new FakeCategoryRepository { CategoryById = null };
+        var imagesRepo = new FakeProductImageRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
         var request = new CreateProductRequest
         {
@@ -124,8 +128,9 @@ public class ProductServiceTests
         {
             CategoryById = new Category { Id = 1, Name = "Cat", IsActive = false }
         };
+        var imagesRepo = new FakeProductImageRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
         var request = new CreateProductRequest
         {
@@ -154,8 +159,9 @@ public class ProductServiceTests
         {
             CategoryById = new Category { Id = 1, Name = "Cat", IsActive = true }
         };
+        var imagesRepo = new FakeProductImageRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
         var request = new CreateProductRequest
         {
@@ -179,8 +185,9 @@ public class ProductServiceTests
     {
         var productsRepo = new FakeProductsRepository();
         var categoriesRepo = new FakeCategoryRepository { CategoryById = null };
+        var imagesRepo = new FakeProductImageRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
         var request = new UpdateProductRequest
         {
@@ -206,8 +213,9 @@ public class ProductServiceTests
         {
             CategoryById = new Category { Id = 2, Name = "Cat", IsActive = false }
         };
+        var imagesRepo = new FakeProductImageRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
         var request = new UpdateProductRequest
         {
@@ -236,8 +244,9 @@ public class ProductServiceTests
         {
             CategoryById = new Category { Id = 2, Name = "Cat", IsActive = true }
         };
+        var imagesRepo = new FakeProductImageRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
         var request = new UpdateProductRequest
         {
@@ -274,8 +283,9 @@ public class ProductServiceTests
         {
             CategoryById = new Category { Id = 2, Name = "Cat", IsActive = true }
         };
+        var imagesRepo = new FakeProductImageRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
         var request = new UpdateProductRequest
         {
@@ -302,8 +312,9 @@ public class ProductServiceTests
     {
         var productsRepo = new FakeProductsRepository { ToggleResult = DbResultOption.Success };
         var categoriesRepo = new FakeCategoryRepository();
+        var imagesRepo = new FakeProductImageRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
         var result = await sut.ToggleProductAsync(productId: 77);
 
@@ -406,5 +417,37 @@ public class ProductServiceTests
 
         public Task<DbResultOption> DetachCategoryAsync(int parentCategoryId, int childCategoryId, CancellationToken ct = default)
             => throw new NotImplementedException();
+    }
+
+    private sealed class FakeProductImageRepository : IProductImageRepository
+    {
+        public List<ProductImage> Images { get; set; } = [];
+
+        public Task<ProductImage?> GetByIdAsync(Guid imageId, CancellationToken ct = default)
+            => Task.FromResult(Images.FirstOrDefault(i => i.Id == imageId));
+
+        public Task<List<ProductImage>> GetByProductIdAsync(int productId, CancellationToken ct = default)
+            => Task.FromResult(Images.Where(i => i.ProductId == productId).ToList());
+
+        public Task<List<ProductImage>> GetByProductsIdsAsync(IEnumerable<int> productIds, CancellationToken ct = default)
+            => Task.FromResult(Images.Where(i => productIds.Contains(i.ProductId)).ToList());
+
+        public Task<ProductImage?> GetPrimaryByProductIdAsync(int productId, CancellationToken ct = default)
+            => Task.FromResult(Images.FirstOrDefault(i => i.ProductId == productId && i.IsPrimary));
+
+        public Task<ProductImage> AddAsync(ProductImage image, CancellationToken ct = default)
+            => Task.FromResult(image);
+
+        public Task<bool> DeleteAsync(Guid imageId, CancellationToken ct = default)
+            => Task.FromResult(true);
+
+        public Task<bool> SetPrimaryAsync(Guid imageId, CancellationToken ct = default)
+            => Task.FromResult(true);
+
+        public Task<bool> UpdateDisplayOrderAsync(int productId, IList<Guid> orderedImageIds, CancellationToken ct = default)
+            => Task.FromResult(true);
+
+        public Task<int> GetCountByProductIdAsync(int productId, CancellationToken ct = default)
+            => Task.FromResult(Images.Count(i => i.ProductId == productId));
     }
 }

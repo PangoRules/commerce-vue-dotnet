@@ -27,6 +27,14 @@ public interface IProductImageRepository
     Task<List<ProductImage>> GetByProductIdAsync(int productId, CancellationToken ct = default);
 
     /// <summary>
+    /// Gets all images for specific products, ordered by display order.
+    /// </summary>
+    /// <param name="productIds">The ids of the products</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of product images ordered by DisplayOrder</returns>
+    Task<List<ProductImage>> GetByProductsIdsAsync(IEnumerable<int> productIds, CancellationToken ct = default);
+
+    /// <summary>
     /// Gets the primary image for a product.
     /// </summary>
     /// <param name="productId">The product ID.</param>
@@ -94,6 +102,17 @@ public class ProductImageRepository(CommerceDbContext context) : IProductImageRe
         return context.ProductImages
             .AsNoTracking()
             .Where(pi => pi.ProductId == productId)
+            .OrderBy(pi => pi.DisplayOrder)
+            .ThenBy(pi => pi.UploadedAt)
+            .ToListAsync(ct);
+    }
+
+    /// <inheritdoc/>
+    public Task<List<ProductImage>> GetByProductsIdsAsync(IEnumerable<int> productIds, CancellationToken ct = default)
+    {
+        return context.ProductImages
+            .AsNoTracking()
+            .Where(pi => productIds.Contains(pi.ProductId))
             .OrderBy(pi => pi.DisplayOrder)
             .ThenBy(pi => pi.UploadedAt)
             .ToListAsync(ct);

@@ -376,6 +376,9 @@ public class ProductImageServiceTests
         public Task<List<ProductImage>> GetByProductIdAsync(int productId, CancellationToken ct = default)
             => Task.FromResult(Images);
 
+        public Task<List<ProductImage>> GetByProductsIdsAsync(IEnumerable<int> productIds, CancellationToken ct = default)
+            => Task.FromResult(Images.Where(i => productIds.Contains(i.ProductId)).ToList());
+
         public Task<ProductImage?> GetPrimaryByProductIdAsync(int productId, CancellationToken ct = default)
             => Task.FromResult(Images.FirstOrDefault(i => i.IsPrimary));
 

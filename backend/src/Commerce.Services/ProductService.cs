@@ -51,18 +51,32 @@ public interface IProductService
 
 public class ProductService(
     IProductRepository productsRepo,
-    ICategoryRepository categoriesRepo
+    ICategoryRepository categoriesRepo,
+    IProductImageRepository imagesRepo
 ) : IProductService
 {
     public async Task<ProductResponse?> GetProductByIdAsync(int productId, CancellationToken ct = default)
     {
         var product = await productsRepo.GetProductByIdAsync(productId, ct);
-        return product is null ? null : Mappers.ProductMapper.ToResponse(product);
+        if (product is null) return null;
+
+        // Fetch images for this product
+        product.Images = await imagesRepo.GetByProductIdAsync(productId, ct);
+
+        return Mappers.ProductMapper.ToResponse(product);
     }
 
     public async Task<PagedResult<ProductResponse>> GetAllProductsAsync(GetProductsQueryParams queryParams, CancellationToken ct = default)
     {
         var paged = await productsRepo.GetAllProductsAsync(queryParams, ct);
+
+        var productIds = paged.Items.Select(p => p.Id);
+        var images = await imagesRepo.GetByProductsIdsAsync(productIds, ct);
+
+        foreach (var product in paged.Items)
+        {
+            product.Images = [.. images.Where(i => i.ProductId == product.Id)];
+        }
 
         return new PagedResult<ProductResponse>(
             [.. paged.Items.Select(Mappers.ProductMapper.ToResponse)],

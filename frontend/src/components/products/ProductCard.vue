@@ -14,6 +14,8 @@ const emit = defineEmits<{
   addToCart: [product: ProductResponse];
 }>();
 
+const images = computed(() => props.product.images ?? []);
+
 // Get primary image URL or first image or placeholder
 const imageUrl = computed(() => {
   // Check for primaryImageUrl first
@@ -21,14 +23,13 @@ const imageUrl = computed(() => {
     return props.product.primaryImageUrl;
   }
   // Then check images array for primary
-  const images = props.product.images ?? [];
-  const primaryImage = images.find((i) => i.isPrimary);
+  const primaryImage = images.value.find((i) => i.isPrimary);
   if (primaryImage) {
     return primaryImage.url;
   }
   // Then use first image if available
-  if (images.length > 0 && images[0]) {
-    return images[0].url;
+  if (images.value.length > 0 && images.value[0]) {
+    return images.value[0].url;
   }
   // Fallback to placeholder
   return "https://placehold.co/400x400/e2e8f0/64748b?text=No+Image";
@@ -45,19 +46,53 @@ const handleAddToCart = (e: Event) => {
 </script>
 
 <template>
-  <v-card
-    :to="`/products/${product.id}`"
-    hover
-    class="product-card h-100 d-flex flex-column"
-  >
+  <v-card hover class="product-card h-100 d-flex flex-column">
     <!-- Image -->
     <div class="position-relative">
-      <v-img :src="imageUrl" aspect-ratio="1" cover class="bg-grey-lighten-4">
+      <v-carousel
+        v-if="images.length > 1"
+        hide-delimiters
+        height="100%"
+        show-arrows="hover"
+      >
+        <v-carousel-item v-for="(img, i) in images" :key="i">
+          <v-img
+            :src="img.url"
+            aspect-ratio="1"
+            cover
+            class="bg-grey-lighten-4"
+          >
+            <template #placeholder>
+              <div class="d-flex align-center justify-center fill-height">
+                <v-progress-circular indeterminate color="grey-lighten-2" />
+              </div>
+            </template>
+
+            <template #error>
+              <div
+                class="d-flex align-center justify-center fill-height bg-grey-lighten-3"
+              >
+                <v-icon icon="mdi-image-off" size="48" color="grey-lighten-1" />
+              </div>
+            </template>
+          </v-img>
+        </v-carousel-item>
+      </v-carousel>
+
+      <!-- Fallback: single image -->
+      <v-img
+        v-else
+        :src="images[0]?.url"
+        aspect-ratio="1"
+        cover
+        class="bg-grey-lighten-4"
+      >
         <template #placeholder>
           <div class="d-flex align-center justify-center fill-height">
             <v-progress-circular indeterminate color="grey-lighten-2" />
           </div>
         </template>
+
         <template #error>
           <div
             class="d-flex align-center justify-center fill-height bg-grey-lighten-3"

@@ -22,6 +22,19 @@ public static class ProductMapper
                     Name = product.Category.Name,
                     Description = product.Category.Description
                 }
-                : null
+                : null,
+            Images = ProductImageMapper.ToResponseList(product.Images),
+            PrimaryImageUrl = GetPrimaryImageUrl(product.Images)
         };
+
+    private static string? GetPrimaryImageUrl(ICollection<ProductImage> images)
+    {
+        if (images == null || images.Count == 0) return null;
+
+        // Find primary image, or fall back to first by DisplayOrder
+        var primary = images.FirstOrDefault(i => i.IsPrimary)
+                      ?? images.OrderBy(i => i.DisplayOrder).First();
+
+        return $"/api/productimage/{primary.Id}";
+    }
 }

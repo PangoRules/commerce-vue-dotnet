@@ -51,6 +51,8 @@ describe("useProducts", () => {
       stockQuantity: 5,
       isActive: true,
       category: null,
+      images: [],
+      primaryImageUrl: null,
     };
     (
       productsApi.getProductById as unknown as ReturnType<typeof vi.fn>
@@ -97,6 +99,8 @@ describe("useProducts", () => {
       stockQuantity: 3,
       isActive: true,
       category: null,
+      images: [],
+      primaryImageUrl: null,
     };
     (
       productsApi.putProduct as unknown as ReturnType<typeof vi.fn>
