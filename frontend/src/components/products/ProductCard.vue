@@ -16,25 +16,6 @@ const emit = defineEmits<{
 
 const images = computed(() => props.product.images ?? []);
 
-// Get primary image URL or first image or placeholder
-const imageUrl = computed(() => {
-  // Check for primaryImageUrl first
-  if (props.product.primaryImageUrl) {
-    return props.product.primaryImageUrl;
-  }
-  // Then check images array for primary
-  const primaryImage = images.value.find((i) => i.isPrimary);
-  if (primaryImage) {
-    return primaryImage.url;
-  }
-  // Then use first image if available
-  if (images.value.length > 0 && images.value[0]) {
-    return images.value[0].url;
-  }
-  // Fallback to placeholder
-  return "https://placehold.co/400x400/e2e8f0/64748b?text=No+Image";
-});
-
 const isLowStock = computed(() => props.product.stockQuantity <= 5);
 const isOutOfStock = computed(() => props.product.stockQuantity === 0);
 
