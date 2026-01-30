@@ -1,4 +1,4 @@
-# Commerce Vue.NET
+# Commerce App — Vue 3 + .NET 8 (Dockerized Development Environment) EDIT
 
 A full-stack e-commerce application built with Vue 3 and .NET 8, containerized with Docker.
 
