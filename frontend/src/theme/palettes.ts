@@ -1,6 +1,12 @@
+export interface Palette {
+  primary: string;
+  secondary: string;
+  accent: string;
+}
+
 export type PaletteName = "meadow" | "sprinkles";
 
-export const palettes = {
+export const palettes: Record<PaletteName, Palette> = {
   meadow: {
     primary: "#2F855A",
     secondary: "#68D391",

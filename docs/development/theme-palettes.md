@@ -1,14 +1,14 @@
 # Configurable Theme Palettes (Light/Dark) - Current Implementation
 
 This document describes how theme palettes are implemented in this codebase
-(today) and where the related pieces live. It is descriptive, not a step-by-step
-recipe.
+and where the related pieces live.
 
 ## Files and responsibilities
 
 - `frontend/src/theme/palettes.ts`
   - Defines the semantic palette list and color tokens.
   - Current palettes: `meadow`, `sprinkles`.
+  - Exports `Palette` interface and `PaletteName` type.
 - `frontend/src/theme/themes.ts`
   - Builds Vuetify theme objects for light/dark variants.
   - Adds shared surface/background and status colors.
@@ -19,8 +19,8 @@ recipe.
 - `frontend/src/stores/theme.ts`
   - Persists user-selected theme name in `localStorage`.
   - Storage key: `app.theme`.
-- `frontend/src/lib/theme.ts`
-  - Helper to sync the store selection into Vuetify.
+- `frontend/src/App.vue`
+  - Watches the theme store and syncs changes to Vuetify.
 
 ## Palette definitions
 
@@ -31,7 +31,8 @@ palette:
 - `secondary`
 - `accent`
 
-Palettes are typed with `PaletteName` and referenced by the theme builder.
+Palettes are typed with `PaletteName` and the `Palette` interface ensures
+type safety for all palette definitions.
 
 ## Theme construction
 
@@ -67,29 +68,26 @@ The exported `ThemeName` type is a union of those keys.
 under `app.theme`. The store initializes from `localStorage` and defaults to
 `meadow-light` when no value is present.
 
-## Sync helper
+## Theme sync
 
-`frontend/src/lib/theme.ts` provides `syncThemeToVuetify()`, which applies the
-stored theme to `theme.global.name.value`. This helper currently exists but is
-not invoked during app startup.
+`frontend/src/App.vue` uses a Vue watcher with `immediate: true` to sync the
+theme store value to Vuetify's `theme.global.name.value`. This ensures:
+
+1. The saved theme is applied on initial load
+2. Any subsequent theme changes are reflected immediately
 
 ## Current behavior summary
 
 - Vuetify loads with `meadow-light` by default.
-- The theme store can persist a selected theme.
-- The persisted theme does not yet get applied automatically on startup because
-  `syncThemeToVuetify()` is not called from `frontend/src/main.ts` (or elsewhere).
+- The theme store persists the selected theme to localStorage.
+- On app startup, the watcher in App.vue applies the stored theme.
+- Theme changes via the store are automatically synced to Vuetify.
 
 ## Notes for future updates
 
 If you add a new palette:
 
-- Add a palette object in `frontend/src/theme/palettes.ts`.
-- Add light/dark theme entries in `frontend/src/theme/themes.ts`.
-- Optionally update any UI that allows selection.
-
-If you want the saved theme to apply on load:
-
-- Call `syncThemeToVuetify()` after `app.use(vuetify)` and `app.use(pinia)`.
-- Or wire a `watch` in `frontend/src/main.ts` to keep Vuetify in sync with the
-  store.
+1. Add a palette object in `frontend/src/theme/palettes.ts`.
+2. Add the palette name to the `PaletteName` type union.
+3. Add light/dark theme entries in `frontend/src/theme/themes.ts`.
+4. Optionally update any UI that allows theme selection.
