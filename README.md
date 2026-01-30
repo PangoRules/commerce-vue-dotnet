@@ -1,4 +1,4 @@
-# Commerce App — Vue 3 + .NET 8 (Dockerized Development Environment)
+# Commerce App — Vue 3 + .NET 8 (Dockerized Development Environment) EDIT
 
 This repository contains a Docker-based local development environment composed of a Vue 3 frontend, an ASP.NET Core backend, and a PostgreSQL database. The goal is to allow developers to spin up the full stack—or individual services—with minimal setup using Docker and Docker Compose.
 
