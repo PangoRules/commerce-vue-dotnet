@@ -2,11 +2,11 @@
 
 ## Quick Reference
 
-| Component | Technology | Port |
-|-----------|------------|------|
-| Backend API | .NET 8 (ASP.NET Core) | 8080 |
-| Frontend | Vue 3 + Vuetify 3 | 5173 |
-| Database | PostgreSQL 16 | 5432 |
+| Component      | Technology            | Port                       |
+| -------------- | --------------------- | -------------------------- |
+| Backend API    | .NET 8 (ASP.NET Core) | 8080                       |
+| Frontend       | Vue 3 + Vuetify 3     | 5173                       |
+| Database       | PostgreSQL 16         | 5432                       |
 | Object Storage | MinIO (S3-compatible) | 9000 (API), 9001 (Console) |
 
 ## Essential Commands
@@ -57,21 +57,28 @@ commerce-vue-dotnet/
 ## Key Patterns
 
 ### Backend: Result Pattern
+
 Services return strongly-typed results. Controllers map to HTTP status codes.
 See: `backend/src/Commerce.Services/Interfaces/`
 
 ### Frontend: ApiResult Pattern
+
 ```typescript
-type ApiResult<T> = { success: true; data: T } | { success: false; error: string }
+type ApiResult<T> =
+  | { success: true; data: T }
+  | { success: false; error: string };
 ```
+
 All API services return `ApiResult<T>` for consistent error handling.
 See: `frontend/src/types/api/`
 
 ### Frontend: Composables Pattern
+
 ```typescript
 // Composables wrap API calls with reactive state
-const { products, loading, error, fetchProducts } = useProducts()
+const { products, loading, error, fetchProducts } = useProducts();
 ```
+
 See: `frontend/src/composables/`
 
 ## Code Quality Standards
@@ -80,6 +87,7 @@ See: `frontend/src/composables/`
 - **Testability**: Keep code in small, testable units
 - **Coverage targets**: 75%+ for both UI (Vitest) and Backend (xUnit)
 - **Scalability**: Follow established patterns for easy extension
+  > DO NOT use exact paths. @ has been configured to act as a relative path.
 
 ## Git Workflow
 
@@ -91,6 +99,7 @@ See: `frontend/src/composables/`
 ## Current Status
 
 ### Implemented ✓
+
 - Product CRUD with images (MinIO storage)
 - Category management with hierarchical links
 - Product listing page with grid/list views
@@ -100,6 +109,7 @@ See: `frontend/src/composables/`
 - i18n support (English, Spanish)
 
 ### TODO
+
 - User authentication and authorization
 - Shopping cart functionality
 - Order management
@@ -108,17 +118,17 @@ See: `frontend/src/composables/`
 
 ## Documentation Index
 
-| Area | File | Purpose |
-|------|------|---------|
-| Hub | [docs/README.md](docs/README.md) | Documentation navigation |
-| Architecture | [docs/architecture/overview.md](docs/architecture/overview.md) | System design, data flow |
-| Decisions | [docs/architecture/decisions/](docs/architecture/decisions/) | ADR log |
-| Getting Started | [docs/development/getting-started.md](docs/development/getting-started.md) | Setup guide |
-| Workflows | [docs/development/workflows.md](docs/development/workflows.md) | Feature development |
-| Testing | [docs/development/testing.md](docs/development/testing.md) | Test strategy |
-| API | [docs/api/conventions.md](docs/api/conventions.md) | Endpoint patterns |
-| Database | [docs/data/database.md](docs/data/database.md) | Schema, migrations |
-| Security | [docs/security/threat-model-lite.md](docs/security/threat-model-lite.md) | Security considerations |
+| Area            | File                                                                       | Purpose                  |
+| --------------- | -------------------------------------------------------------------------- | ------------------------ |
+| Hub             | [docs/README.md](docs/README.md)                                           | Documentation navigation |
+| Architecture    | [docs/architecture/overview.md](docs/architecture/overview.md)             | System design, data flow |
+| Decisions       | [docs/architecture/decisions/](docs/architecture/decisions/)               | ADR log                  |
+| Getting Started | [docs/development/getting-started.md](docs/development/getting-started.md) | Setup guide              |
+| Workflows       | [docs/development/workflows.md](docs/development/workflows.md)             | Feature development      |
+| Testing         | [docs/development/testing.md](docs/development/testing.md)                 | Test strategy            |
+| API             | [docs/api/conventions.md](docs/api/conventions.md)                         | Endpoint patterns        |
+| Database        | [docs/data/database.md](docs/data/database.md)                             | Schema, migrations       |
+| Security        | [docs/security/threat-model-lite.md](docs/security/threat-model-lite.md)   | Security considerations  |
 
 ## Subfolder Guides
 
@@ -127,12 +137,12 @@ See: `frontend/src/composables/`
 
 ## Key Files Reference
 
-| Purpose | File |
-|---------|------|
-| Project context | `.claude-code.json` |
-| Docker services | `docker-compose.yml` |
-| Backend entry | `backend/src/Commerce.Api/Program.cs` |
-| Backend config | `backend/src/Commerce.Api/appsettings.json` |
-| Frontend scripts | `frontend/package.json` |
-| Build/test config | `frontend/vite.config.ts` |
-| Environment vars | `.env` (not committed) |
+| Purpose           | File                                        |
+| ----------------- | ------------------------------------------- |
+| Project context   | `.claude-code.json`                         |
+| Docker services   | `docker-compose.yml`                        |
+| Backend entry     | `backend/src/Commerce.Api/Program.cs`       |
+| Backend config    | `backend/src/Commerce.Api/appsettings.json` |
+| Frontend scripts  | `frontend/package.json`                     |
+| Build/test config | `frontend/vite.config.ts`                   |
+| Environment vars  | `.env` (not committed)                      |
