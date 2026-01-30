@@ -211,6 +211,41 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                 CategoryId = 5,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                 IsActive = true
+            },
+
+            // Test Products (no seeded images - for integration tests)
+            new Product
+            {
+                Id = 9001,
+                Name = "Test Product 1",
+                Description = "Test product without seeded images",
+                Price = 10.00m,
+                StockQuantity = 100,
+                CategoryId = 1,
+                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                IsActive = true
+            },
+            new Product
+            {
+                Id = 9002,
+                Name = "Test Product 2",
+                Description = "Test product without seeded images",
+                Price = 20.00m,
+                StockQuantity = 100,
+                CategoryId = 1,
+                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                IsActive = true
+            },
+            new Product
+            {
+                Id = 9003,
+                Name = "Test Product 3",
+                Description = "Test product without seeded images",
+                Price = 30.00m,
+                StockQuantity = 100,
+                CategoryId = 1,
+                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                IsActive = true
             }
         );
         #endregion

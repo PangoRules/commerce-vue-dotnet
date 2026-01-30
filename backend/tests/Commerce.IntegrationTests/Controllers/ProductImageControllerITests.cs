@@ -21,8 +21,8 @@ public class ProductImageControllerITests
     [Fact]
     public async Task GetProductImages_ReturnsNoContent_WhenNoImages()
     {
-        // Product 1001 exists from seed data but has no images
-        var res = await _client.GetAsync("/api/product/1001/images");
+        // Product 9001 exists from seed data and has no seeded images
+        var res = await _client.GetAsync("/api/product/9001/images");
 
         Assert.Equal(HttpStatusCode.NoContent, res.StatusCode);
     }
@@ -37,8 +37,8 @@ public class ProductImageControllerITests
         fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
         content.Add(fileContent, "file", "test-image.png");
 
-        // Act
-        var res = await _client.PostAsync("/api/product/1001/images", content);
+        // Act - use product 9001 which has no seeded images
+        var res = await _client.PostAsync("/api/product/9001/images", content);
         var body = await res.Content.ReadAsStringAsync();
 
         // Assert
@@ -47,7 +47,7 @@ public class ProductImageControllerITests
 
         var image = await res.Content.ReadFromJsonAsync<ProductImageResponse>();
         Assert.NotNull(image);
-        Assert.Equal(1001, image!.ProductId);
+        Assert.Equal(9001, image!.ProductId);
         Assert.Equal("test-image.png", image.FileName);
         Assert.Equal("image/png", image.ContentType);
         Assert.True(image.IsPrimary); // First image should be primary
@@ -226,7 +226,7 @@ public class ProductImageControllerITests
     [Fact]
     public async Task ReorderImages_Returns204_AndUpdatesDisplayOrder()
     {
-        // Upload three images to product 2003
+        // Upload three images to product 9003 (no seeded images)
         var imageIds = new List<Guid>();
         for (int i = 0; i < 3; i++)
         {
@@ -235,7 +235,7 @@ public class ProductImageControllerITests
             fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
             content.Add(fileContent, "file", $"reorder-{i}.png");
 
-            var uploadRes = await _client.PostAsync("/api/product/2003/images", content);
+            var uploadRes = await _client.PostAsync("/api/product/9003/images", content);
             var uploaded = await uploadRes.Content.ReadFromJsonAsync<ProductImageResponse>();
             imageIds.Add(uploaded!.Id);
         }
@@ -244,12 +244,12 @@ public class ProductImageControllerITests
         var reversedIds = imageIds.AsEnumerable().Reverse().ToList();
         var reorderRequest = new ReorderImagesRequest { ImageIds = reversedIds };
 
-        var res = await _client.PutAsJsonAsync("/api/product/2003/images/reorder", reorderRequest);
+        var res = await _client.PutAsJsonAsync("/api/product/9003/images/reorder", reorderRequest);
 
         Assert.Equal(HttpStatusCode.NoContent, res.StatusCode);
 
         // Verify order changed
-        var listRes = await _client.GetAsync("/api/product/2003/images");
+        var listRes = await _client.GetAsync("/api/product/9003/images");
         var images = await listRes.Content.ReadFromJsonAsync<List<ProductImageResponse>>();
 
         Assert.Equal(reversedIds[0], images![0].Id);
@@ -271,13 +271,13 @@ public class ProductImageControllerITests
     [Fact]
     public async Task MultipleUploads_SecondImageIsNotPrimary()
     {
-        // First upload
+        // First upload - use product 9002 which has no seeded images
         using var content1 = new MultipartFormDataContent();
         var fileContent1 = new ByteArrayContent([0x89, 0x50, 0x4E, 0x47]);
         fileContent1.Headers.ContentType = new MediaTypeHeaderValue("image/png");
         content1.Add(fileContent1, "file", "first.png");
 
-        var res1 = await _client.PostAsync("/api/product/3001/images", content1);
+        var res1 = await _client.PostAsync("/api/product/9002/images", content1);
         var first = await res1.Content.ReadFromJsonAsync<ProductImageResponse>();
         Assert.True(first!.IsPrimary);
 
@@ -287,7 +287,7 @@ public class ProductImageControllerITests
         fileContent2.Headers.ContentType = new MediaTypeHeaderValue("image/png");
         content2.Add(fileContent2, "file", "second.png");
 
-        var res2 = await _client.PostAsync("/api/product/3001/images", content2);
+        var res2 = await _client.PostAsync("/api/product/9002/images", content2);
         var second = await res2.Content.ReadFromJsonAsync<ProductImageResponse>();
 
         Assert.False(second!.IsPrimary);
