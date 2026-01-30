@@ -1,0 +1,8 @@
+{
+  "actions": {
+    "retry": "Retry",
+    "browseAll": "Browse All Products",
+    "viewAll": "View All"
+  },
+  "adjustFilters": "Try adjusting your filters or search terms"
+}

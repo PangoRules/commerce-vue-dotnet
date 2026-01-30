@@ -1,5 +1,5 @@
-import type { CategoryResponse } from "./categoryTypes";
-import type { QueryDefaults } from "./sharedApiTypes";
+import type { CategoryResponse } from "@/types/api/categoryTypes";
+import type { QueryDefaults } from "@/types/api/sharedApiTypes";
 
 export type ProductImageResponse = {
   id: string;

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import type { ProductResponse } from "@/types/api/productTypes";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   product: ProductResponse;
@@ -46,6 +49,12 @@ const handleClick = async () => {
     @click="handleClick"
   >
     <v-icon start :icon="justAdded ? 'mdi-check' : 'mdi-cart-plus'" />
-    {{ justAdded ? 'Added!' : product.stockQuantity === 0 ? 'Out of Stock' : 'Add to Cart' }}
+    <span class="d-inline-block text-truncate" style="max-width: 100px">{{
+      justAdded
+        ? t("products.cart.added")
+        : product.stockQuantity === 0
+          ? t("products.outOfStock")
+          : t("products.cart.add")
+    }}</span>
   </v-btn>
 </template>

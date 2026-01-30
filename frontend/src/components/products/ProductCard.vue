@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { ProductResponse } from "@/types/api/productTypes";
-import ProductPrice from "./ProductPrice.vue";
+import ProductPrice from "@/components/products/ProductPrice.vue";
 import CategoryChip from "@/components/categories/CategoryChip.vue";
+import AddToCartButton from "@/components/products/AddToCartButton.vue";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   product: ProductResponse;
@@ -14,10 +16,15 @@ const emit = defineEmits<{
   addToCart: [product: ProductResponse];
 }>();
 
+const { t } = useI18n();
+
 const images = computed(() => props.product.images ?? []);
 
 const isLowStock = computed(() => props.product.stockQuantity <= 5);
 const isOutOfStock = computed(() => props.product.stockQuantity === 0);
+const lowStockMessage = computed(() =>
+  t("products.stock.onlyLeft", { count: props.product.stockQuantity }),
+);
 
 const handleAddToCart = (e: Event) => {
   e.preventDefault();
@@ -89,7 +96,9 @@ const handleAddToCart = (e: Event) => {
         class="position-absolute w-100 h-100 d-flex align-center justify-center"
         style="top: 0; left: 0; background: rgba(0, 0, 0, 0.5)"
       >
-        <v-chip color="error" variant="flat">Out of Stock</v-chip>
+        <v-chip color="error" variant="flat">{{
+          t("products.outOfStock")
+        }}</v-chip>
       </div>
 
       <!-- Low stock badge -->
@@ -100,7 +109,7 @@ const handleAddToCart = (e: Event) => {
         class="position-absolute"
         style="top: 8px; right: 8px"
       >
-        Only {{ product.stockQuantity }} left
+        {{ lowStockMessage }}
       </v-chip>
     </div>
 
@@ -135,16 +144,11 @@ const handleAddToCart = (e: Event) => {
 
     <!-- Actions -->
     <v-card-actions class="px-4 pb-4">
-      <v-btn
-        color="primary"
-        variant="flat"
-        block
-        :disabled="isOutOfStock"
-        @click="handleAddToCart"
-      >
-        <v-icon start icon="mdi-cart-plus" />
-        Add to Cart
-      </v-btn>
+      <AddToCartButton
+        :product="product"
+        :block="true"
+        @addToCart="handleAddToCart"
+      />
     </v-card-actions>
   </v-card>
 </template>

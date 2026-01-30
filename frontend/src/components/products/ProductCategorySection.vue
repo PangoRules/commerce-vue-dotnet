@@ -3,9 +3,10 @@ import { computed, onMounted, watch } from "vue";
 import type { CategoryResponse } from "@/types/api/categoryTypes";
 import type { ProductResponse } from "@/types/api/productTypes";
 import { useProducts } from "@/composables/useProducts";
-import ProductCard from "./ProductCard.vue";
+import ProductCard from "@/components/products/ProductCard.vue";
 import ProductCardSkeleton from "@/components/shared/ProductCardSkeleton.vue";
 import EmptyState from "@/components/shared/EmptyState.vue";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   category: CategoryResponse;
@@ -16,7 +17,10 @@ const emit = defineEmits<{
   addToCart: [product: ProductResponse];
 }>();
 
-const { loadProductList, listProductResult, isProductListLoading } = useProducts();
+const { t } = useI18n();
+
+const { loadProductList, listProductResult, isProductListLoading } =
+  useProducts();
 
 const products = computed<ProductResponse[]>(() => {
   if (!listProductResult.value?.ok) return [];
@@ -28,6 +32,12 @@ const showViewAll = computed(() => {
   if (!listProductResult.value?.ok) return false;
   return Object.keys(listProductResult.value.data).length > (props.limit ?? 4);
 });
+
+const emptyStateDescription = (categoryName: string) => {
+  return t("products.noProductsInCategory", {
+    category: categoryName,
+  });
+};
 
 const loadProducts = () => {
   loadProductList({
@@ -47,7 +57,10 @@ watch(() => props.category.id, loadProducts);
     <div class="d-flex justify-space-between align-center mb-4">
       <div>
         <h2 class="text-h5 font-weight-bold">{{ category.name }}</h2>
-        <p v-if="category.description" class="text-body-2 text-medium-emphasis mt-1">
+        <p
+          v-if="category.description"
+          class="text-body-2 text-medium-emphasis mt-1"
+        >
           {{ category.description }}
         </p>
       </div>
@@ -58,13 +71,13 @@ watch(() => props.category.id, loadProducts);
         :to="`/categories/${category.id}`"
         append-icon="mdi-arrow-right"
       >
-        View All
+        {{ t("common.actions.viewAll") }}
       </v-btn>
     </div>
 
     <!-- Loading State -->
     <v-row v-if="isProductListLoading">
-      <v-col v-for="i in (limit ?? 4)" :key="i" cols="12" sm="6" md="3">
+      <v-col v-for="i in limit ?? 4" :key="i" cols="12" sm="6" md="3">
         <ProductCardSkeleton />
       </v-col>
     </v-row>
@@ -88,8 +101,8 @@ watch(() => props.category.id, loadProducts);
     <!-- Empty State -->
     <EmptyState
       v-else
-      title="No products yet"
-      :description="`No products available in ${category.name}`"
+      :title="t('products.noProductsYet')"
+      :description="emptyStateDescription(category.name)"
       icon="mdi-package-variant-closed"
     />
   </section>

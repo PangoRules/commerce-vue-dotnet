@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { themes, type ThemeName } from "./themes";
+import { themes, type ThemeName } from "@/theme/themes";
 
 describe("themes", () => {
   const themeNames: ThemeName[] = [
@@ -101,25 +101,25 @@ describe("themes", () => {
   describe("palette colors", () => {
     it("meadow themes share the same palette", () => {
       expect(themes["meadow-light"].colors?.primary).toBe(
-        themes["meadow-dark"].colors?.primary
+        themes["meadow-dark"].colors?.primary,
       );
       expect(themes["meadow-light"].colors?.secondary).toBe(
-        themes["meadow-dark"].colors?.secondary
+        themes["meadow-dark"].colors?.secondary,
       );
       expect(themes["meadow-light"].colors?.accent).toBe(
-        themes["meadow-dark"].colors?.accent
+        themes["meadow-dark"].colors?.accent,
       );
     });
 
     it("sprinkles themes share the same palette", () => {
       expect(themes["sprinkles-light"].colors?.primary).toBe(
-        themes["sprinkles-dark"].colors?.primary
+        themes["sprinkles-dark"].colors?.primary,
       );
       expect(themes["sprinkles-light"].colors?.secondary).toBe(
-        themes["sprinkles-dark"].colors?.secondary
+        themes["sprinkles-dark"].colors?.secondary,
       );
       expect(themes["sprinkles-light"].colors?.accent).toBe(
-        themes["sprinkles-dark"].colors?.accent
+        themes["sprinkles-dark"].colors?.accent,
       );
     });
   });

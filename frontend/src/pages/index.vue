@@ -5,7 +5,9 @@ import type { CategoryResponse } from "@/types/api/categoryTypes";
 import type { ProductResponse } from "@/types/api/productTypes";
 import { ProductCategorySection } from "@/components/products";
 import { LoadingSpinner, EmptyState } from "@/components/shared";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const { loadRoots, rootsResult, isRootsLoading } = useCategories();
 
 const categories = computed<CategoryResponse[]>(() => {
@@ -16,6 +18,10 @@ const categories = computed<CategoryResponse[]>(() => {
 const hasCategories = computed(() => categories.value.length > 0);
 const isLoading = computed(() => isRootsLoading.value);
 const hasError = computed(() => rootsResult.value && !rootsResult.value.ok);
+
+const welcomeTitle = computed(() =>
+  t("home.hero.title", { appName: t("app.name") }),
+);
 
 const handleAddToCart = (product: ProductResponse) => {
   // TODO: Implement cart functionality
@@ -32,11 +38,10 @@ onMounted(() => {
     <!-- Hero Section -->
     <section class="hero-section text-center mb-12">
       <h1 class="text-h3 text-md-h2 font-weight-bold mb-4">
-        Welcome to Commerce
+        {{ welcomeTitle }}
       </h1>
       <p class="text-h6 text-medium-emphasis mx-auto" style="max-width: 600px">
-        Discover amazing products across all categories.
-        Quality items at great prices.
+        {{ t("home.hero.subtitle") }}
       </p>
     </section>
 
@@ -45,13 +50,17 @@ onMounted(() => {
 
     <!-- Error State -->
     <v-alert v-else-if="hasError" type="error" variant="tonal" class="my-8">
-      <template #title>Failed to load categories</template>
+      <template #title>{{ t("errors.categoriesLoadFailedTitle") }}</template>
       <template #text>
-        {{ rootsResult?.ok === false ? rootsResult.error.message : 'Unknown error' }}
+        {{
+          rootsResult?.ok === false
+            ? rootsResult.error.message
+            : t("errors.unknown")
+        }}
       </template>
       <template #append>
         <v-btn variant="text" @click="loadRoots()">
-          Retry
+          {{ t("common.actions.retry") }}
         </v-btn>
       </template>
     </v-alert>
@@ -59,8 +68,8 @@ onMounted(() => {
     <!-- Empty State -->
     <EmptyState
       v-else-if="!hasCategories"
-      title="No categories yet"
-      description="Check back later for amazing products!"
+      :title="t('home.empty.categoriesTitle')"
+      :description="t('home.empty.categoriesDescription')"
       icon="mdi-store-outline"
     />
 
@@ -77,9 +86,9 @@ onMounted(() => {
 
     <!-- Footer CTA -->
     <section v-if="hasCategories" class="text-center mt-12 py-8">
-      <h2 class="text-h5 mb-4">Can't find what you're looking for?</h2>
+      <h2 class="text-h5 mb-4">{{ t("home.cta.title") }}</h2>
       <v-btn color="primary" size="large" to="/products">
-        Browse All Products
+        {{ t("common.actions.browseAll") }}
         <v-icon end icon="mdi-arrow-right" />
       </v-btn>
     </section>
