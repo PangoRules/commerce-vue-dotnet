@@ -1,316 +1,144 @@
-# Commerce App — Vue 3 + .NET 8 (Dockerized Development Environment) EDIT
+# Commerce Vue.NET
 
-This repository contains a Docker-based local development environment composed of a Vue 3 frontend, an ASP.NET Core backend, and a PostgreSQL database. The goal is to allow developers to spin up the full stack—or individual services—with minimal setup using Docker and Docker Compose.
+A full-stack e-commerce application built with Vue 3 and .NET 8, containerized with Docker.
 
----
+## Tech Stack
 
-## Technology Stack
+| Layer          | Technology                        |
+| -------------- | --------------------------------- |
+| Frontend       | Vue 3, TypeScript, Vuetify 3      |
+| Backend        | .NET 8, ASP.NET Core, EF Core     |
+| Database       | PostgreSQL 16                     |
+| Object Storage | MinIO (S3-compatible)             |
+| Testing        | Vitest (frontend), xUnit (backend)|
 
-Frontend
-
-- Vue 3
-- TypeScript
-- Vite
-- Vuetify 3
-- Native Fetch API with a reusable typed HTTP client
-
-Backend
-
-- ASP.NET Core (.NET 8)
-- Minimal hosting model
-- Swagger (enabled in Development only)
-- CORS configured for local development
-
-Database
-
-- PostgreSQL 16 (Dockerized)
-- Persistent storage via Docker volume
-
-Infrastructure
-
-- Docker
-- Docker Compose
-- Per-service Dockerfiles and .dockerignore files
-
----
-
-## Repository Structure
-
-```
-.
-├─ frontend/
-│  ├─ Dockerfile
-│  ├─ .dockerignore
-│  └─ src/
-│     ├─ lib/
-│     │  └─ http.ts
-│     ├─ services/
-│     │  └─ apiClient.ts
-│     ├─ composables/
-│     └─ ...
-├─ backend/
-│  ├─ Dockerfile
-│  ├─ .dockerignore
-│  ├─ Commerce.sln
-│  └─ src/
-│     ├─ Commerce.Api/
-│     ├─ Commerce.Repositories/
-│     ├─ Commerce.Services/
-│     └─ Commerce.Shared/
-│  └─ tests/
-│     └─ Commerce.UnitTests/
-├─ docker-compose.yml
-├─ .env.example
-└─ README.md
-```
-
----
-
-## Environment Variables
-
-This repository includes a `.env.example` file that documents all environment variables required to run the application locally.
-
-The `.env.example` file is provided for reference only and should not be modified directly. Each developer should create their own `.env` file based on it.
-
-### Setup
-
-```
-cp .env.example .env
-```
-
-Update values in `.env` as needed. The `.env` file is ignored by Git and must not be committed.
-
----
-
-## Running the Full Stack (Recommended)
+## Quick Start
 
 ### Prerequisites
 
-- Docker
-- Docker Compose v2 or newer
+- Docker & Docker Compose v2+
+- Node.js 20+ (for local frontend dev)
+- .NET 8 SDK (for local backend dev)
 
-From the repository root:
+### Run with Docker
 
+```bash
+# Copy environment file
+cp .env.example .env
+
+# Start infrastructure (PostgreSQL + MinIO)
+docker compose --profile infra up -d
+
+# Start full stack
+docker compose --profile infra --profile app up
 ```
-docker compose up --build
-```
-
-This command builds the frontend and backend images, starts frontend, backend, and PostgreSQL, and creates a persistent database volume if one does not already exist.
 
 ### Access Points
 
-- Frontend: [http://localhost:5173](http://localhost:5173)
-- Backend API: [http://localhost:8080](http://localhost:8080)
-- Swagger UI (Development only): [http://localhost:8080/swagger](http://localhost:8080/swagger)
-- Health endpoint: [http://localhost:8080/api/health](http://localhost:8080/api/health)
-- Db endpoint: [http://localhost:8080/api/health/db](http://localhost:8080/api/health/db)
+| Service        | URL                                  |
+| -------------- | ------------------------------------ |
+| Frontend       | http://localhost:5173                |
+| Backend API    | http://localhost:8080                |
+| Swagger        | http://localhost:8080/swagger        |
+| MinIO Console  | http://localhost:9001                |
 
----
-
-## Running Services Independently
-
-### Database Only (PostgreSQL)
-
-Start only the database:
+## Project Structure
 
 ```
-docker compose up -d postgres
+commerce-vue-dotnet/
+├── frontend/                   # Vue 3 + TypeScript
+│   └── src/
+│       ├── pages/              # File-based routing
+│       ├── components/         # Vuetify components
+│       ├── composables/        # Business logic hooks
+│       ├── services/           # API client layer
+│       └── i18n/               # Translations (en, es)
+├── backend/                    # .NET 8 Clean Architecture
+│   ├── src/
+│   │   ├── Commerce.Api/       # Controllers, DI config
+│   │   ├── Commerce.Services/  # Business logic, DTOs
+│   │   ├── Commerce.Repositories/  # EF Core, entities
+│   │   └── Commerce.Shared/    # Validation, utilities
+│   └── tests/
+│       ├── Commerce.Services.Tests/      # Unit tests
+│       └── Commerce.IntegrationTests/    # API tests
+└── docs/                       # Documentation
 ```
 
-PostgreSQL will be available on `localhost:5432`.
+## Local Development
 
-Stop the database:
-
-```
-docker compose stop postgres
-```
-
----
-
-### Backend Only (Docker)
-
-```
-cd backend
-docker build -t commerce-backend-dev .
-docker run --rm -p 8080:8080 commerce-backend-dev
-```
-
-Backend will be available at:
-
-```
-http://localhost:8080
-```
-
-Ensure PostgreSQL is running and reachable when running the backend independently.
-
----
-
-### Frontend Only (Docker)
-
-```
-cd frontend
-docker build -t commerce-frontend-dev .
-docker run --rm -p 5173:5173 commerce-frontend-dev
-```
-
-Frontend will be available at:
-
-```
-http://localhost:5173
-```
-
-When running the frontend independently, ensure the API base URL points to `http://localhost:8080`.
-
----
-
-## Database (PostgreSQL)
-
-PostgreSQL runs as a Docker service and is intended for local development use.
-
-### Default Configuration
-
-- Image: postgres:16-alpine
-- Database: commerce_db
-- Username: commerce
-- Password: commerce_password
-- Host (from host machine): localhost
-- Port: 5432
-- Persistence: Docker named volume
-
----
-
-### Connecting via psql (Host)
-
-Install the PostgreSQL client:
-
-```
-sudo dnf install postgresql
-```
-
-Connect:
-
-```
-psql -h localhost -p 5432 -U commerce -d commerce_db
-```
-
----
-
-### Connecting via psql (Inside Container)
-
-```
-docker compose exec postgres psql -U commerce -d commerce_db
-```
-
----
-
-### Connecting via a GUI (DBeaver, pgAdmin, etc.)
-
-Use the following settings:
-
-- Host: localhost
-- Port: 5432
-- Database: commerce_db
-- Username: commerce
-- Password: commerce_password
-
----
-
-### Backend Database Connection
-
-Inside Docker, the backend connects to PostgreSQL using Docker’s internal DNS.
-
-Example connection string:
-
-```
-Host=postgres;Port=5432;Database=commerce_db;Username=commerce;Password=commerce_password
-```
-
----
-
-### Resetting the Database (Dev Only)
-
-To fully reset the local database and reapply all migrations and seed data:
+### Frontend
 
 ```bash
+cd frontend
+npm install
+npm run dev           # Start dev server
+npm run test          # Run tests
+npm run test:coverage # Coverage report
+```
+
+### Backend
+
+```bash
+# Start infrastructure first
+docker compose --profile infra up -d
+
+# Run the API
+cd backend/src/Commerce.Api
+dotnet run
+
+# Run tests
+cd backend
+dotnet test Commerce.sln
+```
+
+## Features
+
+### Implemented
+
+- Product management (CRUD)
+- Product images with MinIO storage
+- Category management with hierarchy
+- Product listing with grid/list views
+- Theme support (light/dark)
+- i18n (English, Spanish)
+
+### Planned
+
+- User authentication
+- Shopping cart
+- Order management
+- Payment integration
+
+## Database
+
+PostgreSQL runs in Docker with auto-migrations on startup.
+
+```bash
+# Reset database (deletes all data)
 docker compose down -v
-#This runs all the items to be tested production like
-docker compose up --build
-#This only builds the items
-docker compose build
-#this so database gets initialized on the background ready to use dockerized
-docker compose up -d postgres
+docker compose --profile infra up -d
 ```
 
-This will:
+### Connection Details
 
-- Stop all services
-- Delete the PostgreSQL Docker volume
-- Recreate a fresh database
-- Automatically apply EF Core migrations
-- Reinsert seed data (categories, products, etc.)
+| Property | Value            |
+| -------- | ---------------- |
+| Host     | localhost        |
+| Port     | 5432             |
+| Database | commerce_db      |
+| Username | commerce         |
+| Password | commerce_password|
 
----
+## Documentation
 
-## Frontend to Backend Communication
+Detailed docs are in the `docs/` folder:
 
-The frontend uses an environment-based API base URL:
+- [Architecture Overview](docs/architecture/overview.md)
+- [Getting Started](docs/development/getting-started.md)
+- [API Conventions](docs/api/conventions.md)
+- [Testing Guide](docs/development/testing.md)
 
-```
-VITE_API_BASE_URL
-```
+## License
 
-This value is injected via Docker Compose and consumed by a reusable HTTP client. All API calls are routed through this client to provide consistent typing and centralized error handling.
-
-A healthcheck composable is included to validate frontend-to-backend connectivity.
-
----
-
-## CORS Configuration
-
-The backend allows cross-origin requests from:
-
-```
-http://localhost:5173
-```
-
-This is required because the frontend and backend run on different ports during local development.
-
----
-
-## Docker Notes
-
-- Each service has its own Dockerfile and .dockerignore
-- .dockerignore files reduce build context size and improve build performance
-- Docker images are intended for local development only
-
----
-
-## Common Commands
-
-Build images manually:
-
-```
-docker build -t commerce-backend-dev backend
-docker build -t commerce-frontend-dev frontend
-```
-
-Run the full stack:
-
-```
-docker compose up --build
-```
-
-Stop all services:
-
-```
-docker compose down
-```
-
----
-
-## Future Improvements
-
-- Environment-specific Docker Compose configurations
-- Database migrations and seeding
-- Production-ready Docker images
-- Authentication and authorization support
+MIT
