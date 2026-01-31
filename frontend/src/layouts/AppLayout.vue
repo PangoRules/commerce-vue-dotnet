@@ -1,3 +1,9 @@
+<script setup lang="ts">
+import { AppNavbar } from "@/components/navbar";
+
+const isDev = import.meta.env.DEV;
+</script>
+
 <template>
   <div class="app-layout">
     <AppNavbar :show-dev-toggle="isDev" />
@@ -9,12 +15,6 @@
     </v-main>
   </div>
 </template>
-
-<script setup lang="ts">
-import { AppNavbar } from "@/components/navbar";
-
-const isDev = import.meta.env.DEV;
-</script>
 
 <style scoped>
 .app-layout {

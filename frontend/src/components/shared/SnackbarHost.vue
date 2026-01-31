@@ -1,3 +1,8 @@
+<script setup lang="ts">
+import { useToastStore } from "@/stores/toast";
+const toast = useToastStore();
+</script>
+
 <template>
   <v-snackbar
     v-model="toast.show"
@@ -10,8 +15,3 @@
     </template>
   </v-snackbar>
 </template>
-
-<script setup lang="ts">
-import { useToastStore } from "@/stores/toast";
-const toast = useToastStore();
-</script>

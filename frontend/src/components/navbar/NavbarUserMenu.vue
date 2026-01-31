@@ -1,13 +1,25 @@
+<script setup lang="ts">
+import type { User } from "@/types/api/authTypes";
+
+defineProps<{
+  isAuthenticated: boolean;
+  user?: User | null;
+  compact?: boolean;
+}>();
+
+defineEmits<{
+  login: [];
+  logout: [];
+  register: [];
+}>();
+</script>
+
 <template>
   <div class="navbar-user-menu">
     <!-- Authenticated User Menu -->
     <v-menu v-if="isAuthenticated" location="bottom end">
       <template #activator="{ props: menuProps }">
-        <v-btn
-          v-bind="menuProps"
-          variant="text"
-          class="navbar-user-menu__btn"
-        >
+        <v-btn v-bind="menuProps" variant="text" class="navbar-user-menu__btn">
           <v-avatar v-if="user?.avatar" size="32" class="mr-2">
             <v-img :src="user.avatar" :alt="user.name" />
           </v-avatar>
@@ -45,12 +57,7 @@
 
     <!-- Guest Menu -->
     <template v-else>
-      <v-btn
-        v-if="compact"
-        icon
-        variant="text"
-        @click="$emit('login')"
-      >
+      <v-btn v-if="compact" icon variant="text" @click="$emit('login')">
         <v-icon icon="mdi-account" />
       </v-btn>
       <template v-else>
@@ -64,22 +71,6 @@
     </template>
   </div>
 </template>
-
-<script setup lang="ts">
-import type { User } from "@/types/api/authTypes";
-
-defineProps<{
-  isAuthenticated: boolean;
-  user?: User | null;
-  compact?: boolean;
-}>();
-
-defineEmits<{
-  login: [];
-  logout: [];
-  register: [];
-}>();
-</script>
 
 <style scoped>
 .navbar-user-menu {

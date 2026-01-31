@@ -1,43 +1,3 @@
-<template>
-  <div class="navbar-search d-flex align-center flex-grow-1 ga-0" :class="{ expanded }">
-    <v-select
-      v-if="!hideCategory"
-      v-model="localCategoryId"
-      :items="categoryItems"
-      item-title="name"
-      item-value="id"
-      density="compact"
-      variant="outlined"
-      hide-details
-      class="navbar-search__category"
-      :class="{ 'navbar-search__category--hidden': hideCategory }"
-    />
-    <v-text-field
-      v-model="localQuery"
-      :placeholder="$t('navbar.search.placeholder')"
-      density="compact"
-      variant="outlined"
-      hide-details
-      single-line
-      class="navbar-search__input"
-      @keyup.enter="handleSubmit"
-    >
-      <template #append-inner>
-        <v-btn
-          icon
-          size="small"
-          variant="text"
-          color="primary"
-          :aria-label="$t('navbar.search.button')"
-          @click="handleSubmit"
-        >
-          <v-icon icon="mdi-magnify" />
-        </v-btn>
-      </template>
-    </v-text-field>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from "vue";
 import { useCategories } from "@/composables/useCategories";
@@ -106,6 +66,49 @@ onMounted(() => {
 });
 </script>
 
+<template>
+  <div
+    class="navbar-search d-flex align-center flex-grow-1 ga-0"
+    :class="{ expanded }"
+  >
+    <v-select
+      v-if="!hideCategory"
+      v-model="localCategoryId"
+      :items="categoryItems"
+      item-title="name"
+      item-value="id"
+      density="compact"
+      variant="outlined"
+      hide-details
+      class="navbar-search__category"
+      :class="{ 'navbar-search__category--hidden': hideCategory }"
+    />
+    <v-text-field
+      v-model="localQuery"
+      :placeholder="$t('navbar.search.placeholder')"
+      density="compact"
+      variant="outlined"
+      hide-details
+      single-line
+      class="navbar-search__input"
+      @keyup.enter="handleSubmit"
+    >
+      <template #append-inner>
+        <v-btn
+          icon
+          size="small"
+          variant="text"
+          color="primary"
+          :aria-label="$t('navbar.search.button')"
+          @click="handleSubmit"
+        >
+          <v-icon icon="mdi-magnify" />
+        </v-btn>
+      </template>
+    </v-text-field>
+  </div>
+</template>
+
 <style scoped>
 .navbar-search {
   display: flex;
@@ -116,7 +119,7 @@ onMounted(() => {
 
 .navbar-search__category {
   flex: 0 0 auto;
-  max-width: 160px;
+  max-width: 20rem;
   border-radius: 4px 0 0 4px;
 }
 

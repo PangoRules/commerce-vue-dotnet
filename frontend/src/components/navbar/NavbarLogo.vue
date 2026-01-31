@@ -1,3 +1,9 @@
+<script setup lang="ts">
+defineProps<{
+  compact?: boolean;
+}>();
+</script>
+
 <template>
   <router-link to="/" class="navbar-logo" :class="{ compact }">
     <v-icon v-if="compact" icon="mdi-store" size="28" color="primary" />
@@ -6,12 +12,6 @@
     </span>
   </router-link>
 </template>
-
-<script setup lang="ts">
-defineProps<{
-  compact?: boolean;
-}>();
-</script>
 
 <style scoped>
 .navbar-logo {

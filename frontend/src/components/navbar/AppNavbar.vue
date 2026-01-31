@@ -1,3 +1,62 @@
+<script setup lang="ts">
+import { ref, computed, watch } from "vue";
+import { useDisplay } from "vuetify";
+import { useAuth } from "@/composables/useAuth";
+import { useSearch } from "@/composables/useSearch";
+import NavbarLogo from "./NavbarLogo.vue";
+import NavbarSearch from "./NavbarSearch.vue";
+import NavbarUserMenu from "./NavbarUserMenu.vue";
+import NavbarCart from "./NavbarCart.vue";
+import NavbarMobileDrawer from "./NavbarMobileDrawer.vue";
+import ThemeToggler from "@/components/shared/ThemeToggler.vue";
+
+defineProps<{
+  showDevToggle?: boolean;
+}>();
+
+const { smAndDown, xs } = useDisplay();
+const { isAuthenticated, user, login, logout, toggleAuth } = useAuth();
+const { searchQuery, selectedCategoryId, submitSearch } = useSearch();
+
+const isDrawerOpen = ref(false);
+const isSearchExpanded = ref(false);
+const cartCount = ref(0);
+
+const isMobile = computed(() => xs.value);
+const isSmall = computed(() => smAndDown.value);
+
+function handleSearch() {
+  submitSearch();
+}
+
+function handleMobileSearch() {
+  submitSearch();
+  isSearchExpanded.value = false;
+}
+
+function handleLogin() {
+  login();
+}
+
+function handleLogout() {
+  logout();
+}
+
+function handleRegister() {
+  login();
+}
+
+function handleCartClick() {
+  // Navigate to cart page (future implementation)
+}
+
+watch(isSmall, (value) => {
+  if (!value) {
+    isSearchExpanded.value = false;
+  }
+});
+</script>
+
 <template>
   <v-app-bar density="comfortable" flat class="app-navbar">
     <div class="nav-grid">
@@ -95,65 +154,6 @@
     @toggle-auth="toggleAuth"
   />
 </template>
-
-<script setup lang="ts">
-import { ref, computed, watch } from "vue";
-import { useDisplay } from "vuetify";
-import { useAuth } from "@/composables/useAuth";
-import { useSearch } from "@/composables/useSearch";
-import NavbarLogo from "./NavbarLogo.vue";
-import NavbarSearch from "./NavbarSearch.vue";
-import NavbarUserMenu from "./NavbarUserMenu.vue";
-import NavbarCart from "./NavbarCart.vue";
-import NavbarMobileDrawer from "./NavbarMobileDrawer.vue";
-import ThemeToggler from "@/components/shared/ThemeToggler.vue";
-
-defineProps<{
-  showDevToggle?: boolean;
-}>();
-
-const { smAndDown, xs } = useDisplay();
-const { isAuthenticated, user, login, logout, toggleAuth } = useAuth();
-const { searchQuery, selectedCategoryId, submitSearch } = useSearch();
-
-const isDrawerOpen = ref(false);
-const isSearchExpanded = ref(false);
-const cartCount = ref(0);
-
-const isMobile = computed(() => xs.value);
-const isSmall = computed(() => smAndDown.value);
-
-function handleSearch() {
-  submitSearch();
-}
-
-function handleMobileSearch() {
-  submitSearch();
-  isSearchExpanded.value = false;
-}
-
-function handleLogin() {
-  login();
-}
-
-function handleLogout() {
-  logout();
-}
-
-function handleRegister() {
-  login();
-}
-
-function handleCartClick() {
-  // Navigate to cart page (future implementation)
-}
-
-watch(isSmall, (value) => {
-  if (!value) {
-    isSearchExpanded.value = false;
-  }
-});
-</script>
 
 <style scoped>
 .nav-grid {

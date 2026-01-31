@@ -1,3 +1,29 @@
+<script setup lang="ts">
+import { computed } from "vue";
+import { useThemeStore } from "@/stores/theme";
+
+const themeStore = useThemeStore();
+
+const isDark = computed(() => themeStore.mode === "dark");
+
+// Unique ID to avoid conflicts if multiple togglers are rendered
+const clipId = `theme-toggle-cutout-${Math.random().toString(36).slice(2, 9)}`;
+
+const iconStyle = computed(() => ({
+  transform: isDark.value ? "rotate(180deg)" : "rotate(0deg)",
+  transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+}));
+
+const cutoutStyle = computed(() => ({
+  transform: isDark.value ? "translateX(-20px)" : "translateX(0)",
+  transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+}));
+
+function toggle() {
+  themeStore.toggleMode();
+}
+</script>
+
 <template>
   <button
     class="theme-toggle"
@@ -29,32 +55,6 @@
     </svg>
   </button>
 </template>
-
-<script setup lang="ts">
-import { computed } from "vue";
-import { useThemeStore } from "@/stores/theme";
-
-const themeStore = useThemeStore();
-
-const isDark = computed(() => themeStore.mode === "dark");
-
-// Unique ID to avoid conflicts if multiple togglers are rendered
-const clipId = `theme-toggle-cutout-${Math.random().toString(36).slice(2, 9)}`;
-
-const iconStyle = computed(() => ({
-  transform: isDark.value ? "rotate(180deg)" : "rotate(0deg)",
-  transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
-}));
-
-const cutoutStyle = computed(() => ({
-  transform: isDark.value ? "translateX(-20px)" : "translateX(0)",
-  transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
-}));
-
-function toggle() {
-  themeStore.toggleMode();
-}
-</script>
 
 <style scoped>
 .theme-toggle {
