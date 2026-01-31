@@ -2,14 +2,9 @@ import { describe, it, expect, vi } from "vitest";
 import { renderWithPlugins } from "@/tests/render";
 import { screen, fireEvent } from "@testing-library/vue";
 import NavbarUserMenu from "./NavbarUserMenu.vue";
-import type { User } from "@/types/api/authTypes";
+import { createMockUser } from "@/tests/helpers";
 
-const mockUser: User = {
-  id: 1,
-  email: "john@example.com",
-  name: "John Doe",
-  avatar: null,
-};
+const mockUser = createMockUser();
 
 describe("NavbarUserMenu", () => {
   describe("Guest state", () => {

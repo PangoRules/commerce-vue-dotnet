@@ -5,43 +5,31 @@ import { createI18n } from "vue-i18n";
 import { createRouter, createMemoryHistory } from "vue-router";
 import { defineComponent, h } from "vue";
 import AppNavbar from "./AppNavbar.vue";
+import { createPinia, setActivePinia } from "pinia";
+import {
+  createMockUseAuth,
+  createMockUseSearch,
+  createMockUseCategories,
+  createMockUseDisplay,
+} from "@/tests/helpers";
 
 vi.mock("@/composables/useAuth", () => ({
-  useAuth: () => ({
-    isAuthenticated: { value: false },
-    user: { value: null },
-    login: vi.fn(),
-    logout: vi.fn(),
-    toggleAuth: vi.fn(),
-  }),
+  useAuth: () => createMockUseAuth(),
 }));
 
 vi.mock("@/composables/useSearch", () => ({
-  useSearch: () => ({
-    searchQuery: { value: "" },
-    selectedCategoryId: { value: null },
-    setSearchQuery: vi.fn(),
-    setSelectedCategory: vi.fn(),
-    submitSearch: vi.fn(),
-  }),
+  useSearch: () => createMockUseSearch(),
 }));
 
 vi.mock("@/composables/useCategories", () => ({
-  useCategories: () => ({
-    loadCategoryList: vi.fn(),
-    listCategoryResult: { value: null },
-    isCategoryListLoading: { value: false },
-  }),
+  useCategories: () => createMockUseCategories(),
 }));
 
 vi.mock("vuetify", async (importOriginal) => {
   const actual = await importOriginal<typeof import("vuetify")>();
   return {
     ...actual,
-    useDisplay: () => ({
-      smAndDown: { value: false },
-      xs: { value: false },
-    }),
+    useDisplay: () => createMockUseDisplay(),
   };
 });
 
@@ -87,7 +75,7 @@ const VAppBarStub = defineComponent({
       h(
         "div",
         { class: "v-app-bar app-navbar", "data-testid": "app-bar" },
-        slots.default?.()
+        slots.default?.(),
       );
   },
 });
@@ -106,6 +94,35 @@ const VSheetStub = defineComponent({
   },
 });
 
+const NavbarSearchStub = defineComponent({
+  setup(_, { slots }) {
+    return () => h("div", { class: "navbar-search" }, slots.default?.());
+  },
+});
+
+const NavbarLogoStub = defineComponent({
+  setup(_, { slots }) {
+    return () => h("div", { class: "navbar-logo" }, slots.default?.());
+  },
+});
+
+const NavbarUserMenuStub = defineComponent({
+  setup(_, { slots }) {
+    return () => h("div", { class: "navbar-user-menu" }, slots.default?.());
+  },
+});
+
+const NavbarMobileDrawerStub = defineComponent({
+  props: ["modelValue"],
+  setup(props, { slots }) {
+    return () => (props.modelValue ? h("div", {}, slots.default?.()) : null);
+  },
+});
+
+beforeEach(() => {
+  setActivePinia(createPinia());
+});
+
 describe("AppNavbar", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -122,6 +139,10 @@ describe("AppNavbar", () => {
           VAppBarNavIcon: true,
           VSlideYTransition: true,
           VSheet: VSheetStub,
+          NavbarSearch: NavbarSearchStub,
+          NavbarLogo: NavbarLogoStub,
+          NavbarUserMenu: NavbarUserMenuStub,
+          NavbarMobileDrawer: NavbarMobileDrawerStub,
         },
       },
     });

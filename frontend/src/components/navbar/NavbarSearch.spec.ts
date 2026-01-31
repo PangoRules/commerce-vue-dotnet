@@ -2,13 +2,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderWithPlugins } from "@/tests/render";
 import { screen, fireEvent } from "@testing-library/vue";
 import NavbarSearch from "./NavbarSearch.vue";
+import { createMockUseCategories } from "@/tests/helpers";
 
 vi.mock("@/composables/useCategories", () => ({
-  useCategories: () => ({
-    loadCategoryList: vi.fn(),
-    listCategoryResult: { value: null },
-    isCategoryListLoading: { value: false },
-  }),
+  useCategories: () => createMockUseCategories(),
 }));
 
 describe("NavbarSearch", () => {

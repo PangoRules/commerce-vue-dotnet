@@ -2,30 +2,14 @@ import { describe, it, expect } from "vitest";
 import { renderWithPlugins } from "@/tests/render";
 import { screen } from "@testing-library/vue";
 import ProductCard from "./ProductCard.vue";
-import type { ProductResponse } from "@/types/api/productTypes";
-
-const mockProduct = (
-  overrides: Partial<ProductResponse> = {}
-): ProductResponse => ({
-  id: 1,
-  name: "Test Product",
-  description: "Test description",
-  price: 99.99,
-  stockQuantity: 10,
-  categoryId: 1,
-  isActive: true,
-  category: { id: 1, name: "Test Category", description: null },
-  images: [],
-  primaryImageUrl: null,
-  ...overrides,
-});
+import { createMockProduct } from "@/tests/helpers";
 
 describe("ProductCard", () => {
   it("shows low stock badge when stockQuantity <= 5 and showStock=true", async () => {
     const { container } = await renderWithPlugins(ProductCard, {
       render: {
         props: {
-          product: mockProduct({ stockQuantity: 3 }),
+          product: createMockProduct({ stockQuantity: 3 }),
           showStock: true,
         },
       },
@@ -46,7 +30,7 @@ describe("ProductCard", () => {
     const { container } = await renderWithPlugins(ProductCard, {
       render: {
         props: {
-          product: mockProduct({ stockQuantity: 3 }),
+          product: createMockProduct({ stockQuantity: 3 }),
           showStock: false,
         },
       },
@@ -66,7 +50,7 @@ describe("ProductCard", () => {
     const { container } = await renderWithPlugins(ProductCard, {
       render: {
         props: {
-          product: mockProduct({ stockQuantity: 0 }),
+          product: createMockProduct({ stockQuantity: 0 }),
         },
       },
     });
@@ -85,7 +69,7 @@ describe("ProductCard", () => {
     await renderWithPlugins(ProductCard, {
       render: {
         props: {
-          product: mockProduct({ images: [], primaryImageUrl: null }),
+          product: createMockProduct({ images: [], primaryImageUrl: null }),
         },
       },
     });
@@ -98,7 +82,7 @@ describe("ProductCard", () => {
     await renderWithPlugins(ProductCard, {
       render: {
         props: {
-          product: mockProduct({
+          product: createMockProduct({
             name: "Awesome Widget",
             description: "A great product for everyone",
           }),
@@ -114,7 +98,7 @@ describe("ProductCard", () => {
     await renderWithPlugins(ProductCard, {
       render: {
         props: {
-          product: mockProduct(),
+          product: createMockProduct(),
         },
       },
     });
@@ -128,7 +112,7 @@ describe("ProductCard", () => {
     await renderWithPlugins(ProductCard, {
       render: {
         props: {
-          product: mockProduct({
+          product: createMockProduct({
             category: { id: 5, name: "Electronics", description: null },
           }),
           showCategory: true,
@@ -143,7 +127,7 @@ describe("ProductCard", () => {
     await renderWithPlugins(ProductCard, {
       render: {
         props: {
-          product: mockProduct({
+          product: createMockProduct({
             category: { id: 5, name: "Electronics", description: null },
           }),
           showCategory: false,
@@ -158,7 +142,7 @@ describe("ProductCard", () => {
     const { container } = await renderWithPlugins(ProductCard, {
       render: {
         props: {
-          product: mockProduct({ stockQuantity: 10 }),
+          product: createMockProduct({ stockQuantity: 10 }),
           showStock: true,
         },
       },

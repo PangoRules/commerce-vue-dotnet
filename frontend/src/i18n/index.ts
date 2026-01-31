@@ -1,40 +1,37 @@
 import { createI18n } from "vue-i18n";
 import type { I18nSchema, Locales } from "@/i18n/i18types";
 
-// EN
-import enApp from "@/i18n/locales/en/app.json";
-import enCommon from "@/i18n/locales/en/common.json";
-import enHome from "@/i18n/locales/en/home.json";
-import enErrors from "@/i18n/locales/en/errors.json";
-import enProducts from "@/i18n/locales/en/products.json";
-import enNavbar from "@/i18n/locales/en/navbar.json";
+// Dynamically import all locale files
+// Pattern: ./locales/{locale}/{namespace}.json
+const localeModules = import.meta.glob<Record<string, unknown>>(
+  "./locales/**/*.json",
+  { eager: true },
+);
 
-// ES
-import esApp from "@/i18n/locales/es/app.json";
-import esCommon from "@/i18n/locales/es/common.json";
-import esHome from "@/i18n/locales/es/home.json";
-import esErrors from "@/i18n/locales/es/errors.json";
-import esProducts from "@/i18n/locales/es/products.json";
-import esNavbar from "@/i18n/locales/es/navbar.json";
+function buildMessages(): Record<Locales, I18nSchema> {
+  const messages: Record<string, Record<string, unknown>> = {};
 
-const messages = {
-  en: {
-    app: enApp,
-    common: enCommon,
-    home: enHome,
-    errors: enErrors,
-    products: enProducts,
-    navbar: enNavbar,
-  },
-  es: {
-    app: esApp,
-    common: esCommon,
-    home: esHome,
-    errors: esErrors,
-    products: esProducts,
-    navbar: esNavbar,
-  },
-} satisfies Record<Locales, I18nSchema>;
+  for (const [path, module] of Object.entries(localeModules)) {
+    // Extract locale and namespace from path: ./locales/en/common.json -> ["en", "common"]
+    const match = path.match(/\.\/locales\/(\w+)\/(\w+)\.json$/);
+    if (!match) continue;
+
+    const locale = match[1];
+    const namespace = match[2];
+
+    if (!locale || !namespace) continue;
+
+    if (!messages[locale]) {
+      messages[locale] = {};
+    }
+
+    messages[locale][namespace] = module.default ?? module;
+  }
+
+  return messages as Record<Locales, I18nSchema>;
+}
+
+export const messages = buildMessages();
 
 export const i18n = createI18n<[I18nSchema], Locales>({
   legacy: false,
