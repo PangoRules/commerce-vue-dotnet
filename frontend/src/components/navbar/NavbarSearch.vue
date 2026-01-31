@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex align-center flex-grow-1 ga-0" :class="{ expanded }">
+  <div class="navbar-search d-flex align-center flex-grow-1 ga-0" :class="{ expanded }">
     <v-select
       v-if="!hideCategory"
       v-model="localCategoryId"
