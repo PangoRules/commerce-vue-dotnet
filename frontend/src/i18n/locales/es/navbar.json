@@ -1,0 +1,30 @@
+{
+  "search": {
+    "placeholder": "Buscar productos...",
+    "allCategories": "Todas las Categorías",
+    "button": "Buscar"
+  },
+  "user": {
+    "greeting": "Hola, {name}",
+    "guestGreeting": "Hola, Invitado",
+    "signIn": "Iniciar Sesión",
+    "signOut": "Cerrar Sesión",
+    "register": "Registrarse",
+    "profile": "Mi Perfil",
+    "orders": "Mis Pedidos",
+    "account": "Cuenta"
+  },
+  "cart": {
+    "label": "Carrito",
+    "itemCount": "{count} artículo | {count} artículos",
+    "empty": "Tu carrito está vacío"
+  },
+  "menu": {
+    "home": "Inicio",
+    "products": "Productos",
+    "categories": "Categorías",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú"
+  },
+  "devToggle": "Cambiar Auth (Dev)"
+}

@@ -43,7 +43,7 @@ describe("AddToCartButton", () => {
       expect(emitted().add).toBeDefined();
     });
 
-    expect(emitted().add[0]).toEqual([product]);
+    expect(emitted().add?.[0]).toEqual([product]);
 
     vi.useRealTimers();
   });

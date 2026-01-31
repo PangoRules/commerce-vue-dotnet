@@ -4,6 +4,7 @@ export type I18nSchema = {
   home: typeof import("@/i18n/locales/en/home.json");
   errors: typeof import("@/i18n/locales/en/errors.json");
   products: typeof import("@/i18n/locales/en/products.json");
+  navbar: typeof import("@/i18n/locales/en/navbar.json");
 };
 
 export type Locales = "en" | "es";

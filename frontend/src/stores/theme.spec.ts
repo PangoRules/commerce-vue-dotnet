@@ -1,80 +1,93 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createPinia, setActivePinia } from "pinia";
 import { useThemeStore } from "./theme";
+import { ACTIVE_PALETTE } from "@/theme/themes";
 
 describe("theme store", () => {
   beforeEach(() => {
-    localStorage.clear();
     setActivePinia(createPinia());
   });
 
   describe("initialization", () => {
-    it("defaults to meadow-light when localStorage is empty", () => {
+    it("defaults to light mode", () => {
       const store = useThemeStore();
-      expect(store.themeName).toBe("meadow-light");
-    });
-
-    it("loads theme from localStorage when present", () => {
-      localStorage.setItem("app.theme", "sprinkles-dark");
-      setActivePinia(createPinia());
-
-      const store = useThemeStore();
-      expect(store.themeName).toBe("sprinkles-dark");
+      expect(store.mode).toBe("light");
+      expect(store.themeName).toBe(`${ACTIVE_PALETTE}-light`);
     });
   });
 
-  describe("setTheme", () => {
-    it("updates themeName state", () => {
+  describe("setMode", () => {
+    it("updates mode and derives themeName", () => {
       const store = useThemeStore();
 
-      store.setTheme("meadow-dark");
+      store.setMode("dark");
 
-      expect(store.themeName).toBe("meadow-dark");
+      expect(store.mode).toBe("dark");
+      expect(store.themeName).toBe(`${ACTIVE_PALETTE}-dark`);
     });
 
-    it("persists theme to localStorage", () => {
+    it("can set to light mode", () => {
       const store = useThemeStore();
+      store.setMode("dark");
 
-      store.setTheme("sprinkles-light");
+      store.setMode("light");
 
-      expect(localStorage.getItem("app.theme")).toBe("sprinkles-light");
-    });
-
-    it("can switch between all available themes", () => {
-      const store = useThemeStore();
-      const themes = [
-        "meadow-light",
-        "meadow-dark",
-        "sprinkles-light",
-        "sprinkles-dark",
-      ] as const;
-
-      themes.forEach((theme) => {
-        store.setTheme(theme);
-        expect(store.themeName).toBe(theme);
-        expect(localStorage.getItem("app.theme")).toBe(theme);
-      });
+      expect(store.mode).toBe("light");
+      expect(store.themeName).toBe(`${ACTIVE_PALETTE}-light`);
     });
   });
 
-  describe("persistence", () => {
-    it("uses app.theme as storage key", () => {
+  describe("toggleMode", () => {
+    it("toggles from light to dark", () => {
       const store = useThemeStore();
+      expect(store.mode).toBe("light");
 
-      store.setTheme("meadow-dark");
+      store.toggleMode();
 
-      expect(localStorage.getItem("app.theme")).toBe("meadow-dark");
-      expect(localStorage.getItem("theme")).toBeNull();
+      expect(store.mode).toBe("dark");
+      expect(store.themeName).toBe(`${ACTIVE_PALETTE}-dark`);
     });
 
-    it("survives store recreation", () => {
-      const store1 = useThemeStore();
-      store1.setTheme("sprinkles-dark");
+    it("toggles from dark to light", () => {
+      const store = useThemeStore();
+      store.setMode("dark");
 
-      setActivePinia(createPinia());
-      const store2 = useThemeStore();
+      store.toggleMode();
 
-      expect(store2.themeName).toBe("sprinkles-dark");
+      expect(store.mode).toBe("light");
+      expect(store.themeName).toBe(`${ACTIVE_PALETTE}-light`);
+    });
+
+    it("can toggle multiple times", () => {
+      const store = useThemeStore();
+
+      store.toggleMode();
+      expect(store.mode).toBe("dark");
+
+      store.toggleMode();
+      expect(store.mode).toBe("light");
+
+      store.toggleMode();
+      expect(store.mode).toBe("dark");
+    });
+  });
+
+  describe("themeName derivation", () => {
+    it("derives theme name from active palette and mode", () => {
+      const store = useThemeStore();
+
+      expect(store.themeName).toBe(`${ACTIVE_PALETTE}-light`);
+
+      store.setMode("dark");
+      expect(store.themeName).toBe(`${ACTIVE_PALETTE}-dark`);
+    });
+
+    it("always uses the configured ACTIVE_PALETTE", () => {
+      const store = useThemeStore();
+
+      expect(store.themeName).toContain(ACTIVE_PALETTE);
+      store.toggleMode();
+      expect(store.themeName).toContain(ACTIVE_PALETTE);
     });
   });
 });
