@@ -3,10 +3,10 @@ import { computed, onMounted, watch } from "vue";
 import type { CategoryResponse } from "@/types/api/categoryTypes";
 import type { ProductResponse } from "@/types/api/productTypes";
 import { useProducts } from "@/composables/useProducts";
-import ProductCard from "@/components/products/ProductCard.vue";
 import ProductCardSkeleton from "@/components/shared/ProductCardSkeleton.vue";
 import EmptyState from "@/components/shared/EmptyState.vue";
 import { useI18n } from "vue-i18n";
+import ProductCarousel from "@/components/products/ProductCarousel.vue";
 
 const props = defineProps<{
   category: CategoryResponse;
@@ -82,21 +82,8 @@ watch(() => props.category.id, loadProducts);
       </v-col>
     </v-row>
 
-    <!-- Products Grid -->
-    <v-row v-else-if="hasProducts">
-      <v-col
-        v-for="product in products"
-        :key="product.id"
-        cols="12"
-        sm="6"
-        md="3"
-      >
-        <ProductCard
-          :product="product"
-          @add-to-cart="emit('addToCart', $event)"
-        />
-      </v-col>
-    </v-row>
+    <!-- Products carousel -->
+    <ProductCarousel v-else-if="hasProducts" :products="products" />
 
     <!-- Empty State -->
     <EmptyState

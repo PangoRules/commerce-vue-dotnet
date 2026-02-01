@@ -1,223 +1,148 @@
-// src/composables/__tests__/useCategories.spec.ts
-// @vitest-environment jsdom
-
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { nextTick } from "vue";
+import { categoryApi } from "./categoryApi";
+import { apiRoutes } from "@/config/apiRoutes";
+import type { CategoryRequest } from "@/types/api/categoryTypes";
 
-import { useCategories } from "@/composables/useCategories";
-import { categoryApi } from "@/services/categoryApi";
-import type { ApiResult } from "@/lib/http";
-import type {
-  CategoryAdminDetailsResponse,
-  CategoryRequest,
-  CategoryResponse,
-} from "@/types/api/categoryTypes";
-import { httpFail, httpOk } from "@/tests/helpers/apiResult";
-
-vi.mock("@/services/categoryApi", () => ({
-  categoryApi: {
-    getCategories: vi.fn(),
-    getCategoryById: vi.fn(),
-    postCategory: vi.fn(),
-    putCategory: vi.fn(),
-    toggleCategory: vi.fn(),
-    getRoots: vi.fn(),
-    getChildren: vi.fn(),
-    attachChild: vi.fn(),
-    detachChild: vi.fn(),
+vi.mock("@/services/apiClient", () => ({
+  api: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    patch: vi.fn(),
+    del: vi.fn(),
   },
 }));
 
-describe("useCategories", () => {
+import { api } from "@/services/apiClient";
+
+describe("categoryApi", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("loadCategoryList sets loading and stores result", async () => {
-    const res: ApiResult<CategoryResponse[]> = httpOk([]);
-    vi.mocked(categoryApi.getCategories).mockResolvedValue(res);
+  describe("getCategories", () => {
+    it("calls api.get with list route and query", async () => {
+      const query = { page: 1, pageSize: 10 };
 
-    const sut = useCategories();
+      await categoryApi.getCategories(query);
 
-    const p = sut.loadCategoryList({ page: 1, pageSize: 10 });
-    expect(sut.isCategoryListLoading.value).toBe(true);
-
-    await p;
-    await nextTick();
-
-    expect(categoryApi.getCategories).toHaveBeenCalledWith({
-      page: 1,
-      pageSize: 10,
+      expect(api.get).toHaveBeenCalledWith(apiRoutes.categories.list, {
+        query,
+      });
     });
-    expect(sut.listCategoryResult.value).toEqual(res);
-    expect(sut.isCategoryListLoading.value).toBe(false);
+
+    it("calls api.get with undefined query when not provided", async () => {
+      await categoryApi.getCategories();
+
+      expect(api.get).toHaveBeenCalledWith(apiRoutes.categories.list, {
+        query: undefined,
+      });
+    });
   });
 
-  it("loadByCategoryId sets loading and stores result", async () => {
-    const details: CategoryAdminDetailsResponse = {
-      id: 1,
-      name: "Electronics",
-      description: null,
-      isActive: true,
-      parents: [],
-      children: [],
-    };
+  describe("getCategoryById", () => {
+    it("calls api.get with byId route", async () => {
+      await categoryApi.getCategoryById(5);
 
-    const res: ApiResult<CategoryAdminDetailsResponse> = httpOk(details);
-    vi.mocked(categoryApi.getCategoryById).mockResolvedValue(res);
-
-    const sut = useCategories();
-
-    const p = sut.loadByCategoryId(1);
-    expect(sut.isByCategoryIdLoading.value).toBe(true);
-
-    await p;
-    await nextTick();
-
-    expect(categoryApi.getCategoryById).toHaveBeenCalledWith(1);
-    expect(sut.byCategoryIdResult.value).toEqual(res);
-    expect(sut.isByCategoryIdLoading.value).toBe(false);
+      expect(api.get).toHaveBeenCalledWith(apiRoutes.categories.byId(5));
+    });
   });
 
-  it("createCategory sets loading and stores result", async () => {
-    const res: ApiResult<void> = httpOk(undefined, 201);
-    vi.mocked(categoryApi.postCategory).mockResolvedValue(res);
+  describe("postCategory", () => {
+    it("calls api.post with create route and payload", async () => {
+      const payload: CategoryRequest = {
+        name: "Electronics",
+        description: "Electronic devices",
+        parentCategoryIds: [1, 2],
+      };
 
-    const sut = useCategories();
-    const payload: CategoryRequest = {
-      name: "New",
-      description: "Desc",
-      parentCategoryIds: [1],
-    };
+      await categoryApi.postCategory(payload);
 
-    const p = sut.createCategory(payload);
-    expect(sut.isCategoryCreatedLoading.value).toBe(true);
-
-    await p;
-    await nextTick();
-
-    expect(categoryApi.postCategory).toHaveBeenCalledWith(payload);
-    expect(sut.createdCategoryResult.value).toEqual(res);
-    expect(sut.isCategoryCreatedLoading.value).toBe(false);
+      expect(api.post).toHaveBeenCalledWith(
+        apiRoutes.categories.create,
+        payload,
+      );
+    });
   });
 
-  it("updateCategory sets loading and stores result", async () => {
-    const res: ApiResult<void> = httpOk(undefined, 204);
-    vi.mocked(categoryApi.putCategory).mockResolvedValue(res);
+  describe("putCategory", () => {
+    it("calls api.put with update route and payload", async () => {
+      const payload: CategoryRequest = {
+        name: "Updated Electronics",
+        description: "Updated description",
+        parentCategoryIds: [],
+      };
 
-    const sut = useCategories();
-    const payload: CategoryRequest = {
-      name: "Updated",
-      description: "Updated desc",
-      parentCategoryIds: [],
-    };
+      await categoryApi.putCategory(10, payload);
 
-    const p = sut.updateCategory(10, payload);
-    expect(sut.isUpdatedCategoryLoading.value).toBe(true);
-
-    await p;
-    await nextTick();
-
-    expect(categoryApi.putCategory).toHaveBeenCalledWith(10, payload);
-    expect(sut.updatedCategoryResult.value).toEqual(res);
-    expect(sut.isUpdatedCategoryLoading.value).toBe(false);
+      expect(api.put).toHaveBeenCalledWith(
+        apiRoutes.categories.update(10),
+        payload,
+      );
+    });
   });
 
-  it("toggleCategoryStatus sets loading and stores result", async () => {
-    const res: ApiResult<void> = httpOk(undefined, 204);
-    vi.mocked(categoryApi.toggleCategory).mockResolvedValue(res);
+  describe("toggleCategory", () => {
+    it("calls api.patch with toggle route", async () => {
+      await categoryApi.toggleCategory(7);
 
-    const sut = useCategories();
-
-    const p = sut.toggleCategoryStatus(10);
-    expect(sut.isPatchToggleCategoryStatusLoading.value).toBe(true);
-
-    await p;
-    await nextTick();
-
-    expect(categoryApi.toggleCategory).toHaveBeenCalledWith(10);
-    expect(sut.patchToggleCategoryStatusResult.value).toEqual(res);
-    expect(sut.isPatchToggleCategoryStatusLoading.value).toBe(false);
+      expect(api.patch).toHaveBeenCalledWith(apiRoutes.categories.toggle(7));
+    });
   });
 
-  it("loadRoots sets loading and stores result", async () => {
-    const res: ApiResult<CategoryResponse[]> = httpOk([]);
-    vi.mocked(categoryApi.getRoots).mockResolvedValue(res);
+  describe("getRoots", () => {
+    it("calls api.get with roots route and default includeInactive=false", async () => {
+      await categoryApi.getRoots();
 
-    const sut = useCategories();
+      expect(api.get).toHaveBeenCalledWith(apiRoutes.categories.roots, {
+        query: { includeInactive: false },
+      });
+    });
 
-    const p = sut.loadRoots(true);
-    expect(sut.isRootsLoading.value).toBe(true);
+    it("calls api.get with roots route and includeInactive=true", async () => {
+      await categoryApi.getRoots(true);
 
-    await p;
-    await nextTick();
-
-    expect(categoryApi.getRoots).toHaveBeenCalledWith(true);
-    expect(sut.rootsResult.value).toEqual(res);
-    expect(sut.isRootsLoading.value).toBe(false);
+      expect(api.get).toHaveBeenCalledWith(apiRoutes.categories.roots, {
+        query: { includeInactive: true },
+      });
+    });
   });
 
-  it("loadChildren sets loading and stores result", async () => {
-    const res: ApiResult<CategoryResponse[]> = httpOk([]);
-    vi.mocked(categoryApi.getChildren).mockResolvedValue(res);
+  describe("getChildren", () => {
+    it("calls api.get with children route and default includeInactive=false", async () => {
+      await categoryApi.getChildren(5);
 
-    const sut = useCategories();
+      expect(api.get).toHaveBeenCalledWith(apiRoutes.categories.children(5), {
+        query: { includeInactive: false },
+      });
+    });
 
-    const p = sut.loadChildren(5, true);
-    expect(sut.isChildrenLoading.value).toBe(true);
+    it("calls api.get with children route and includeInactive=true", async () => {
+      await categoryApi.getChildren(5, true);
 
-    await p;
-    await nextTick();
-
-    expect(categoryApi.getChildren).toHaveBeenCalledWith(5, true);
-    expect(sut.childrenResult.value).toEqual(res);
-    expect(sut.isChildrenLoading.value).toBe(false);
+      expect(api.get).toHaveBeenCalledWith(apiRoutes.categories.children(5), {
+        query: { includeInactive: true },
+      });
+    });
   });
 
-  it("attachChild sets loading and stores result", async () => {
-    const res: ApiResult<void> = httpOk(undefined, 204);
-    vi.mocked(categoryApi.attachChild).mockResolvedValue(res);
+  describe("attachChild", () => {
+    it("calls api.post with attachChild route", async () => {
+      await categoryApi.attachChild(1, 99);
 
-    const sut = useCategories();
-
-    const p = sut.attachChild(1, 99);
-    expect(sut.isAttachChildLoading.value).toBe(true);
-
-    await p;
-    await nextTick();
-
-    expect(categoryApi.attachChild).toHaveBeenCalledWith(1, 99);
-    expect(sut.attachChildResult.value).toEqual(res);
-    expect(sut.isAttachChildLoading.value).toBe(false);
+      expect(api.post).toHaveBeenCalledWith(
+        apiRoutes.categories.attachChild(1, 99),
+      );
+    });
   });
 
-  it("detachChild sets loading and stores result", async () => {
-    const res: ApiResult<void> = httpOk(undefined, 204);
-    vi.mocked(categoryApi.detachChild).mockResolvedValue(res);
+  describe("detachChild", () => {
+    it("calls api.del with detachChild route", async () => {
+      await categoryApi.detachChild(1, 99);
 
-    const sut = useCategories();
-
-    const p = sut.detachChild(1, 99);
-    expect(sut.isDetachChildLoading.value).toBe(true);
-
-    await p;
-    await nextTick();
-
-    expect(categoryApi.detachChild).toHaveBeenCalledWith(1, 99);
-    expect(sut.detachChildResult.value).toEqual(res);
-    expect(sut.isDetachChildLoading.value).toBe(false);
-  });
-
-  it("stores a failure result too (example)", async () => {
-    const res: ApiResult<CategoryResponse[]> = httpFail(500, "Server died");
-    vi.mocked(categoryApi.getCategories).mockResolvedValue(res);
-
-    const sut = useCategories();
-
-    await sut.loadCategoryList();
-    await nextTick();
-
-    expect(sut.listCategoryResult.value).toEqual(res);
-    expect(sut.isCategoryListLoading.value).toBe(false);
+      expect(api.del).toHaveBeenCalledWith(
+        apiRoutes.categories.detachChild(1, 99),
+      );
+    });
   });
 });
