@@ -1,0 +1,13 @@
+{
+  "hero": {
+    "title": "Welcome to {appName}",
+    "subtitle": "Discover amazing products across all categories. Quality items at great prices."
+  },
+  "empty": {
+    "categoriesTitle": "No categories yet",
+    "categoriesDescription": "Check back later for amazing products!"
+  },
+  "cta": {
+    "title": "Can't find what you're looking for?"
+  }
+}

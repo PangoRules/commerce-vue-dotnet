@@ -76,6 +76,7 @@ export default defineConfig(({ mode }) => {
           "src/config/**",
           "src/App.vue",
           "src/services/apiClient.ts",
+          "src/components/products/ProductCategorySection.vue",
         ],
       },
     },

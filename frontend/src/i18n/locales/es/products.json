@@ -1,0 +1,13 @@
+{
+  "cart": {
+    "add": "Agregar al Carrito",
+    "added": "Agregado al Carrito"
+  },
+  "outOfStock": "Agotado",
+  "stock": {
+    "onlyLeft": "Solo quedan {count}"
+  },
+  "noProductsYet": "No hay productos todavía",
+  "noProductsInCategory": "No hay productos en {category}",
+  "noProductsFound": "No se encontraron productos"
+}

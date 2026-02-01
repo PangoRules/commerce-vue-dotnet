@@ -1,0 +1,13 @@
+{
+  "cart": {
+    "add": "Add to Cart",
+    "added": "Added to Cart"
+  },
+  "outOfStock": "Out of Stock",
+  "stock": {
+    "onlyLeft": "Only {count} left"
+  },
+  "noProductsYet": "No products yet",
+  "noProductsInCategory": "No products in {category}",
+  "noProductsFound": "No products found"
+}

@@ -1,0 +1,30 @@
+{
+  "search": {
+    "placeholder": "Search products...",
+    "allCategories": "All Categories",
+    "button": "Search"
+  },
+  "user": {
+    "greeting": "Hello, {name}",
+    "guestGreeting": "Hello, Guest",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "register": "Register",
+    "profile": "My Profile",
+    "orders": "My Orders",
+    "account": "Account"
+  },
+  "cart": {
+    "label": "Cart",
+    "itemCount": "{count} item | {count} items",
+    "empty": "Your cart is empty"
+  },
+  "menu": {
+    "home": "Home",
+    "products": "Products",
+    "categories": "Categories",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "devToggle": "Toggle Auth (Dev)"
+}

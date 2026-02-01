@@ -15,6 +15,7 @@ import { createVuetify } from "vuetify";
 import type { Component } from "vue";
 
 import { aliases, mdi } from "vuetify/iconsets/mdi-svg";
+import { messages } from "@/i18n";
 
 export type RenderWithPluginsOptions<C extends Component> = {
   // our custom options
@@ -43,7 +44,8 @@ export async function renderWithPlugins<C extends Component>(
   const i18n = createI18n({
     legacy: false,
     locale: "en",
-    messages: { en: {} },
+    fallbackLocale: "en",
+    messages,
   });
 
   const router = createRouter({

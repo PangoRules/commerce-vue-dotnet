@@ -1,7 +1,16 @@
 import type { ThemeDefinition } from "vuetify";
 import { palettes, type PaletteName } from "@/theme/palettes";
 
-type Mode = "light" | "dark";
+export const ACTIVE_PALETTE: PaletteName = "meadow";
+
+export function getThemeName(mode: Mode): ThemeName {
+  return `${ACTIVE_PALETTE}-${mode}` as ThemeName;
+}
+
+export const modes = ["light", "dark"] as const;
+export type Mode = (typeof modes)[number];
+
+export const DEFAULT_THEME = getThemeName("light");
 
 const surfaces = {
   light: {

@@ -1,11 +1,14 @@
+<script setup lang="ts">
+import { AppNavbar } from "@/components/navbar";
+
+const isDev = import.meta.env.DEV;
+</script>
+
 <template>
   <div class="app-layout">
-    <v-app-bar>
-      <v-app-bar-title>{{ $t("app.name") }}</v-app-bar-title>
-    </v-app-bar>
+    <AppNavbar :show-dev-toggle="isDev" />
 
     <v-main>
-      <!-- no container here unless you want global padding -->
       <div class="app-content">
         <slot />
       </div>

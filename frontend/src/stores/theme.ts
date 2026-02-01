@@ -1,17 +1,26 @@
 import { defineStore } from "pinia";
-import type { ThemeName } from "@/theme/themes";
+import { getThemeName, type Mode, type ThemeName } from "@/theme/themes";
+import { computed, ref } from "vue";
 
-const storageKey = "app.theme";
+export const useThemeStore = defineStore(
+  "theme",
+  () => {
+    const mode = ref<Mode>("light");
 
-export const useThemeStore = defineStore("theme", {
-  state: () => ({
-    themeName: (localStorage.getItem(storageKey) ??
-      "meadow-light") as ThemeName,
-  }),
-  actions: {
-    setTheme(theme: ThemeName) {
-      this.themeName = theme;
-      localStorage.setItem(storageKey, theme);
+    const themeName = computed<ThemeName>(() => getThemeName(mode.value));
+
+    function setMode(newMode: Mode) {
+      mode.value = newMode;
+    }
+    function toggleMode() {
+      setMode(mode.value === "light" ? "dark" : "light");
+    }
+
+    return { themeName, mode, setMode, toggleMode };
+  },
+  {
+    persist: {
+      key: "app.theme",
     },
   },
-});
+);

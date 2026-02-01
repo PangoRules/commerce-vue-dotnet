@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import type { ProductResponse } from "@/types/api/productTypes";
-import ProductCard from "./ProductCard.vue";
+import ProductCard from "@/components/products/ProductCard.vue";
 import ProductCardSkeleton from "@/components/shared/ProductCardSkeleton.vue";
 import EmptyState from "@/components/shared/EmptyState.vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 defineProps<{
   products: ProductResponse[];
@@ -30,7 +33,7 @@ const emit = defineEmits<{
   <!-- Loading State -->
   <v-row v-if="loading">
     <v-col
-      v-for="i in (skeletonCount ?? 8)"
+      v-for="i in skeletonCount ?? 8"
       :key="i"
       :cols="cols?.xs ?? 12"
       :sm="cols?.sm ?? 6"
@@ -65,8 +68,8 @@ const emit = defineEmits<{
   <!-- Empty State -->
   <EmptyState
     v-else
-    :title="emptyTitle ?? 'No products found'"
-    :description="emptyDescription ?? 'Try adjusting your filters or search terms'"
+    :title="emptyTitle ?? t('products.noProductsFound')"
+    :description="emptyDescription ?? t('common.adjustFilters')"
     icon="mdi-magnify"
   />
 </template>

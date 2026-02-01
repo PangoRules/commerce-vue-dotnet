@@ -1,3 +1,10 @@
+<script setup lang="ts">
+import { useToastStore } from "@/stores/toast";
+import { useI18n } from "vue-i18n";
+const toast = useToastStore();
+const { t } = useI18n();
+</script>
+
 <template>
   <v-snackbar
     v-model="toast.show"
@@ -6,12 +13,9 @@
   >
     {{ toast.text }}
     <template #actions>
-      <v-btn variant="text" @click="toast.show = false">Close</v-btn>
+      <v-btn variant="text" @click="toast.show = false">{{
+        t("common.actions.close")
+      }}</v-btn>
     </template>
   </v-snackbar>
 </template>
-
-<script setup lang="ts">
-import { useToastStore } from "@/stores/toast";
-const toast = useToastStore();
-</script>
