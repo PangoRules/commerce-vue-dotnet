@@ -34,7 +34,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-container class="py-8">
+  <v-container class="py-8 mx-auto">
     <!-- Hero Section -->
     <section class="hero-section text-center mb-12">
       <h1 class="text-h3 text-md-h2 font-weight-bold mb-4">
