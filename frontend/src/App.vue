@@ -17,7 +17,7 @@ onMounted(() => {
 watch(
   () => themeStore.themeName,
   (name) => {
-    vuetifyTheme.global.name.value = name;
+    vuetifyTheme.change(name);
   },
   { immediate: true },
 );
