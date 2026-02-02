@@ -19,11 +19,18 @@ public class Product
     /// </summary>
     public ICollection<ProductImage> Images { get; set; } = [];
 
+    /// <summary>
+    /// Toggles the active status of the product.
+    /// </summary>
     public void ToggleProduct()
     {
         this.IsActive = !this.IsActive;
     }
 
+    /// <summary>
+    /// Updates the product with the given request.
+    /// </summary>
+    /// <param name="request">The request to update the product.</param>
     public void UpdateProduct(UpdateProductRequest request)
     {
         this.Name = request.Name;
@@ -33,6 +40,11 @@ public class Product
         this.CategoryId = request.CategoryId;
     }
 
+    /// <summary>
+    /// Creates a new product from the given request.
+    /// </summary>
+    /// <param name="request">The request to create the product.</param>
+    /// <returns>A new product created from the request.</returns>
     public static Product FromCreateRequest(CreateProductRequest request)
     {
         return new Product

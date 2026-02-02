@@ -43,6 +43,12 @@ vi.mock("@/components/shared", () => ({
   },
 }));
 
+// Routes referenced in the component
+const testRoutes = [
+  { path: "/", component: { template: "<div />" } },
+  { path: "/products", component: { template: "<div />" } },
+];
+
 describe("IndexPage (pages/index.vue)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -145,7 +151,7 @@ describe("IndexPage (pages/index.vue)", () => {
         ],
       };
 
-      await renderWithPlugins(IndexPage, {});
+      await renderWithPlugins(IndexPage, { routes: testRoutes });
 
       const sections = screen.getAllByTestId("category-section");
       expect(sections.length).toBe(3);
@@ -158,7 +164,7 @@ describe("IndexPage (pages/index.vue)", () => {
         data: [createMockCategory({ id: 5, name: "Gadgets" })],
       };
 
-      await renderWithPlugins(IndexPage, {});
+      await renderWithPlugins(IndexPage, { routes: testRoutes });
 
       const section = screen.getByTestId("category-section");
       expect(section.getAttribute("data-category-id")).toBe("5");
@@ -196,7 +202,7 @@ describe("IndexPage (pages/index.vue)", () => {
         data: [createMockCategory({ id: 1, name: "Electronics" })],
       };
 
-      await renderWithPlugins(IndexPage, {});
+      await renderWithPlugins(IndexPage, { routes: testRoutes });
 
       // Find the link/button that goes to /products
       const buttons = screen.getAllByRole("link");
@@ -209,7 +215,7 @@ describe("IndexPage (pages/index.vue)", () => {
     it("hides footer CTA when no categories exist", async () => {
       mockRootsResult.value = { ok: true, status: 200, data: [] };
 
-      await renderWithPlugins(IndexPage, {});
+      await renderWithPlugins(IndexPage, { routes: testRoutes });
 
       // Should not have a link to /products when empty
       const links = screen.queryAllByRole("link");

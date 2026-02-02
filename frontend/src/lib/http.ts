@@ -105,6 +105,8 @@ export function createHttpClient(config?: {
   defaultHeaders?: Record<string, string>;
   // allow attaching auth tokens later
   getAuthHeader?: () => string | null;
+  // allow attaching locale for Accept-Language header
+  getLocale?: () => string | null;
   onError?: (err: ApiError) => void;
 }) {
   const baseUrl =
@@ -134,6 +136,9 @@ export function createHttpClient(config?: {
 
     const auth = config?.getAuthHeader?.();
     if (auth) headers["Authorization"] = auth;
+
+    const locale = config?.getLocale?.();
+    if (locale) headers["Accept-Language"] = locale;
 
     // Body handling
     let body: BodyInit | undefined = undefined;

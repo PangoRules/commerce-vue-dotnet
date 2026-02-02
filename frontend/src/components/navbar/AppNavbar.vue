@@ -9,6 +9,7 @@ import NavbarUserMenu from "./NavbarUserMenu.vue";
 import NavbarCart from "./NavbarCart.vue";
 import NavbarMobileDrawer from "./NavbarMobileDrawer.vue";
 import ThemeToggler from "@/components/shared/ThemeToggler.vue";
+import LangSelector from "../shared/LangSelector.vue";
 
 defineProps<{
   showDevToggle?: boolean;
@@ -111,6 +112,7 @@ watch(isSmall, (value) => {
         />
         <NavbarCart :count="cartCount" @click="handleCartClick" />
         <ThemeToggler />
+        <LangSelector />
         <v-btn
           v-if="showDevToggle && !isMobile"
           icon

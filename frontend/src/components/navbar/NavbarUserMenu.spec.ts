@@ -6,6 +6,13 @@ import { createMockUser } from "@/tests/helpers";
 
 const mockUser = createMockUser();
 
+// Routes referenced in the component's dropdown menu
+const testRoutes = [
+  { path: "/", component: { template: "<div />" } },
+  { path: "/profile", component: { template: "<div />" } },
+  { path: "/orders", component: { template: "<div />" } },
+];
+
 describe("NavbarUserMenu", () => {
   describe("Guest state", () => {
     it("shows sign in button when not authenticated", async () => {
@@ -216,6 +223,7 @@ describe("NavbarUserMenu", () => {
   describe("Dropdown menu", () => {
     it("can click authenticated user button to open menu", async () => {
       await renderWithPlugins(NavbarUserMenu, {
+        routes: testRoutes,
         render: {
           props: {
             isAuthenticated: true,
@@ -236,6 +244,7 @@ describe("NavbarUserMenu", () => {
 
     it("menu button has correct aria attributes for accessibility", async () => {
       const { container } = await renderWithPlugins(NavbarUserMenu, {
+        routes: testRoutes,
         render: {
           props: {
             isAuthenticated: true,
@@ -252,6 +261,7 @@ describe("NavbarUserMenu", () => {
 
     it("renders v-menu wrapper for authenticated users", async () => {
       const { container } = await renderWithPlugins(NavbarUserMenu, {
+        routes: testRoutes,
         render: {
           props: {
             isAuthenticated: true,

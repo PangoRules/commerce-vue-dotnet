@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { renderWithPlugins } from "@/tests/render";
 import { fireEvent } from "@testing-library/vue";
 import ThemeToggler from "./ThemeToggler.vue";
-import { useThemeStore } from "@/stores/theme";
+import { useAppStore } from "@/stores/app";
 
 describe("ThemeToggler", () => {
   it("renders toggle button", async () => {
@@ -14,16 +14,16 @@ describe("ThemeToggler", () => {
   it("toggles theme mode when clicked", async () => {
     const { container } = await renderWithPlugins(ThemeToggler, {});
     // Get store AFTER render so Pinia is initialized
-    const themeStore = useThemeStore();
+    const appStore = useAppStore();
     const button = container.querySelector<HTMLButtonElement>(".theme-toggle");
 
-    expect(themeStore.mode).toBe("light");
+    expect(appStore.mode).toBe("light");
 
     await fireEvent.click(button!);
-    expect(themeStore.mode).toBe("dark");
+    expect(appStore.mode).toBe("dark");
 
     await fireEvent.click(button!);
-    expect(themeStore.mode).toBe("light");
+    expect(appStore.mode).toBe("light");
   });
 
   it("shows correct aria-label based on mode", async () => {
