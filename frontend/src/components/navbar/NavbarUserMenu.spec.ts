@@ -27,7 +27,7 @@ describe("NavbarUserMenu", () => {
 
       const buttons = screen.getAllByRole("button");
       const signInButton = buttons.find((btn) =>
-        btn.textContent?.toLowerCase().includes("sign")
+        btn.textContent?.toLowerCase().includes("sign"),
       );
       expect(signInButton).toBeDefined();
     });
@@ -44,7 +44,7 @@ describe("NavbarUserMenu", () => {
 
       const buttons = screen.getAllByRole("button");
       const registerButton = buttons.find((btn) =>
-        btn.textContent?.toLowerCase().includes("register")
+        btn.textContent?.toLowerCase().includes("register"),
       );
       expect(registerButton).toBeDefined();
     });
@@ -77,7 +77,7 @@ describe("NavbarUserMenu", () => {
 
       const buttons = screen.getAllByRole("button");
       const signInButton = buttons.find((btn) =>
-        btn.textContent?.toLowerCase().includes("sign")
+        btn.textContent?.toLowerCase().includes("sign"),
       );
       if (signInButton) {
         await fireEvent.click(signInButton);
@@ -99,12 +99,29 @@ describe("NavbarUserMenu", () => {
 
       const buttons = screen.getAllByRole("button");
       const registerButton = buttons.find((btn) =>
-        btn.textContent?.toLowerCase().includes("register")
+        btn.textContent?.toLowerCase().includes("register"),
       );
       if (registerButton) {
         await fireEvent.click(registerButton);
         expect(onRegister).toHaveBeenCalledTimes(1);
       }
+    });
+
+    it("emits login event when icon button is clicked in compact mode", async () => {
+      const onLogin = vi.fn();
+      await renderWithPlugins(NavbarUserMenu, {
+        render: {
+          props: {
+            isAuthenticated: false,
+            compact: true,
+            onLogin,
+          },
+        },
+      });
+
+      const button = screen.getByRole("button");
+      await fireEvent.click(button);
+      expect(onLogin).toHaveBeenCalledTimes(1);
     });
 
     it("emits login event when icon button is clicked in compact mode", async () => {
