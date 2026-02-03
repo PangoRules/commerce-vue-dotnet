@@ -174,6 +174,34 @@ public class CategoryServiceTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
+    public async Task GetRootsAsync_PassesFeaturedOnly_AndMaps(bool featuredOnly)
+    {
+        // Arrange
+        var repo = new FakeCategoryRepository
+        {
+            Roots =
+            [
+                new Category { Id = 10, Name = "Electronics", Description = "Featured category", IsActive = true, IsFeatured = true }
+            ]
+        };
+
+        var sut = new CategoryService(repo);
+
+        // Act
+        var result = await sut.GetRootsAsync(includeInactive: false, featuredOnly: featuredOnly);
+
+        // Assert
+        Assert.Single(result);
+        Assert.Equal(10, result[0].Id);
+        Assert.Equal("Electronics", result[0].Name);
+        Assert.True(result[0].IsFeatured);
+
+        Assert.Equal(featuredOnly, repo.LastRootsFeaturedOnly);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public async Task GetChildrenAsync_PassesArgs_AndMaps(bool includeInactive)
     {
         // Arrange
@@ -362,6 +390,7 @@ public class CategoryServiceTests
         public int? LastSimpleCategoryId {get; private set; }
 
         public bool? LastRootsIncludeInactive { get; private set; }
+        public bool? LastRootsFeaturedOnly { get; private set; }
         public int? LastChildrenParentId { get; private set; }
         public bool? LastChildrenIncludeInactive { get; private set; }
 
@@ -396,9 +425,10 @@ public class CategoryServiceTests
             return Task.FromResult(CategoryGraphById);
         }
 
-        public Task<IReadOnlyList<Category>> GetRootsAsync(bool includeInactive = false, CancellationToken ct = default)
+        public Task<IReadOnlyList<Category>> GetRootsAsync(bool includeInactive = false, bool featuredOnly = false, CancellationToken ct = default)
         {
             LastRootsIncludeInactive = includeInactive;
+            LastRootsFeaturedOnly = featuredOnly;
             return Task.FromResult<IReadOnlyList<Category>>(Roots);
         }
 

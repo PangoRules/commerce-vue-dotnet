@@ -13,6 +13,7 @@ public static class ProductMapper
             Name = product.Name,
             Description = product.Description,
             Price = product.Price,
+            SalePrice = product.SalePrice,
             StockQuantity = product.StockQuantity,
             IsActive = product.IsActive,
             Category = product.Category != null
@@ -20,7 +21,8 @@ public static class ProductMapper
                 {
                     Id = product.Category.Id,
                     Name = product.Category.Name,
-                    Description = product.Category.Description
+                    Description = product.Category.Description,
+                    IsFeatured = product.Category.IsFeatured
                 }
                 : null,
             Images = ProductImageMapper.ToResponseList(product.Images),

@@ -10,6 +10,7 @@ public static class CategoryMapper
         {
             Id = category.Id,
             Name = category.Name,
-            Description = category.Description
+            Description = category.Description,
+            IsFeatured = category.IsFeatured
         };
 }

@@ -45,12 +45,15 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
     /// <summary>
     /// Get root categories for navigation (active-only by default).
     /// </summary>
+    /// <param name="includeInactive">Include inactive categories.</param>
+    /// <param name="featuredOnly">Return only featured categories.</param>
+    /// <param name="ct">Cancellation token.</param>
     [HttpGet("roots")]
     [ProducesResponseType(typeof(List<CategoryResponse>), 200)]
     [ProducesResponseType(204)]
-    public async Task<IActionResult> GetRoots([FromQuery] bool includeInactive = false, CancellationToken ct = default)
+    public async Task<IActionResult> GetRoots([FromQuery] bool includeInactive = false, [FromQuery] bool featuredOnly = false, CancellationToken ct = default)
     {
-        var roots = await categoryService.GetRootsAsync(includeInactive, ct);
+        var roots = await categoryService.GetRootsAsync(includeInactive, featuredOnly, ct);
         return roots.Count > 0 ? Ok(roots) : NoContent();
     }
 

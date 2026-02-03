@@ -11,6 +11,7 @@ public class ProductResponse
     public string Name { get; init; } = null!;
     public string? Description { get; init; }
     public decimal Price { get; init; }
+    public decimal? SalePrice { get; init; }
     public int StockQuantity { get; init; }
     public bool IsActive { get; init; }
     public CategoryResponse? Category { get; set; } = null!;

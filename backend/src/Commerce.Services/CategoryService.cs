@@ -21,7 +21,10 @@ public interface ICategoryService
     /// <summary>
     /// Get root categories for navigation (active-only by default).
     /// </summary>
-    Task<IReadOnlyList<CategoryResponse>> GetRootsAsync(bool includeInactive = false, CancellationToken ct = default);
+    /// <param name="includeInactive">Whether to include inactive categories.</param>
+    /// <param name="featuredOnly">Whether to return only featured categories.</param>
+    /// <param name="ct">The cancellation token.</param>
+    Task<IReadOnlyList<CategoryResponse>> GetRootsAsync(bool includeInactive = false, bool featuredOnly = false, CancellationToken ct = default);
 
     /// <summary>
     /// Get children categories for a parent (active-only by default).
@@ -75,9 +78,9 @@ public class CategoryService(ICategoryRepository categoriesRepository) : ICatego
         return ToAdminDetailsResponse(category);
     }
 
-    public async Task<IReadOnlyList<CategoryResponse>> GetRootsAsync(bool includeInactive = false, CancellationToken ct = default)
+    public async Task<IReadOnlyList<CategoryResponse>> GetRootsAsync(bool includeInactive = false, bool featuredOnly = false, CancellationToken ct = default)
     {
-        var roots = await categoriesRepository.GetRootsAsync(includeInactive, ct);
+        var roots = await categoriesRepository.GetRootsAsync(includeInactive, featuredOnly, ct);
         return [.. roots.Select(Mappers.CategoryMapper.ToResponse)];
     }
 

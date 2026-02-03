@@ -397,7 +397,7 @@ public class ProductServiceTests
         public Task<Category?> GetCategoryGraphByIdAsync(int id, CancellationToken ct = default)
             => throw new NotImplementedException();
 
-        public Task<IReadOnlyList<Category>> GetRootsAsync(bool includeInactive = false, CancellationToken ct = default)
+        public Task<IReadOnlyList<Category>> GetRootsAsync(bool includeInactive = false, bool featuredOnly = false, CancellationToken ct = default)
             => throw new NotImplementedException();
 
         public Task<IReadOnlyList<Category>> GetChildrenAsync(int parentCategoryId, bool includeInactive = false, CancellationToken ct = default)
