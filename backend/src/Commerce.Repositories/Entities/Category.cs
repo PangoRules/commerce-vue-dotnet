@@ -11,9 +11,6 @@ public class Category
     public string? Description { get; set; }
     public DateTime CreatedAt { get; set; }
     public bool IsActive { get; set; }
-
-    public bool IsFeatured { get; set; } = false;
-
     public ICollection<Product> Products { get; set; } = [];
 
     // Graph links:
