@@ -1,5 +1,5 @@
 <template>
   <v-container class="py-8 mx-auto">
-    <h1>HOME</h1>
+    <h1>Categories</h1>
   </v-container>
 </template>

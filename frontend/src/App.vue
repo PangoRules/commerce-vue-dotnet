@@ -3,19 +3,24 @@ import SnackbarHost from "@/components/shared/SnackbarHost.vue";
 import LayoutRenderer from "@/layouts/LayoutRenderer.vue";
 import { onMounted, watch } from "vue";
 import { useTheme } from "vuetify";
-import { useThemeStore } from "@/stores/theme";
+import { useAppStore } from "@/stores/app";
 
 const vuetifyTheme = useTheme();
-const themeStore = useThemeStore();
+const appStore = useAppStore();
 
 onMounted(() => {
-  if (window.matchMedia("(prefers-color-scheme: dark)")) {
-    themeStore.setMode("dark");
+  // Only set dark mode on first visit (when no persisted preference exists)
+  // The store will already have the persisted value if it exists
+  if (
+    localStorage.getItem("app") === null &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  ) {
+    appStore.setMode("dark");
   }
 });
 
 watch(
-  () => themeStore.themeName,
+  () => appStore.themeName,
   (name) => {
     vuetifyTheme.change(name);
   },

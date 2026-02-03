@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { useThemeStore } from "@/stores/theme";
+import { useAppStore } from "@/stores/app";
 
-const themeStore = useThemeStore();
+const appStore = useAppStore();
 
-const isDark = computed(() => themeStore.mode === "dark");
+const isDark = computed(() => appStore.mode === "dark");
 
 // Unique ID to avoid conflicts if multiple togglers are rendered
 const clipId = `theme-toggle-cutout-${Math.random().toString(36).slice(2, 9)}`;
@@ -20,7 +20,7 @@ const cutoutStyle = computed(() => ({
 }));
 
 function toggle() {
-  themeStore.toggleMode();
+  appStore.toggleMode();
 }
 </script>
 

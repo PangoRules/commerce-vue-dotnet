@@ -210,4 +210,44 @@ describe("http client", () => {
       unwrap({ ok: false, error: { kind: "http", message: "nope" } }),
     ).toThrow("nope");
   });
+
+  it("includes Accept-Language header when getLocale is provided", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(jsonResponse({ ok: true }, { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const api = createHttpClient({
+      baseUrl,
+      getLocale: () => "es",
+    });
+
+    await api.get("/api/products");
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const init = fetchMock.mock.calls[0]![1] as RequestInit;
+    expect((init.headers as Record<string, string>)["Accept-Language"]).toBe(
+      "es",
+    );
+  });
+
+  it("does not include Accept-Language header when getLocale returns null", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(jsonResponse({ ok: true }, { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const api = createHttpClient({
+      baseUrl,
+      getLocale: () => null,
+    });
+
+    await api.get("/api/products");
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const init = fetchMock.mock.calls[0]![1] as RequestInit;
+    expect(
+      (init.headers as Record<string, string>)["Accept-Language"],
+    ).toBeUndefined();
+  });
 });

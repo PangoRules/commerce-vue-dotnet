@@ -6,6 +6,13 @@ import { createMockUser } from "@/tests/helpers";
 
 const mockUser = createMockUser();
 
+// Routes referenced in the component's dropdown menu
+const testRoutes = [
+  { path: "/", component: { template: "<div />" } },
+  { path: "/profile", component: { template: "<div />" } },
+  { path: "/orders", component: { template: "<div />" } },
+];
+
 describe("NavbarUserMenu", () => {
   describe("Guest state", () => {
     it("shows sign in button when not authenticated", async () => {
@@ -20,7 +27,7 @@ describe("NavbarUserMenu", () => {
 
       const buttons = screen.getAllByRole("button");
       const signInButton = buttons.find((btn) =>
-        btn.textContent?.toLowerCase().includes("sign")
+        btn.textContent?.toLowerCase().includes("sign"),
       );
       expect(signInButton).toBeDefined();
     });
@@ -37,7 +44,7 @@ describe("NavbarUserMenu", () => {
 
       const buttons = screen.getAllByRole("button");
       const registerButton = buttons.find((btn) =>
-        btn.textContent?.toLowerCase().includes("register")
+        btn.textContent?.toLowerCase().includes("register"),
       );
       expect(registerButton).toBeDefined();
     });
@@ -70,7 +77,7 @@ describe("NavbarUserMenu", () => {
 
       const buttons = screen.getAllByRole("button");
       const signInButton = buttons.find((btn) =>
-        btn.textContent?.toLowerCase().includes("sign")
+        btn.textContent?.toLowerCase().includes("sign"),
       );
       if (signInButton) {
         await fireEvent.click(signInButton);
@@ -92,12 +99,29 @@ describe("NavbarUserMenu", () => {
 
       const buttons = screen.getAllByRole("button");
       const registerButton = buttons.find((btn) =>
-        btn.textContent?.toLowerCase().includes("register")
+        btn.textContent?.toLowerCase().includes("register"),
       );
       if (registerButton) {
         await fireEvent.click(registerButton);
         expect(onRegister).toHaveBeenCalledTimes(1);
       }
+    });
+
+    it("emits login event when icon button is clicked in compact mode", async () => {
+      const onLogin = vi.fn();
+      await renderWithPlugins(NavbarUserMenu, {
+        render: {
+          props: {
+            isAuthenticated: false,
+            compact: true,
+            onLogin,
+          },
+        },
+      });
+
+      const button = screen.getByRole("button");
+      await fireEvent.click(button);
+      expect(onLogin).toHaveBeenCalledTimes(1);
     });
 
     it("emits login event when icon button is clicked in compact mode", async () => {
@@ -216,6 +240,7 @@ describe("NavbarUserMenu", () => {
   describe("Dropdown menu", () => {
     it("can click authenticated user button to open menu", async () => {
       await renderWithPlugins(NavbarUserMenu, {
+        routes: testRoutes,
         render: {
           props: {
             isAuthenticated: true,
@@ -236,6 +261,7 @@ describe("NavbarUserMenu", () => {
 
     it("menu button has correct aria attributes for accessibility", async () => {
       const { container } = await renderWithPlugins(NavbarUserMenu, {
+        routes: testRoutes,
         render: {
           props: {
             isAuthenticated: true,
@@ -252,6 +278,7 @@ describe("NavbarUserMenu", () => {
 
     it("renders v-menu wrapper for authenticated users", async () => {
       const { container } = await renderWithPlugins(NavbarUserMenu, {
+        routes: testRoutes,
         render: {
           props: {
             isAuthenticated: true,

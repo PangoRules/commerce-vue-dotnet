@@ -33,10 +33,35 @@ function buildMessages(): Record<Locales, I18nSchema> {
 
 export const messages = buildMessages();
 
+export const supportedLocales: Locales[] = ["en", "es"];
+const defaultLocale: Locales = "en";
+
+function detectUserLocale(): Locales {
+  // Check browser language preferences
+  const browserLocales = navigator.languages ?? [navigator.language];
+
+  for (const browserLocale of browserLocales) {
+    if (!browserLocale) continue;
+    // Extract language code (e.g., "en-US" -> "en")
+    const lang = browserLocale.split("-")[0]?.toLowerCase();
+    if (!lang) continue;
+
+    if (supportedLocales.includes(lang as Locales)) {
+      return lang as Locales;
+    }
+  }
+
+  return defaultLocale;
+}
+
 export const i18n = createI18n<[I18nSchema], Locales>({
   legacy: false,
   globalInjection: true,
-  locale: "es",
-  fallbackLocale: "en",
+  locale: detectUserLocale(),
+  fallbackLocale: defaultLocale,
   messages,
 });
+
+export function getCurrentLocale(): Locales {
+  return i18n.global.locale;
+}
