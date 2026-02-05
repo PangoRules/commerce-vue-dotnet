@@ -1,4 +1,4 @@
-@host = http://localhost:5001
+@host = http://localhost:8080
 @contentType = application/json
 
 ### Get all products (200 or 204)
@@ -23,6 +23,9 @@ Accept: {{contentType}}
 GET {{host}}/api/product?searchTerm=laptop&sortBy=Name&sortDescending=false&page=1&pageSize=5
 Accept: {{contentType}}
 
+### Get all products – OnSale only
+GET {{host}}/api/product?page=1&pageSize=5&OnSale=true
+Accept: {{contentType}}
 
 ### Get product by id (200 or 404)
 GET {{host}}/api/product/3001

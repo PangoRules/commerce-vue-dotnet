@@ -46,6 +46,7 @@ export const useAppStore = defineStore(
     }
 
     // Sync locale changes to vue-i18n
+    // In vue-i18n v11 with legacy: false, locale is a Ref
     watch(
       locale,
       (newLocale) => {

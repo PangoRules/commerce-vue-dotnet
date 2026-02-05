@@ -9,5 +9,12 @@
   },
   "noProductsYet": "No products yet",
   "noProductsInCategory": "No products in {category}",
-  "noProductsFound": "No products found"
+  "noProductsFound": "No products found",
+  "empty": {
+    "categoriesTitle": "No categories yet",
+    "categoriesDescription": "Check back later for amazing products!"
+  },
+  "cta": {
+    "title": "Can't find what you're looking for?"
+  }
 }

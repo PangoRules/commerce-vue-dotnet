@@ -9,7 +9,8 @@ describe("app store", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     // Reset i18n locale to default before each test
-    i18n.global.locale = "en";
+    // In vue-i18n v11 with legacy: false, locale is a Ref
+    i18n.global.locale.value = "en";
   });
 
   describe("theme - initialization", () => {
@@ -117,7 +118,8 @@ describe("app store", () => {
       store.setLocale("es");
       await nextTick();
 
-      expect(i18n.global.locale).toBe("es");
+      // In vue-i18n v11 with legacy: false, locale is a Ref
+      expect(i18n.global.locale.value).toBe("es");
     });
 
     it("ignores unsupported locale values", () => {

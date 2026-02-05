@@ -20,7 +20,9 @@ export type CategoryAdminDetailsResponse = {
   children: CategoryNameIdPair[];
 };
 
-export type CategoryListQuery = QueryDefaults;
+export type CategoryListQuery = QueryDefaults & {
+  featuredOnly?: boolean;
+};
 
 export type CategoryRequest = {
   name: string;
