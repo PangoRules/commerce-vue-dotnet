@@ -4,6 +4,10 @@ import { supportedLocales } from "@/i18n";
 import type { Locales } from "@/i18n/i18types";
 
 const appStore = useAppStore();
+
+const setLocale = (locale: Locales) => {
+  appStore.setLocale(locale);
+};
 </script>
 
 <template>
@@ -18,7 +22,7 @@ const appStore = useAppStore();
         :key="index"
         :value="item"
       >
-        <v-list-item-title @click="appStore.setLocale(item as Locales)">{{
+        <v-list-item-title @click="setLocale(item as Locales)">{{
           item.toUpperCase()
         }}</v-list-item-title>
       </v-list-item>

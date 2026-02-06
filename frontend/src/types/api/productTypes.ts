@@ -29,6 +29,7 @@ export type ProductResponse = {
 export type ProductListQuery = QueryDefaults & {
   categoryId?: number;
   isActive?: boolean;
+  onSale?: boolean;
 };
 
 export type ProductMap = Record<string, ProductResponse>;

@@ -54,7 +54,7 @@ function detectUserLocale(): Locales {
   return defaultLocale;
 }
 
-export const i18n = createI18n<[I18nSchema], Locales>({
+export const i18n = createI18n<[I18nSchema], Locales, false>({
   legacy: false,
   globalInjection: true,
   locale: detectUserLocale(),
@@ -63,6 +63,5 @@ export const i18n = createI18n<[I18nSchema], Locales>({
 });
 
 export function getCurrentLocale(): Locales {
-  // In vue-i18n v11 with legacy: false, locale is a Ref
-  return i18n.global.locale;
+  return i18n.global.locale.value;
 }
