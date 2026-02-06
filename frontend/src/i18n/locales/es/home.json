@@ -2,5 +2,9 @@
   "hero": {
     "title": "Bienvenido a {appName}",
     "subtitle": "Descubre productos increíbles en todas las categorías. Productos de calidad a precios increíbles."
+  },
+  "deals": {
+    "title": "Productos más populares",
+    "pagination": "Página {page} de {pageCount}"
   }
 }

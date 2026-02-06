@@ -19,6 +19,7 @@ export type ProductResponse = {
   name: string;
   description?: string | null | undefined;
   price: number;
+  salePrice?: number | null | undefined;
   stockQuantity: number;
   isActive: boolean;
   category: CategoryResponse | null | undefined;

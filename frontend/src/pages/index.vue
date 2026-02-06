@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DealsCarousel from "@/components/home/DealsCarousel.vue";
 import FeaturedCategories from "@/components/home/FeaturedCategories.vue";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
@@ -26,7 +27,6 @@ const welcomeTitle = computed(() =>
     <FeaturedCategories />
 
     <!-- Deals Carousel -->
-
-    <!-- Best Sellers -->
+    <DealsCarousel />
   </v-container>
 </template>

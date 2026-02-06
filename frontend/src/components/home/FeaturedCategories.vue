@@ -29,9 +29,13 @@ const { mdAndUp } = useDisplay();
   <v-container v-else-if="!mdAndUp" class="mx-auto" max-width="100%">
     <v-row>
       <v-col cols="12">
-        <div class="text-h5 font-weight-medium mb-4">
-          {{ t("categories.featuredCategories") }}
-        </div>
+        <h2
+          class="text-h5 font-weight-bold d-flex justify-space-between mb-4 align-center"
+        >
+          <div class="text-truncate">
+            {{ t("categories.featuredCategories") }}
+          </div>
+        </h2>
       </v-col>
     </v-row>
 
@@ -62,33 +66,41 @@ const { mdAndUp } = useDisplay();
   <v-container v-else>
     <v-row>
       <v-col cols="12">
-        <div class="text-h5 font-weight-medium mb-4">
-          {{ t("categories.featuredCategories") }}
-        </div>
+        <h2
+          class="text-h4 font-weight-bold d-flex justify-space-between mb-4 align-center"
+        >
+          <div class="text-truncate">
+            {{ t("categories.featuredCategories") }}
+          </div>
+        </h2>
       </v-col>
     </v-row>
-    <v-slide-group show-arrows class="justify-center">
-      <v-slide-group-item
-        v-for="category in featuredCategories"
-        :key="category.id"
-      >
-        <v-card
-          class="ma-3 d-flex flex-column category-card"
-          width="50%"
-          border
-          flat
-          :to="`/products?category=${category.id}`"
-        >
-          <v-img src="https://placehold.co/400x400" height="320" cover />
-          <v-card-item class="flex-grow-1">
-            <v-card-title class="text-h5">{{ category.name }}</v-card-title>
-            <v-card-subtitle class="text-wrap text-body-1">
-              {{ category.description }}
-            </v-card-subtitle>
-          </v-card-item>
-        </v-card>
-      </v-slide-group-item>
-    </v-slide-group>
+    <v-row>
+      <v-col cols="12">
+        <v-slide-group show-arrows>
+          <v-slide-group-item
+            v-for="category in featuredCategories"
+            :key="category.id"
+          >
+            <v-card
+              class="ma-2 d-flex flex-column category-card"
+              width="50%"
+              border
+              flat
+              :to="`/products?category=${category.id}`"
+            >
+              <v-img src="https://placehold.co/400x400" height="320" cover />
+              <v-card-item class="flex-grow-1">
+                <v-card-title class="text-h5">{{ category.name }}</v-card-title>
+                <v-card-subtitle class="text-wrap text-body-1">
+                  {{ category.description }}
+                </v-card-subtitle>
+              </v-card-item>
+            </v-card>
+          </v-slide-group-item>
+        </v-slide-group>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
