@@ -52,7 +52,7 @@ This document provides a summary of the project's architecture, technology stack
     2.  `Commerce.Services`: Business logic, DTOs, and mappers.
     3.  `Commerce.Repositories`: Data access using Entity Framework Core.
     4.  `Commerce.Shared`: Common utilities, validators, and enums.
--   **Key Patterns**: Uses a `Result` pattern in services for robust error handling.
+-   **Key Patterns**: Uses a `Result` pattern in services for robust error handling. Generic `ImageAsset` pipeline supports images for any entity type (Product, Category) via `ImageAssetType` enum and `OwnerId`.
 -   **Testing**: Employs xUnit, Moq, and FluentAssertions for unit tests, with Testcontainers for integration tests.
 
 ### Frontend (Vue 3)
@@ -66,6 +66,7 @@ This document provides a summary of the project's architecture, technology stack
 -   **Key Patterns**:
     -   `ApiResult<T>` pattern for consistent API error handling.
     -   Composables for reactive state management.
+    -   Home page features: FeaturedCategories (crossfade image slideshow), DealsCarousel.
 -   **Testing**: Uses Vitest and `@testing-library/vue`.
 
 ---

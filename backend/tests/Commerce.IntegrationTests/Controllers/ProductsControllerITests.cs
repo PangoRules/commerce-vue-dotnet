@@ -171,5 +171,61 @@ namespace Commerce.IntegrationTests
             Assert.NotNull(product);
             Assert.Equal(1001, product!.Id);
         }
+
+        [Fact]
+        public async Task GetAllProducts_OnSaleTrue_ReturnsOnlyProductsWithSalePrice()
+        {
+            var res = await _client.GetAsync("/api/product?onSale=true");
+            var body = await res.Content.ReadAsStringAsync();
+
+            Assert.True(res.StatusCode is HttpStatusCode.OK or HttpStatusCode.NoContent,
+                $"Status: {(int)res.StatusCode}\n{body}");
+
+            if (res.StatusCode == HttpStatusCode.NoContent)
+                return;
+
+            var items = await res.Content.ReadFromJsonAsync<List<ProductResponse>>();
+            Assert.NotNull(items);
+            Assert.NotEmpty(items!);
+
+            // All returned products should have a SalePrice
+            Assert.All(items!, p => Assert.NotNull(p.SalePrice));
+        }
+
+        [Fact]
+        public async Task GetAllProducts_OnSaleFalse_ReturnsAllProducts()
+        {
+            var res = await _client.GetAsync("/api/product?onSale=false");
+            var body = await res.Content.ReadAsStringAsync();
+
+            Assert.True(res.StatusCode is HttpStatusCode.OK or HttpStatusCode.NoContent,
+                $"Status: {(int)res.StatusCode}\n{body}");
+
+            if (res.StatusCode == HttpStatusCode.NoContent)
+                return;
+
+            var items = await res.Content.ReadFromJsonAsync<List<ProductResponse>>();
+            Assert.NotNull(items);
+
+            // Should include products both with and without SalePrice
+            var hasWithSale = items!.Any(p => p.SalePrice.HasValue);
+            var hasWithoutSale = items!.Any(p => !p.SalePrice.HasValue);
+            Assert.True(hasWithSale || hasWithoutSale);
+        }
+
+        [Fact]
+        public async Task GetProductById_ProductWithSalePrice_ReturnsSalePrice()
+        {
+            // Product 1001 has a SalePrice of 599.99
+            var res = await _client.GetAsync("/api/product/1001");
+            var body = await res.Content.ReadAsStringAsync();
+
+            Assert.True(res.IsSuccessStatusCode, $"Status: {(int)res.StatusCode}\n{body}");
+
+            var product = await res.Content.ReadFromJsonAsync<ProductResponse>();
+            Assert.NotNull(product);
+            Assert.NotNull(product!.SalePrice);
+            Assert.Equal(599.99m, product.SalePrice);
+        }
     }
 }

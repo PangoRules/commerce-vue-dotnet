@@ -9,15 +9,11 @@ public class Product
     public string Name { get; set; } = null!;
     public string? Description { get; set; }
     public decimal Price { get; set; }
+    public decimal? SalePrice { get; set; }
     public int StockQuantity { get; set; }
     public DateTime CreatedAt { get; set; }
     public bool IsActive { get; set; }
     public Category Category { get; set; } = null!;
-
-    /// <summary>
-    /// Navigation property to the product's images.
-    /// </summary>
-    public ICollection<ProductImage> Images { get; set; } = [];
 
     /// <summary>
     /// Toggles the active status of the product.
@@ -36,6 +32,7 @@ public class Product
         this.Name = request.Name;
         this.Description = request.Description;
         this.Price = request.Price;
+        this.SalePrice = request.SalePrice;
         this.StockQuantity = request.StockQuantity;
         this.CategoryId = request.CategoryId;
     }
@@ -53,6 +50,7 @@ public class Product
             Name = request.Name,
             Description = request.Description,
             Price = request.Price,
+            SalePrice = request.SalePrice,
             StockQuantity = request.StockQuantity,
             CreatedAt = DateTime.UtcNow,
             IsActive = true

@@ -39,9 +39,10 @@ public interface ICategoryRepository
     /// Get all root categories (categories without parents).
     /// </summary>
     /// <param name="includeInactive">Whether to include inactive categories.</param>
+    /// <param name="featuredOnly">Whether to return only featured categories.</param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A list of root categories.</returns>
-    Task<IReadOnlyList<Category>> GetRootsAsync(bool includeInactive = false, CancellationToken ct = default);
+    Task<IReadOnlyList<Category>> GetRootsAsync(bool includeInactive = false, bool featuredOnly = false, CancellationToken ct = default);
 
     /// <summary>
     /// Get all child categories of a given parent category.
@@ -113,6 +114,11 @@ public class CategoryRepository(CommerceDbContext context) : ICategoryRepository
             query = query.Where(c => c.IsActive == queryParams.IsActive.Value);
         }
 
+        if (queryParams.FeaturedOnly)
+        {
+            query = query.Where(c => c.IsFeatured);
+        }
+
         var totalItems = await query.CountAsync(ct);
 
         if(queryParams.SortDescending)
@@ -153,13 +159,16 @@ public class CategoryRepository(CommerceDbContext context) : ICategoryRepository
             .FirstOrDefaultAsync(c => c.Id == id, ct);
     }
 
-    public async Task<IReadOnlyList<Category>> GetRootsAsync(bool includeInactive = false, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Category>> GetRootsAsync(bool includeInactive = false, bool featuredOnly = false, CancellationToken ct = default)
     {
         var query = context.Categories.AsNoTracking()
             .Where(c => !c.ParentLinks.Any());
 
         if (!includeInactive)
             query = query.Where(c => c.IsActive);
+
+        if (featuredOnly)
+            query = query.Where(c => c.IsFeatured);
 
         return await query.OrderBy(c => c.Name).ToListAsync(ct);
     }

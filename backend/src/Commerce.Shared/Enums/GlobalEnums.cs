@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Commerce.Shared.Enums;
 
 
@@ -9,4 +11,11 @@ public enum DbResultOption
     Invalid,
     Conflict,
     Error
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ImageAssetType
+{
+    Product,
+    Category
 }

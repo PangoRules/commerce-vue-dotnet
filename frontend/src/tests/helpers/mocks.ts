@@ -25,6 +25,9 @@ export function createMockCategory(
     id: 1,
     name: "Test Category",
     description: null,
+    isFeatured: false,
+    images: [],
+    primaryImageUrl: null,
     ...overrides,
   };
 }

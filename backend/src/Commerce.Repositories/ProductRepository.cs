@@ -77,6 +77,11 @@ public class ProductRepository(CommerceDbContext context) : IProductRepository
             query = query.Where(p => p.IsActive == queryParams.IsActive.Value);
         }
 
+        if (queryParams.OnSale)
+        {
+            query = query.Where(p => p.SalePrice.HasValue);
+        }
+
         if (!string.IsNullOrWhiteSpace(queryParams.SearchTerm))
         {
             var term = queryParams.SearchTerm.Trim();

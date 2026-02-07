@@ -11,7 +11,8 @@ public sealed class GetCategoriesQueryParams
     public int PageSize { get; set; } = 10;
     public string? SearchTerm { get; set; }
     public bool? IsActive { get; set; } = null;
-    public bool SortDescending {get; set;} = false;
+    public bool FeaturedOnly { get; set; } = false;
+    public bool SortDescending { get; set; } = false;
 }
 
 [ExcludeFromCodeCoverage]

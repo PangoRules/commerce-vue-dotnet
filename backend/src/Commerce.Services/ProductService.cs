@@ -52,7 +52,7 @@ public interface IProductService
 public class ProductService(
     IProductRepository productsRepo,
     ICategoryRepository categoriesRepo,
-    IProductImageRepository imagesRepo
+    IImageAssetRepository imagesRepo
 ) : IProductService
 {
     public async Task<ProductResponse?> GetProductByIdAsync(int productId, CancellationToken ct = default)
@@ -60,26 +60,22 @@ public class ProductService(
         var product = await productsRepo.GetProductByIdAsync(productId, ct);
         if (product is null) return null;
 
-        // Fetch images for this product
-        product.Images = await imagesRepo.GetByProductIdAsync(productId, ct);
+        // Fetch images for this product via the generic image asset repo
+        var images = await imagesRepo.GetByTypeAndOwnerIdAsync(ImageAssetType.Product, productId, ct);
 
-        return Mappers.ProductMapper.ToResponse(product);
+        return Mappers.ProductMapper.ToResponse(product, images);
     }
 
     public async Task<PagedResult<ProductResponse>> GetAllProductsAsync(GetProductsQueryParams queryParams, CancellationToken ct = default)
     {
         var paged = await productsRepo.GetAllProductsAsync(queryParams, ct);
 
-        var productIds = paged.Items.Select(p => p.Id);
-        var images = await imagesRepo.GetByProductsIdsAsync(productIds, ct);
-
-        foreach (var product in paged.Items)
-        {
-            product.Images = [.. images.Where(i => i.ProductId == product.Id)];
-        }
+        var productIds = paged.Items.Select(p => p.Id).ToList();
+        var images = await imagesRepo.GetByTypeAndOwnersIdsAsync(ImageAssetType.Product, productIds, ct);
 
         return new PagedResult<ProductResponse>(
-            [.. paged.Items.Select(Mappers.ProductMapper.ToResponse)],
+            [.. paged.Items.Select(p =>
+                Mappers.ProductMapper.ToResponse(p, [.. images.Where(i => i.OwnerId == p.Id)]))],
             paged.Page,
             paged.PageSize,
             paged.TotalCount

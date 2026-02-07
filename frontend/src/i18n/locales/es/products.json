@@ -7,7 +7,14 @@
   "stock": {
     "onlyLeft": "Solo quedan {count}"
   },
-  "noProductsYet": "No hay productos todavía",
+  "noProductsYet": "No hay productos todavía",
   "noProductsInCategory": "No hay productos en {category}",
-  "noProductsFound": "No se encontraron productos"
+  "noProductsFound": "No se encontraron productos",
+  "empty": {
+    "categoriesTitle": "No hay categorías aún",
+    "categoriesDescription": "Revisa más tarde para encontrar productos increíbles!"
+  },
+  "cta": {
+    "title": "No encuentras lo que buscas?"
+  }
 }

@@ -19,10 +19,6 @@ const hasCategories = computed(() => categories.value.length > 0);
 const isLoading = computed(() => isRootsLoading.value);
 const hasError = computed(() => rootsResult.value && !rootsResult.value.ok);
 
-const welcomeTitle = computed(() =>
-  t("home.hero.title", { appName: t("app.name") }),
-);
-
 const handleAddToCart = (product: ProductResponse) => {
   // TODO: Implement cart functionality
   console.log("Add to cart:", product);
@@ -35,16 +31,6 @@ onMounted(() => {
 
 <template>
   <v-container class="py-8 mx-auto">
-    <!-- Hero Section -->
-    <section class="hero-section text-center mb-12">
-      <h1 class="text-h3 text-md-h2 font-weight-bold mb-4">
-        {{ welcomeTitle }}
-      </h1>
-      <p class="text-h6 text-medium-emphasis mx-auto" style="max-width: 600px">
-        {{ t("home.hero.subtitle") }}
-      </p>
-    </section>
-
     <!-- Loading State -->
     <LoadingSpinner v-if="isLoading" text="Loading categories..." />
 
@@ -68,8 +54,8 @@ onMounted(() => {
     <!-- Empty State -->
     <EmptyState
       v-else-if="!hasCategories"
-      :title="t('home.empty.categoriesTitle')"
-      :description="t('home.empty.categoriesDescription')"
+      :title="t('products.empty.categoriesTitle')"
+      :description="t('products.empty.categoriesDescription')"
       icon="mdi-store-outline"
     />
 
@@ -86,7 +72,7 @@ onMounted(() => {
 
     <!-- Footer CTA -->
     <section v-if="hasCategories" class="text-center mt-12 py-8">
-      <h2 class="text-h5 mb-4">{{ t("home.cta.title") }}</h2>
+      <h2 class="text-h5 mb-4">{{ t("products.cta.title") }}</h2>
       <v-btn color="primary" size="large" to="/products">
         {{ t("common.actions.browseAll") }}
         <v-icon end icon="mdi-arrow-right" />

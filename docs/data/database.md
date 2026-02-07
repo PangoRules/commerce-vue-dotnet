@@ -52,15 +52,22 @@ ConnectionStrings__DefaultConnection=Host=...
 | CreatedAt | timestamp | NOT NULL, default now |
 | UpdatedAt | timestamp | NULLABLE |
 
-### ProductImage
+### ImageAssets
 
 | Column | Type | Constraints |
 |--------|------|-------------|
-| Id | int | PK, auto-increment |
-| ProductId | int | FK → Product.Id |
-| Url | varchar | NOT NULL |
+| Id | uuid | PK |
+| Type | int (enum) | NOT NULL (0=Product, 1=Category) |
+| OwnerId | int | NOT NULL |
+| ObjectKey | varchar | NOT NULL, unique |
+| FileName | varchar | NOT NULL |
+| ContentType | varchar | NOT NULL |
+| SizeBytes | bigint | NOT NULL |
+| DisplayOrder | int | NOT NULL, default 0 |
 | IsPrimary | boolean | NOT NULL, default false |
-| CreatedAt | timestamp | NOT NULL |
+| UploadedAt | timestamp | NOT NULL |
+
+> Composite index on (Type, OwnerId) for efficient lookups. No FK — the owner is validated by the calling service/controller.
 
 ### Category
 
@@ -86,8 +93,8 @@ Category (1) ←─── CategoryLink ───→ (1) Category
     │                                   (parent-child hierarchy)
     │
     └──── (1) ←─────────────────── (*) Product
-                                        │
-                                        └── (1) ←─── (*) ProductImage
+
+ImageAssets (Type + OwnerId) ──→ Product or Category (no FK, polymorphic)
 ```
 
 ## EF Core Setup
@@ -101,7 +108,8 @@ Category (1) ←─── CategoryLink ───→ (1) Category
 `backend/src/Commerce.Repositories/Configurations/`
 
 - `ProductConfiguration.cs`
-- `ProductImageConfiguration.cs`
+- `ImageAssetConfiguration.cs`
+- `ImageAssetSeedConfiguration.cs`
 - `CategoryConfiguration.cs`
 - `CategoryLinkConfiguration.cs`
 

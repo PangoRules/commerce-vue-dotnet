@@ -54,7 +54,7 @@ function detectUserLocale(): Locales {
   return defaultLocale;
 }
 
-export const i18n = createI18n<[I18nSchema], Locales>({
+export const i18n = createI18n<[I18nSchema], Locales, false>({
   legacy: false,
   globalInjection: true,
   locale: detectUserLocale(),
@@ -63,5 +63,5 @@ export const i18n = createI18n<[I18nSchema], Locales>({
 });
 
 export function getCurrentLocale(): Locales {
-  return i18n.global.locale;
+  return i18n.global.locale.value;
 }

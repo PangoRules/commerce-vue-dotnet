@@ -21,7 +21,10 @@ public interface ICategoryService
     /// <summary>
     /// Get root categories for navigation (active-only by default).
     /// </summary>
-    Task<IReadOnlyList<CategoryResponse>> GetRootsAsync(bool includeInactive = false, CancellationToken ct = default);
+    /// <param name="includeInactive">Whether to include inactive categories.</param>
+    /// <param name="featuredOnly">Whether to return only featured categories.</param>
+    /// <param name="ct">The cancellation token.</param>
+    Task<IReadOnlyList<CategoryResponse>> GetRootsAsync(bool includeInactive = false, bool featuredOnly = false, CancellationToken ct = default);
 
     /// <summary>
     /// Get children categories for a parent (active-only by default).
@@ -54,14 +57,21 @@ public interface ICategoryService
     Task<DbResultOption> DetachCategoryAsync(int parentCategoryId, int childCategoryId, CancellationToken ct = default);
 }
 
-public class CategoryService(ICategoryRepository categoriesRepository) : ICategoryService
+public class CategoryService(
+    ICategoryRepository categoriesRepository,
+    IImageAssetRepository imagesRepo
+) : ICategoryService
 {
     public async Task<PagedResult<CategoryResponse>> GetCategoriesAsync(GetCategoriesQueryParams queryParams, CancellationToken ct = default)
     {
         var paged = await categoriesRepository.GetAllCategoriesAsync(queryParams, ct);
 
+        var categoryIds = paged.Items.Select(c => c.Id).ToList();
+        var images = await imagesRepo.GetByTypeAndOwnersIdsAsync(ImageAssetType.Category, categoryIds, ct);
+
         return new PagedResult<CategoryResponse>(
-            [.. paged.Items.Select(Mappers.CategoryMapper.ToResponse)],
+            [.. paged.Items.Select(c =>
+                Mappers.CategoryMapper.ToResponse(c, images.Where(i => i.OwnerId == c.Id)))],
             paged.Page,
             paged.PageSize,
             paged.TotalCount);
@@ -75,16 +85,26 @@ public class CategoryService(ICategoryRepository categoriesRepository) : ICatego
         return ToAdminDetailsResponse(category);
     }
 
-    public async Task<IReadOnlyList<CategoryResponse>> GetRootsAsync(bool includeInactive = false, CancellationToken ct = default)
+    public async Task<IReadOnlyList<CategoryResponse>> GetRootsAsync(bool includeInactive = false, bool featuredOnly = false, CancellationToken ct = default)
     {
-        var roots = await categoriesRepository.GetRootsAsync(includeInactive, ct);
-        return [.. roots.Select(Mappers.CategoryMapper.ToResponse)];
+        var roots = await categoriesRepository.GetRootsAsync(includeInactive, featuredOnly, ct);
+
+        var categoryIds = roots.Select(c => c.Id).ToList();
+        var images = await imagesRepo.GetByTypeAndOwnersIdsAsync(ImageAssetType.Category, categoryIds, ct);
+
+        return [.. roots.Select(c =>
+            Mappers.CategoryMapper.ToResponse(c, images.Where(i => i.OwnerId == c.Id)))];
     }
 
     public async Task<IReadOnlyList<CategoryResponse>> GetChildrenAsync(int parentCategoryId, bool includeInactive = false, CancellationToken ct = default)
     {
         var children = await categoriesRepository.GetChildrenAsync(parentCategoryId, includeInactive, ct);
-        return [.. children.Select(Mappers.CategoryMapper.ToResponse)];
+
+        var categoryIds = children.Select(c => c.Id).ToList();
+        var images = await imagesRepo.GetByTypeAndOwnersIdsAsync(ImageAssetType.Category, categoryIds, ct);
+
+        return [.. children.Select(c =>
+            Mappers.CategoryMapper.ToResponse(c, images.Where(i => i.OwnerId == c.Id)))];
     }
 
     public Task<(DbResultOption Result, int CategoryId)> AddCategoryAsync(CreateCategoryRequest categoryRequest, CancellationToken ct = default)

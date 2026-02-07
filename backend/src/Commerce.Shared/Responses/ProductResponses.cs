@@ -11,6 +11,7 @@ public class ProductResponse
     public string Name { get; init; } = null!;
     public string? Description { get; init; }
     public decimal Price { get; init; }
+    public decimal? SalePrice { get; init; }
     public int StockQuantity { get; init; }
     public bool IsActive { get; init; }
     public CategoryResponse? Category { get; set; } = null!;
@@ -18,7 +19,7 @@ public class ProductResponse
     /// <summary>
     /// Images associated with this product, ordered by DisplayOrder.
     /// </summary>
-    public List<ProductImageResponse> Images { get; set; } = [];
+    public List<ImageAssetResponse> Images { get; set; } = [];
 
     /// <summary>
     /// URL to the primary image, or null if no primary image is set.

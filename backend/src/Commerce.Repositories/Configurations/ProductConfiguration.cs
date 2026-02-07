@@ -25,6 +25,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.Price)
             .HasPrecision(18, 2);
 
+        builder.Property(p => p.SalePrice)
+            .HasPrecision(18, 2);
+
         builder.Property(p => p.StockQuantity)
             .IsRequired();
 
@@ -45,6 +48,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                 Name = "Smartphone",
                 Description = "Latest model smartphone with advanced features",
                 Price = 699.99m,
+                SalePrice = 599.99m, // On sale!
                 StockQuantity = 50,
                 CategoryId = 1,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
@@ -56,6 +60,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                 Name = "Wireless Headphones",
                 Description = "Noise-canceling over-ear headphones",
                 Price = 199.99m,
+                SalePrice = 149.99m, // On sale!
                 StockQuantity = 35,
                 CategoryId = 1,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
@@ -115,6 +120,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                 Name = "Air Fryer",
                 Description = "Oil-free air fryer with multiple presets",
                 Price = 129.99m,
+                SalePrice = 99.99m, // On sale!
                 StockQuantity = 40,
                 CategoryId = 3,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
@@ -150,6 +156,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                 Name = "Men's T-Shirt",
                 Description = "100% cotton men's t-shirt",
                 Price = 19.99m,
+                SalePrice = 14.99m, // On sale!
                 StockQuantity = 150,
                 CategoryId = 4,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),

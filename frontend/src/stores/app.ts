@@ -49,7 +49,7 @@ export const useAppStore = defineStore(
     watch(
       locale,
       (newLocale) => {
-        i18n.global.locale = newLocale;
+        i18n.global.locale.value = newLocale;
       },
       { immediate: true },
     );

@@ -28,7 +28,8 @@ vi.mock("@/components/products", () => ({
   ProductCategorySection: {
     name: "ProductCategorySection",
     props: ["category", "limit"],
-    template: '<div data-testid="category-section" :data-category-id="category.id">{{ category.name }}</div>',
+    template:
+      '<div data-testid="category-section" :data-category-id="category.id">{{ category.name }}</div>',
   },
 }));
 
@@ -78,7 +79,12 @@ describe("IndexPage (pages/index.vue)", () => {
 
     it("hides loading spinner when loading is complete", async () => {
       mockIsRootsLoading.value = false;
-      mockRootsResult.value = { ok: true, status: 200, headers: mockHeaders, data: [] };
+      mockRootsResult.value = {
+        ok: true,
+        status: 200,
+        headers: mockHeaders,
+        data: [],
+      };
 
       await renderWithPlugins(IndexPage, {});
 
@@ -134,7 +140,12 @@ describe("IndexPage (pages/index.vue)", () => {
 
   describe("empty state", () => {
     it("shows empty state when no categories are returned", async () => {
-      mockRootsResult.value = { ok: true, status: 200, headers: mockHeaders, data: [] };
+      mockRootsResult.value = {
+        ok: true,
+        status: 200,
+        headers: mockHeaders,
+        data: [],
+      };
 
       await renderWithPlugins(IndexPage, {});
 
@@ -177,27 +188,27 @@ describe("IndexPage (pages/index.vue)", () => {
     });
   });
 
-  describe("hero section", () => {
-    it("renders hero title", async () => {
-      mockRootsResult.value = { ok: true, status: 200, headers: mockHeaders, data: [] };
+  // describe("hero section", () => {
+  //   it("renders hero title", async () => {
+  //     mockRootsResult.value = { ok: true, status: 200, headers: mockHeaders, data: [] };
 
-      await renderWithPlugins(IndexPage, {});
+  //     await renderWithPlugins(IndexPage, {});
 
-      // The title includes the app name from i18n
-      const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toBeDefined();
-    });
+  //     // The title includes the app name from i18n
+  //     const heading = screen.getByRole("heading", { level: 1 });
+  //     expect(heading).toBeDefined();
+  //   });
 
-    it("renders hero subtitle", async () => {
-      mockRootsResult.value = { ok: true, status: 200, headers: mockHeaders, data: [] };
+  //   it("renders hero subtitle", async () => {
+  //     mockRootsResult.value = { ok: true, status: 200, headers: mockHeaders, data: [] };
 
-      await renderWithPlugins(IndexPage, {});
+  //     await renderWithPlugins(IndexPage, {});
 
-      // Subtitle is a paragraph
-      const container = document.querySelector(".hero-section");
-      expect(container).toBeDefined();
-    });
-  });
+  //     // Subtitle is a paragraph
+  //     const container = document.querySelector(".hero-section");
+  //     expect(container).toBeDefined();
+  //   });
+  // });
 
   describe("footer CTA", () => {
     it("shows browse all button when categories exist", async () => {
@@ -213,20 +224,25 @@ describe("IndexPage (pages/index.vue)", () => {
       // Find the link/button that goes to /products
       const buttons = screen.getAllByRole("link");
       const browseAllLink = buttons.find((btn) =>
-        btn.getAttribute("href")?.includes("/products")
+        btn.getAttribute("href")?.includes("/products"),
       );
       expect(browseAllLink).toBeDefined();
     });
 
     it("hides footer CTA when no categories exist", async () => {
-      mockRootsResult.value = { ok: true, status: 200, headers: mockHeaders, data: [] };
+      mockRootsResult.value = {
+        ok: true,
+        status: 200,
+        headers: mockHeaders,
+        data: [],
+      };
 
       await renderWithPlugins(IndexPage, { routes: testRoutes });
 
       // Should not have a link to /products when empty
       const links = screen.queryAllByRole("link");
       const browseAllLink = links.find((link) =>
-        link.getAttribute("href")?.includes("/products")
+        link.getAttribute("href")?.includes("/products"),
       );
       expect(browseAllLink).toBeUndefined();
     });

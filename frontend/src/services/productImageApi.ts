@@ -1,23 +1,23 @@
 import { api } from "@/services/apiClient";
 import { apiRoutes } from "@/config/apiRoutes";
 import type {
-  ProductImageResponse,
+  ImageAssetResponse,
   ReorderImagesRequest,
-} from "@/types/api/productTypes";
+} from "@/types/api/imageAssetTypes";
 
 export const productImageApi = {
   /**
    * Get all images for a product
    */
   getImages(productId: number) {
-    return api.get<ProductImageResponse[]>(apiRoutes.productImages.list(productId));
+    return api.get<ImageAssetResponse[]>(apiRoutes.productImages.list(productId));
   },
 
   /**
    * Get image metadata by ID
    */
   getImageMetadata(imageId: string) {
-    return api.get<ProductImageResponse>(apiRoutes.productImages.metadata(imageId));
+    return api.get<ImageAssetResponse>(apiRoutes.productImages.metadata(imageId));
   },
 
   /**
@@ -35,7 +35,7 @@ export const productImageApi = {
     const formData = new FormData();
     formData.append("file", file);
 
-    return api.post<ProductImageResponse>(
+    return api.post<ImageAssetResponse>(
       apiRoutes.productImages.upload(productId),
       formData,
       {

@@ -139,7 +139,23 @@ npm run preview
 |------------|---------|------|
 | useProducts | Product CRUD | `composables/useProducts.ts` |
 | useCategories | Category management | `composables/useCategories.ts` |
-| useProductImages | Image management | `composables/useProductImages.ts` |
+| useProductImages | Image upload/delete/reorder | `composables/useProductImages.ts` |
+
+## Key Components
+
+| Component | Purpose | File |
+|-----------|---------|------|
+| FeaturedCategories | Crossfade slideshow of featured category images | `components/home/FeaturedCategories.vue` |
+| DealsCarousel | Carousel of on-sale products | `components/home/DealsCarousel.vue` |
+
+## Type Files
+
+| File | Purpose |
+|------|---------|
+| `types/api/productTypes.ts` | Product request/response types |
+| `types/api/categoryTypes.ts` | Category types (includes images array + primaryImageUrl) |
+| `types/api/imageAssetTypes.ts` | ImageAssetResponse, ReorderImagesRequest |
+| `types/api/authTypes.ts` | User/auth types |
 
 ## Key Files
 
