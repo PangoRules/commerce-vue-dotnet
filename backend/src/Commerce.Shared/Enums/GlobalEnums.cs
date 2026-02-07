@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Commerce.Shared.Enums;
 
 
@@ -11,6 +13,7 @@ public enum DbResultOption
     Error
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ImageAssetType
 {
     Product,
