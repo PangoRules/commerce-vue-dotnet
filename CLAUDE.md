@@ -26,7 +26,7 @@ cd backend/src/Commerce.Api && dotnet run
 
 # Run tests
 cd frontend && npm run test              # Frontend unit tests
-cd backend/tests/Commerce.Services.Tests && dotnet test  # Backend unit tests
+cd backend/tests/Commerce.UnitTests && dotnet test       # Backend unit tests
 
 # Check coverage
 cd frontend && npm run test:coverage     # Target: 75%+
@@ -101,12 +101,15 @@ See: `frontend/src/composables/`
 ### Implemented ✓
 
 - Product CRUD with images (MinIO storage)
-- Category management with hierarchical links
+- Category management with hierarchical links and images
+- Generic ImageAsset pipeline (supports Product, Category, and future entity types)
 - Product listing page with grid/list views
+- Landing page with FeaturedCategories (crossfade slideshow) and DealsCarousel
 - API client layer with ApiResult pattern
-- Composables for products, categories, product images
+- Composables for products, categories, image assets
 - Docker Compose for local development
 - i18n support (English, Spanish)
+- Seed data for products, categories, and images (MinIO upload script)
 
 ### TODO
 

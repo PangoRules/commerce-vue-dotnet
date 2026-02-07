@@ -31,7 +31,7 @@ cd backend/src/Commerce.Api && dotnet run
 
 # Tests
 cd frontend && npm run test
-cd backend/tests/Commerce.Services.Tests && dotnet test
+cd backend/tests/Commerce.UnitTests && dotnet test
 ```
 
 ## Repo Structure (Key Paths)
@@ -59,6 +59,7 @@ frontend/
 - Backend services return a strongly-typed Result pattern; controllers map to HTTP codes
 - Frontend API services return `ApiResult<T>` for consistent error handling
 - Composables wrap API calls with reactive state (e.g., `useProducts`)
+- Generic `ImageAsset` pipeline handles images for any entity type (Product, Category) via `ImageAssetType` enum + `OwnerId`
 
 ## Local Conventions
 

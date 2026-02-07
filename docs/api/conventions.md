@@ -37,11 +37,11 @@ DELETE /api/{resource}/{id}         # Delete
 | Categories     | `/api/category/roots`                                         | GET          |
 | Categories     | `/api/category/{parentCategoryId}/children`                   | GET          |
 | Categories     | `/api/category/{parentCategoryId}/children/{childCategoryId}` | POST, DELETE |
-| Product Images | `/api/product/{productId}/images`                             | GET, POST    |
-| Product Images | `/api/product/{productId}/images/reorder`                     | PUT          |
-| Product Images | `/api/productimage/{id}`                                      | GET, DELETE  |
-| Product Images | `/api/productimage/{id}/metadata`                             | GET          |
-| Product Images | `/api/productimage/{id}/primary`                              | PUT          |
+| Image Assets   | `/api/{ownerType}/{ownerId}/images`                           | GET, POST    |
+| Image Assets   | `/api/{ownerType}/{ownerId}/images/reorder`                   | PUT          |
+| Image Assets   | `/api/imageasset/{id}`                                        | GET, DELETE  |
+| Image Assets   | `/api/imageasset/{id}/metadata`                               | GET          |
+| Image Assets   | `/api/imageasset/{id}/primary`                                | PUT          |
 
 ## Request Formats
 
@@ -104,7 +104,8 @@ Content-Type: application/json
   "images": [
     {
       "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-      "productId": 0,
+      "type": "Product",
+      "ownerId": 0,
       "fileName": "string",
       "contentType": "string",
       "sizeBytes": 0,
@@ -138,7 +139,8 @@ Content-Type: application/json
     "images": [
       {
         "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        "productId": 0,
+        "type": "Product",
+        "ownerId": 0,
         "fileName": "string",
         "contentType": "string",
         "sizeBytes": 0,
@@ -237,15 +239,18 @@ export function useProducts() {
 }
 ```
 
-## File Upload (Product Images)
+## File Upload (Image Assets)
+
+Image assets use a generic pipeline supporting multiple owner types (Product, Category, etc.).
 
 ### Endpoint
 
 ```http
-POST /api/product/{productId}/images
+POST /api/{ownerType}/{ownerId}/images
 Content-Type: multipart/form-data
 ```
 
+> `{ownerType}` is `products` or `categories` <br>
 > Form field name: file <br>
 > Max file size: 10 MB <br>
 > Allowed content types: image/jpeg, image/png, image/webp, image/gif
@@ -258,7 +263,7 @@ uploadImage(productId: number, file: File) {
   const formData = new FormData();
   formData.append("file", file);
 
-  return api.post<ProductImageResponse>(
+  return api.post<ImageAssetResponse>(
     apiRoutes.productImages.upload(productId),
     formData,
     {
@@ -276,14 +281,15 @@ uploadImage(productId: number, file: File) {
 ```json
 {
   "id": "3f4c1b4b-2f7b-4a1c-9c0a-7f9e2f3a1c11",
-  "productId": 1001,
+  "type": "Product",
+  "ownerId": 1001,
   "fileName": "iphone.webp",
   "contentType": "image/webp",
   "sizeBytes": 50000,
   "displayOrder": 1,
   "isPrimary": false,
   "uploadedAt": "2026-01-01T00:00:00Z",
-  "url": "/api/productimage/3f4c1b4b-2f7b-4a1c-9c0a-7f9e2f3a1c11"
+  "url": "/api/imageasset/3f4c1b4b-2f7b-4a1c-9c0a-7f9e2f3a1c11"
 }
 ```
 

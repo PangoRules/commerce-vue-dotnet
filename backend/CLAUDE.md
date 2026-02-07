@@ -59,8 +59,8 @@ Commerce.Shared (Validation, Utilities)
 6. **Service Interface**: Define in `Commerce.Services/Interfaces/`
 7. **Service Implementation**: Implement with business logic
 8. **Controller**: Add in `Commerce.Api/Controllers/`
-9. **Unit Tests**: Write in `Commerce.Services.Tests/`
-10. **Integration Tests**: Write in `Commerce.Api.IntegrationTests/`
+9. **Unit Tests**: Write in `Commerce.UnitTests/`
+10. **Integration Tests**: Write in `Commerce.IntegrationTests/`
 
 ## Commands
 
@@ -73,14 +73,14 @@ dotnet run
 dotnet watch run
 
 # Run unit tests
-cd backend/tests/Commerce.Services.Tests
+cd backend/tests/Commerce.UnitTests
 dotnet test
 
 # Run with coverage
 dotnet test --collect:"XPlat Code Coverage"
 
 # Run integration tests
-cd backend/tests/Commerce.Api.IntegrationTests
+cd backend/tests/Commerce.IntegrationTests
 dotnet test
 
 # EF Core Migrations (from Commerce.Api directory)
@@ -94,9 +94,11 @@ dotnet ef migrations list --project ../Commerce.Repositories
 | Entity | Purpose | File |
 |--------|---------|------|
 | Product | Core product data | `Entities/Product.cs` |
-| ProductImage | Product images (MinIO) | `Entities/ProductImage.cs` |
+| ImageAsset | Generic images for any entity (MinIO) | `Entities/ImageAsset.cs` |
 | Category | Product categories | `Entities/Category.cs` |
 | CategoryLink | Category hierarchy | `Entities/CategoryLink.cs` |
+
+> **Note**: `ImageAsset` uses an `ImageAssetType` enum (`Product`, `Category`) and an `OwnerId` int instead of a direct FK. This allows a single image pipeline to serve multiple entity types.
 
 ## Key Files
 
@@ -125,5 +127,5 @@ Storage__Provider=Minio
 Storage__Endpoint=localhost:9000
 Storage__AccessKey=...
 Storage__SecretKey=...
-Storage__Bucket=products
+Storage__Bucket=commerce-assets
 ```
