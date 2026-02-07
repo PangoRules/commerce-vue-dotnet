@@ -1,9 +1,13 @@
+import type { ImageAssetResponse } from "@/types/api/imageAssetTypes";
 import type { QueryDefaults } from "@/types/api/sharedApiTypes";
 
 export type CategoryResponse = {
   id: number;
   name: string;
   description: string | null | undefined;
+  isFeatured: boolean;
+  images: ImageAssetResponse[];
+  primaryImageUrl: string | null;
 };
 
 export type CategoryNameIdPair = {

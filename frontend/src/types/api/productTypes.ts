@@ -1,17 +1,6 @@
 import type { CategoryResponse } from "@/types/api/categoryTypes";
+import type { ImageAssetResponse } from "@/types/api/imageAssetTypes";
 import type { QueryDefaults } from "@/types/api/sharedApiTypes";
-
-export type ProductImageResponse = {
-  id: string;
-  productId: number;
-  fileName: string;
-  contentType: string;
-  sizeBytes: number;
-  displayOrder: number;
-  isPrimary: boolean;
-  uploadedAt: string;
-  url: string;
-};
 
 export type ProductResponse = {
   id: number;
@@ -23,7 +12,7 @@ export type ProductResponse = {
   stockQuantity: number;
   isActive: boolean;
   category: CategoryResponse | null | undefined;
-  images: ProductImageResponse[];
+  images: ImageAssetResponse[];
   primaryImageUrl: string | null;
 };
 
@@ -41,8 +30,4 @@ export type ProductRequest = {
   description: string;
   price: number;
   stockQuantity: number;
-};
-
-export type ReorderImagesRequest = {
-  imageIds: string[];
 };

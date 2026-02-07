@@ -4,6 +4,7 @@ using Commerce.Services;
 using Commerce.Shared.Enums;
 using Commerce.Shared.Requests;
 using Commerce.Shared.Responses;
+using ImageAssetType = Commerce.Shared.Enums.ImageAssetType;
 
 namespace Commerce.UnitTests.Services;
 
@@ -25,7 +26,7 @@ public class CategoryServiceTests
             PageSize = 10
         };
 
-        var sut = new CategoryService(repo);
+        var sut = new CategoryService(repo, new FakeImageAssetRepository());
         var queryParams = new GetCategoriesQueryParams { Page = 1, PageSize = 10 };
 
         // Act
@@ -61,7 +62,7 @@ public class CategoryServiceTests
             PageSize = 10
         };
 
-        var sut = new CategoryService(repo);
+        var sut = new CategoryService(repo, new FakeImageAssetRepository());
 
         // Act
         var results = await sut.GetCategoriesAsync(new GetCategoriesQueryParams());
@@ -82,7 +83,7 @@ public class CategoryServiceTests
             CategoryGraphById = null
         };
 
-        var sut = new CategoryService(repo);
+        var sut = new CategoryService(repo, new FakeImageAssetRepository());
 
         // Act
         var result = await sut.GetCategoryAdminDetailsAsync(categoryId: 123);
@@ -121,7 +122,7 @@ public class CategoryServiceTests
             CategoryGraphById = graph
         };
 
-        var sut = new CategoryService(repo);
+        var sut = new CategoryService(repo, new FakeImageAssetRepository());
 
         // Act
         var result = await sut.GetCategoryAdminDetailsAsync(categoryId: 2);
@@ -158,7 +159,7 @@ public class CategoryServiceTests
             ]
         };
 
-        var sut = new CategoryService(repo);
+        var sut = new CategoryService(repo, new FakeImageAssetRepository());
 
         // Act
         var result = await sut.GetRootsAsync(includeInactive);
@@ -185,7 +186,7 @@ public class CategoryServiceTests
             ]
         };
 
-        var sut = new CategoryService(repo);
+        var sut = new CategoryService(repo, new FakeImageAssetRepository());
 
         // Act
         var result = await sut.GetRootsAsync(includeInactive: false, featuredOnly: featuredOnly);
@@ -213,7 +214,7 @@ public class CategoryServiceTests
             ]
         };
 
-        var sut = new CategoryService(repo);
+        var sut = new CategoryService(repo, new FakeImageAssetRepository());
 
         // Act
         var result = await sut.GetChildrenAsync(parentCategoryId: 5, includeInactive);
@@ -239,7 +240,7 @@ public class CategoryServiceTests
             AddResult = (repoResult, repoCategoryId)
         };
 
-        var sut = new CategoryService(repo);
+        var sut = new CategoryService(repo, new FakeImageAssetRepository());
 
         var request = new CreateCategoryRequest
         {
@@ -270,7 +271,7 @@ public class CategoryServiceTests
             UpdateResult = repoResult
         };
 
-        var sut = new CategoryService(repo);
+        var sut = new CategoryService(repo, new FakeImageAssetRepository());
 
         var request = new CreateCategoryRequest
         {
@@ -299,7 +300,7 @@ public class CategoryServiceTests
             ToggleResult = repoResult
         };
 
-        var sut = new CategoryService(repo);
+        var sut = new CategoryService(repo, new FakeImageAssetRepository());
 
         // Act
         var result = await sut.ToggleCategoryAsync(categoryId: 77);
@@ -324,7 +325,7 @@ public class CategoryServiceTests
             AttachResult = repoResult
         };
 
-        var sut = new CategoryService(repo);
+        var sut = new CategoryService(repo, new FakeImageAssetRepository());
 
         // Act
         var result = await sut.AttachCategoryAsync(parentCategoryId: 1, childCategoryId: 2);
@@ -348,7 +349,7 @@ public class CategoryServiceTests
             DetachResult = repoResult
         };
 
-        var sut = new CategoryService(repo);
+        var sut = new CategoryService(repo, new FakeImageAssetRepository());
 
         // Act
         var result = await sut.DetachCategoryAsync(parentCategoryId: 1, childCategoryId: 2);
@@ -477,5 +478,37 @@ public class CategoryServiceTests
             LastSimpleCategoryId = id;
             return Task.FromResult<Category?>(CategoryGraphById);
         }
+    }
+
+    private sealed class FakeImageAssetRepository : IImageAssetRepository
+    {
+        public List<ImageAsset> Images { get; set; } = [];
+
+        public Task<ImageAsset?> GetByIdAsync(Guid imageId, CancellationToken ct = default)
+            => Task.FromResult(Images.FirstOrDefault(i => i.Id == imageId));
+
+        public Task<List<ImageAsset>> GetByTypeAndOwnerIdAsync(ImageAssetType type, int ownerId, CancellationToken ct = default)
+            => Task.FromResult(Images.Where(i => i.Type == type && i.OwnerId == ownerId).ToList());
+
+        public Task<List<ImageAsset>> GetByTypeAndOwnersIdsAsync(ImageAssetType type, List<int> ownerIds, CancellationToken ct = default)
+            => Task.FromResult(Images.Where(i => i.Type == type && ownerIds.Contains(i.OwnerId)).ToList());
+
+        public Task<ImageAsset?> GetPrimaryByTypeAndOwnerIdAsync(ImageAssetType type, int ownerId, CancellationToken ct = default)
+            => Task.FromResult(Images.FirstOrDefault(i => i.Type == type && i.OwnerId == ownerId && i.IsPrimary));
+
+        public Task<ImageAsset> AddAsync(ImageAsset image, CancellationToken ct = default)
+            => Task.FromResult(image);
+
+        public Task<bool> DeleteAsync(Guid imageId, CancellationToken ct = default)
+            => Task.FromResult(true);
+
+        public Task<bool> SetPrimaryAsync(Guid imageId, CancellationToken ct = default)
+            => Task.FromResult(true);
+
+        public Task<bool> UpdateDisplayOrderAsync(ImageAssetType type, int ownerId, IList<Guid> orderedImageIds, CancellationToken ct = default)
+            => Task.FromResult(true);
+
+        public Task<int> GetCountByOwnerIdAsync(ImageAssetType type, int ownerId, CancellationToken ct = default)
+            => Task.FromResult(Images.Count(i => i.Type == type && i.OwnerId == ownerId));
     }
 }

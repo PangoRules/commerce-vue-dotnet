@@ -3,6 +3,7 @@ using System;
 using Commerce.Repositories.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Commerce.Repositories.Migrations
 {
     [DbContext(typeof(CommerceDbContext))]
-    partial class CommerceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260206214040_AddImageAssetEntity")]
+    partial class AddImageAssetEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -257,359 +260,6 @@ namespace Commerce.Repositories.Migrations
                     b.HasIndex("Type", "OwnerId", "DisplayOrder");
 
                     b.ToTable("ImageAssets", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("aaaa1111-1001-1001-1001-000000000001"),
-                            ContentType = "image/webp",
-                            DisplayOrder = 0,
-                            FileName = "smartphone.webp",
-                            IsPrimary = true,
-                            ObjectKey = "products/1001/smartphone.webp",
-                            OwnerId = 1001,
-                            SizeBytes = 50000L,
-                            Type = "Product",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaa1111-1002-1002-1002-000000000001"),
-                            ContentType = "image/webp",
-                            DisplayOrder = 0,
-                            FileName = "headphones.webp",
-                            IsPrimary = true,
-                            ObjectKey = "products/1002/headphones.webp",
-                            OwnerId = 1002,
-                            SizeBytes = 50000L,
-                            Type = "Product",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaa1111-1003-1003-1003-000000000001"),
-                            ContentType = "image/webp",
-                            DisplayOrder = 0,
-                            FileName = "laptop.webp",
-                            IsPrimary = true,
-                            ObjectKey = "products/1003/laptop.webp",
-                            OwnerId = 1003,
-                            SizeBytes = 50000L,
-                            Type = "Product",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaa2222-2001-2001-2001-000000000001"),
-                            ContentType = "image/webp",
-                            DisplayOrder = 0,
-                            FileName = "clean-code.webp",
-                            IsPrimary = true,
-                            ObjectKey = "products/2001/clean-code.webp",
-                            OwnerId = 2001,
-                            SizeBytes = 50000L,
-                            Type = "Product",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaa2222-2002-2002-2002-000000000001"),
-                            ContentType = "image/webp",
-                            DisplayOrder = 0,
-                            FileName = "pragmatic-programmer.webp",
-                            IsPrimary = true,
-                            ObjectKey = "products/2002/pragmatic-programmer.webp",
-                            OwnerId = 2002,
-                            SizeBytes = 50000L,
-                            Type = "Product",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaa2222-2003-2003-2003-000000000001"),
-                            ContentType = "image/webp",
-                            DisplayOrder = 0,
-                            FileName = "design-patterns.webp",
-                            IsPrimary = true,
-                            ObjectKey = "products/2003/design-patterns.webp",
-                            OwnerId = 2003,
-                            SizeBytes = 50000L,
-                            Type = "Product",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaa3333-3001-3001-3001-000000000001"),
-                            ContentType = "image/webp",
-                            DisplayOrder = 0,
-                            FileName = "air-fryer.webp",
-                            IsPrimary = true,
-                            ObjectKey = "products/3001/air-fryer.webp",
-                            OwnerId = 3001,
-                            SizeBytes = 50000L,
-                            Type = "Product",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaa3333-3002-3002-3002-000000000001"),
-                            ContentType = "image/webp",
-                            DisplayOrder = 0,
-                            FileName = "blender.webp",
-                            IsPrimary = true,
-                            ObjectKey = "products/3002/blender.webp",
-                            OwnerId = 3002,
-                            SizeBytes = 50000L,
-                            Type = "Product",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaa3333-3003-3003-3003-000000000001"),
-                            ContentType = "image/webp",
-                            DisplayOrder = 0,
-                            FileName = "coffee-maker.webp",
-                            IsPrimary = true,
-                            ObjectKey = "products/3003/coffee-maker.webp",
-                            OwnerId = 3003,
-                            SizeBytes = 50000L,
-                            Type = "Product",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaa4444-4001-4001-4001-000000000001"),
-                            ContentType = "image/webp",
-                            DisplayOrder = 0,
-                            FileName = "tshirt.webp",
-                            IsPrimary = true,
-                            ObjectKey = "products/4001/tshirt.webp",
-                            OwnerId = 4001,
-                            SizeBytes = 50000L,
-                            Type = "Product",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaa4444-4002-4002-4002-000000000001"),
-                            ContentType = "image/webp",
-                            DisplayOrder = 0,
-                            FileName = "jeans.webp",
-                            IsPrimary = true,
-                            ObjectKey = "products/4002/jeans.webp",
-                            OwnerId = 4002,
-                            SizeBytes = 50000L,
-                            Type = "Product",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaa4444-4003-4003-4003-000000000001"),
-                            ContentType = "image/webp",
-                            DisplayOrder = 0,
-                            FileName = "hoodie.webp",
-                            IsPrimary = true,
-                            ObjectKey = "products/4003/hoodie.webp",
-                            OwnerId = 4003,
-                            SizeBytes = 50000L,
-                            Type = "Product",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaa5555-5001-5001-5001-000000000001"),
-                            ContentType = "image/webp",
-                            DisplayOrder = 0,
-                            FileName = "yoga-mat.webp",
-                            IsPrimary = true,
-                            ObjectKey = "products/5001/yoga-mat.webp",
-                            OwnerId = 5001,
-                            SizeBytes = 50000L,
-                            Type = "Product",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaa5555-5002-5002-5002-000000000001"),
-                            ContentType = "image/webp",
-                            DisplayOrder = 0,
-                            FileName = "dumbbell-set.webp",
-                            IsPrimary = true,
-                            ObjectKey = "products/5002/dumbbell-set.webp",
-                            OwnerId = 5002,
-                            SizeBytes = 50000L,
-                            Type = "Product",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("aaaa5555-5003-5003-5003-000000000001"),
-                            ContentType = "image/webp",
-                            DisplayOrder = 0,
-                            FileName = "camping-tent.webp",
-                            IsPrimary = true,
-                            ObjectKey = "products/5003/camping-tent.webp",
-                            OwnerId = 5003,
-                            SizeBytes = 50000L,
-                            Type = "Product",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("bbbb0001-0001-0001-0001-000000000001"),
-                            ContentType = "image/jpeg",
-                            DisplayOrder = 0,
-                            FileName = "elec1.jpg",
-                            IsPrimary = true,
-                            ObjectKey = "categories/1/elec1.jpg",
-                            OwnerId = 1,
-                            SizeBytes = 50000L,
-                            Type = "Category",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("bbbb0001-0001-0001-0001-000000000002"),
-                            ContentType = "image/jpeg",
-                            DisplayOrder = 1,
-                            FileName = "elec2.jpg",
-                            IsPrimary = false,
-                            ObjectKey = "categories/1/elec2.jpg",
-                            OwnerId = 1,
-                            SizeBytes = 50000L,
-                            Type = "Category",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("bbbb0001-0001-0001-0001-000000000003"),
-                            ContentType = "image/jpeg",
-                            DisplayOrder = 2,
-                            FileName = "elec3.jpg",
-                            IsPrimary = false,
-                            ObjectKey = "categories/1/elec3.jpg",
-                            OwnerId = 1,
-                            SizeBytes = 50000L,
-                            Type = "Category",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("bbbb0002-0002-0002-0002-000000000001"),
-                            ContentType = "image/jpeg",
-                            DisplayOrder = 0,
-                            FileName = "dariuszsankowski-glasses-1052023_640.jpg",
-                            IsPrimary = true,
-                            ObjectKey = "categories/2/dariuszsankowski-glasses-1052023_640.jpg",
-                            OwnerId = 2,
-                            SizeBytes = 50000L,
-                            Type = "Category",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("bbbb0002-0002-0002-0002-000000000002"),
-                            ContentType = "image/jpeg",
-                            DisplayOrder = 1,
-                            FileName = "dglodowska-book-419589_640.jpg",
-                            IsPrimary = false,
-                            ObjectKey = "categories/2/dglodowska-book-419589_640.jpg",
-                            OwnerId = 2,
-                            SizeBytes = 50000L,
-                            Type = "Category",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("bbbb0003-0003-0003-0003-000000000001"),
-                            ContentType = "image/jpeg",
-                            DisplayOrder = 0,
-                            FileName = "kitchen1.jpg",
-                            IsPrimary = true,
-                            ObjectKey = "categories/3/kitchen1.jpg",
-                            OwnerId = 3,
-                            SizeBytes = 50000L,
-                            Type = "Category",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("bbbb0003-0003-0003-0003-000000000002"),
-                            ContentType = "image/jpeg",
-                            DisplayOrder = 1,
-                            FileName = "kitchen2.jpg",
-                            IsPrimary = false,
-                            ObjectKey = "categories/3/kitchen2.jpg",
-                            OwnerId = 3,
-                            SizeBytes = 50000L,
-                            Type = "Category",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("bbbb0003-0003-0003-0003-000000000003"),
-                            ContentType = "image/jpeg",
-                            DisplayOrder = 2,
-                            FileName = "kitchen3.jpg",
-                            IsPrimary = false,
-                            ObjectKey = "categories/3/kitchen3.jpg",
-                            OwnerId = 3,
-                            SizeBytes = 50000L,
-                            Type = "Category",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("bbbb0004-0004-0004-0004-000000000001"),
-                            ContentType = "image/jpeg",
-                            DisplayOrder = 0,
-                            FileName = "cloth1.jpg",
-                            IsPrimary = true,
-                            ObjectKey = "categories/4/cloth1.jpg",
-                            OwnerId = 4,
-                            SizeBytes = 50000L,
-                            Type = "Category",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("bbbb0004-0004-0004-0004-000000000002"),
-                            ContentType = "image/jpeg",
-                            DisplayOrder = 1,
-                            FileName = "cloth2.jpg",
-                            IsPrimary = false,
-                            ObjectKey = "categories/4/cloth2.jpg",
-                            OwnerId = 4,
-                            SizeBytes = 50000L,
-                            Type = "Category",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("bbbb0004-0004-0004-0004-000000000003"),
-                            ContentType = "image/jpeg",
-                            DisplayOrder = 2,
-                            FileName = "cloth3.jpg",
-                            IsPrimary = false,
-                            ObjectKey = "categories/4/cloth3.jpg",
-                            OwnerId = 4,
-                            SizeBytes = 50000L,
-                            Type = "Category",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            Id = new Guid("bbbb0004-0004-0004-0004-000000000004"),
-                            ContentType = "image/jpeg",
-                            DisplayOrder = 3,
-                            FileName = "cloth4.jpg",
-                            IsPrimary = false,
-                            ObjectKey = "categories/4/cloth4.jpg",
-                            OwnerId = 4,
-                            SizeBytes = 50000L,
-                            Type = "Category",
-                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        });
                 });
 
             modelBuilder.Entity("Commerce.Repositories.Entities.Product", b =>
@@ -862,6 +512,241 @@ namespace Commerce.Repositories.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Commerce.Repositories.Entities.ProductImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("DisplayOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("IsPrimary")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("ObjectKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("SizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ObjectKey")
+                        .IsUnique();
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ProductId", "IsPrimary")
+                        .HasFilter("\"IsPrimary\" = true");
+
+                    b.ToTable("ProductImage", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1001-1001-1001-000000000001"),
+                            ContentType = "image/webp",
+                            DisplayOrder = 0,
+                            FileName = "smartphone.webp",
+                            IsPrimary = true,
+                            ObjectKey = "products/1001/smartphone.webp",
+                            ProductId = 1001,
+                            SizeBytes = 50000L,
+                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1002-1002-1002-000000000001"),
+                            ContentType = "image/webp",
+                            DisplayOrder = 0,
+                            FileName = "headphones.webp",
+                            IsPrimary = true,
+                            ObjectKey = "products/1002/headphones.webp",
+                            ProductId = 1002,
+                            SizeBytes = 50000L,
+                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1003-1003-1003-000000000001"),
+                            ContentType = "image/webp",
+                            DisplayOrder = 0,
+                            FileName = "laptop.webp",
+                            IsPrimary = true,
+                            ObjectKey = "products/1003/laptop.webp",
+                            ProductId = 1003,
+                            SizeBytes = 50000L,
+                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2001-2001-2001-000000000001"),
+                            ContentType = "image/webp",
+                            DisplayOrder = 0,
+                            FileName = "clean-code.webp",
+                            IsPrimary = true,
+                            ObjectKey = "products/2001/clean-code.webp",
+                            ProductId = 2001,
+                            SizeBytes = 50000L,
+                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2002-2002-2002-000000000001"),
+                            ContentType = "image/webp",
+                            DisplayOrder = 0,
+                            FileName = "pragmatic-programmer.webp",
+                            IsPrimary = true,
+                            ObjectKey = "products/2002/pragmatic-programmer.webp",
+                            ProductId = 2002,
+                            SizeBytes = 50000L,
+                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2003-2003-2003-000000000001"),
+                            ContentType = "image/webp",
+                            DisplayOrder = 0,
+                            FileName = "design-patterns.webp",
+                            IsPrimary = true,
+                            ObjectKey = "products/2003/design-patterns.webp",
+                            ProductId = 2003,
+                            SizeBytes = 50000L,
+                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("33333333-3001-3001-3001-000000000001"),
+                            ContentType = "image/webp",
+                            DisplayOrder = 0,
+                            FileName = "air-fryer.webp",
+                            IsPrimary = true,
+                            ObjectKey = "products/3001/air-fryer.webp",
+                            ProductId = 3001,
+                            SizeBytes = 50000L,
+                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("33333333-3002-3002-3002-000000000001"),
+                            ContentType = "image/webp",
+                            DisplayOrder = 0,
+                            FileName = "blender.webp",
+                            IsPrimary = true,
+                            ObjectKey = "products/3002/blender.webp",
+                            ProductId = 3002,
+                            SizeBytes = 50000L,
+                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("33333333-3003-3003-3003-000000000001"),
+                            ContentType = "image/webp",
+                            DisplayOrder = 0,
+                            FileName = "coffee-maker.webp",
+                            IsPrimary = true,
+                            ObjectKey = "products/3003/coffee-maker.webp",
+                            ProductId = 3003,
+                            SizeBytes = 50000L,
+                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-4001-4001-4001-000000000001"),
+                            ContentType = "image/webp",
+                            DisplayOrder = 0,
+                            FileName = "tshirt.webp",
+                            IsPrimary = true,
+                            ObjectKey = "products/4001/tshirt.webp",
+                            ProductId = 4001,
+                            SizeBytes = 50000L,
+                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-4002-4002-4002-000000000001"),
+                            ContentType = "image/webp",
+                            DisplayOrder = 0,
+                            FileName = "jeans.webp",
+                            IsPrimary = true,
+                            ObjectKey = "products/4002/jeans.webp",
+                            ProductId = 4002,
+                            SizeBytes = 50000L,
+                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-4003-4003-4003-000000000001"),
+                            ContentType = "image/webp",
+                            DisplayOrder = 0,
+                            FileName = "hoodie.webp",
+                            IsPrimary = true,
+                            ObjectKey = "products/4003/hoodie.webp",
+                            ProductId = 4003,
+                            SizeBytes = 50000L,
+                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("55555555-5001-5001-5001-000000000001"),
+                            ContentType = "image/webp",
+                            DisplayOrder = 0,
+                            FileName = "yoga-mat.webp",
+                            IsPrimary = true,
+                            ObjectKey = "products/5001/yoga-mat.webp",
+                            ProductId = 5001,
+                            SizeBytes = 50000L,
+                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("55555555-5002-5002-5002-000000000001"),
+                            ContentType = "image/webp",
+                            DisplayOrder = 0,
+                            FileName = "dumbbell-set.webp",
+                            IsPrimary = true,
+                            ObjectKey = "products/5002/dumbbell-set.webp",
+                            ProductId = 5002,
+                            SizeBytes = 50000L,
+                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = new Guid("55555555-5003-5003-5003-000000000001"),
+                            ContentType = "image/webp",
+                            DisplayOrder = 0,
+                            FileName = "camping-tent.webp",
+                            IsPrimary = true,
+                            ObjectKey = "products/5003/camping-tent.webp",
+                            ProductId = 5003,
+                            SizeBytes = 50000L,
+                            UploadedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
+                });
+
             modelBuilder.Entity("Commerce.Repositories.Entities.CategoryLink", b =>
                 {
                     b.HasOne("Commerce.Repositories.Entities.Category", "ChildCategory")
@@ -892,6 +777,17 @@ namespace Commerce.Repositories.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("Commerce.Repositories.Entities.ProductImage", b =>
+                {
+                    b.HasOne("Commerce.Repositories.Entities.Product", "Product")
+                        .WithMany("Images")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Commerce.Repositories.Entities.Category", b =>
                 {
                     b.Navigation("ChildLinks");
@@ -899,6 +795,11 @@ namespace Commerce.Repositories.Migrations
                     b.Navigation("ParentLinks");
 
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("Commerce.Repositories.Entities.Product", b =>
+                {
+                    b.Navigation("Images");
                 });
 #pragma warning restore 612, 618
         }

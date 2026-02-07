@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useProductImages } from "./useProductImages";
 import type { ApiResult } from "@/lib/http";
-import type { ProductImageResponse } from "@/types/api/productTypes";
+import type { ImageAssetResponse } from "@/types/api/imageAssetTypes";
 
 vi.mock("@/services/productImageApi", () => ({
   productImageApi: {
@@ -25,16 +25,17 @@ function okVoid(): ApiResult<void> {
   return { ok: true, status: 204, headers: new Headers(), data: undefined };
 }
 
-const mockImage: ProductImageResponse = {
+const mockImage: ImageAssetResponse = {
   id: "img-123",
-  productId: 1,
+  type: "Product",
+  ownerId: 1,
   fileName: "test.jpg",
   contentType: "image/jpeg",
   sizeBytes: 1024,
   displayOrder: 0,
   isPrimary: true,
   uploadedAt: "2026-01-01T00:00:00Z",
-  url: "/api/productimage/img-123",
+  url: "/api/imageasset/img-123",
 };
 
 describe("useProductImages", () => {
@@ -58,7 +59,7 @@ describe("useProductImages", () => {
     });
 
     it("sets loading true while request is in flight", async () => {
-      let resolve!: (v: ApiResult<ProductImageResponse[]>) => void;
+      let resolve!: (v: ApiResult<ImageAssetResponse[]>) => void;
       (
         productImageApi.getImages as unknown as ReturnType<typeof vi.fn>
       ).mockImplementation(() => new Promise((r) => (resolve = r)));
@@ -107,7 +108,7 @@ describe("useProductImages", () => {
     });
 
     it("sets isUploading true while uploading", async () => {
-      let resolve!: (v: ApiResult<ProductImageResponse>) => void;
+      let resolve!: (v: ApiResult<ImageAssetResponse>) => void;
       (
         productImageApi.uploadImage as unknown as ReturnType<typeof vi.fn>
       ).mockImplementation(() => new Promise((r) => (resolve = r)));
@@ -175,12 +176,12 @@ describe("useProductImages", () => {
     it("returns URL from productImageApi", () => {
       (
         productImageApi.getImageUrl as unknown as ReturnType<typeof vi.fn>
-      ).mockReturnValue("/api/productimage/xyz");
+      ).mockReturnValue("/api/imageasset/xyz");
 
       const sut = useProductImages();
       const url = sut.getImageUrl("xyz");
 
-      expect(url).toBe("/api/productimage/xyz");
+      expect(url).toBe("/api/imageasset/xyz");
       expect(productImageApi.getImageUrl).toHaveBeenCalledWith("xyz");
     });
   });

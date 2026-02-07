@@ -1,11 +1,11 @@
 import { ref } from "vue";
 import type { ApiResult } from "@/lib/http";
-import type { ProductImageResponse } from "@/types/api/productTypes";
+import type { ImageAssetResponse } from "@/types/api/imageAssetTypes";
 import { productImageApi } from "@/services/productImageApi";
 
 export function useProductImages() {
   // List images for a product
-  const imagesResult = ref<ApiResult<ProductImageResponse[]> | null>(null);
+  const imagesResult = ref<ApiResult<ImageAssetResponse[]> | null>(null);
   const isImagesLoading = ref(false);
 
   async function loadImages(productId: number) {
@@ -15,7 +15,7 @@ export function useProductImages() {
   }
 
   // Get image metadata
-  const imageMetadataResult = ref<ApiResult<ProductImageResponse> | null>(null);
+  const imageMetadataResult = ref<ApiResult<ImageAssetResponse> | null>(null);
   const isImageMetadataLoading = ref(false);
 
   async function loadImageMetadata(imageId: string) {
@@ -25,7 +25,7 @@ export function useProductImages() {
   }
 
   // Upload image
-  const uploadResult = ref<ApiResult<ProductImageResponse> | null>(null);
+  const uploadResult = ref<ApiResult<ImageAssetResponse> | null>(null);
   const isUploading = ref(false);
 
   async function uploadImage(productId: number, file: File) {

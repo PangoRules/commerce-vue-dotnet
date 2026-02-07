@@ -16,11 +16,6 @@ public class Product
     public Category Category { get; set; } = null!;
 
     /// <summary>
-    /// Navigation property to the product's images.
-    /// </summary>
-    public ICollection<ProductImage> Images { get; set; } = [];
-
-    /// <summary>
     /// Toggles the active status of the product.
     /// </summary>
     public void ToggleProduct()

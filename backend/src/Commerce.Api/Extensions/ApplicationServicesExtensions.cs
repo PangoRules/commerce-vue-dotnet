@@ -16,12 +16,12 @@ public static class ApplicationServicesExtensions
         services.AddScoped<IHealthService, HealthService>();
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<ICategoryService, CategoryService>();
-        services.AddScoped<IProductImageService, ProductImageService>();
+        services.AddScoped<IImageAssetService, ImageAssetService>();
         #endregion
         #region Repositories Registration
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
-        services.AddScoped<IProductImageRepository, ProductImageRepository>();
+        services.AddScoped<IImageAssetRepository, ImageAssetRepository>();
         #endregion
         #region Validators Registration
         services.AddValidatorsFromAssemblyContaining<GetProductsQueryParams>();

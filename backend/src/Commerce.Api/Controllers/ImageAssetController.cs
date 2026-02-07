@@ -10,13 +10,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace Commerce.Api.Controllers;
 
 /// <summary>
-/// Controller for product image operations.
+/// Controller for generic image asset operations.
 /// </summary>
 [ApiController]
 [Produces("application/json")]
 [ExcludeFromCodeCoverage]
-public class ProductImageController(
-    IProductImageService imageService,
+public class ImageAssetController(
+    IImageAssetService imageService,
     IObjectStorageService storageService
 ) : ControllerBase
 {
@@ -31,12 +31,28 @@ public class ProductImageController(
     private const long MaxFileSizeBytes = 10 * 1024 * 1024; // 10 MB
 
     /// <summary>
+    /// Tries to parse a route string to an <see cref="ImageAssetType"/>.
+    /// </summary>
+    private static bool TryParseOwnerType(string ownerType, out ImageAssetType type)
+    {
+        return ownerType.ToLowerInvariant() switch
+        {
+            "product" or "products" => SetOut(ImageAssetType.Product, out type),
+            "category" or "categories" => SetOut(ImageAssetType.Category, out type),
+            _ => SetOut(default, out type, false)
+        };
+
+        static bool SetOut(ImageAssetType value, out ImageAssetType result, bool success = true)
+        {
+            result = value;
+            return success;
+        }
+    }
+
+    /// <summary>
     /// Gets an image by ID (proxy endpoint - streams image from storage).
     /// </summary>
-    /// <param name="id">The image ID.</param>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>The image file.</returns>
-    [HttpGet("api/productimage/{id:guid}")]
+    [HttpGet("api/imageasset/{id:guid}")]
     [ProducesResponseType(typeof(FileStreamResult), 200)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetImage(Guid id, CancellationToken ct)
@@ -55,45 +71,45 @@ public class ProductImageController(
     /// <summary>
     /// Gets image metadata by ID.
     /// </summary>
-    /// <param name="id">The image ID.</param>
-    /// <param name="ct">Cancellation token.</param>
-    [HttpGet("api/productimage/{id:guid}/metadata")]
-    [ProducesResponseType(typeof(ProductImageResponse), 200)]
+    [HttpGet("api/imageasset/{id:guid}/metadata")]
+    [ProducesResponseType(typeof(ImageAssetResponse), 200)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetImageMetadata(Guid id, CancellationToken ct)
     {
-        var image = await imageService.GetImageByIdAsync(id, ct);
+        var image = await imageService.GetImageAssetByIdAsync(id, ct);
         return image is not null ? Ok(image) : NotFound();
     }
 
     /// <summary>
-    /// Gets all images for a product.
+    /// Gets all images for an owner.
     /// </summary>
-    /// <param name="productId">The product ID.</param>
-    /// <param name="ct">Cancellation token.</param>
-    [HttpGet("api/product/{productId:int}/images")]
-    [ProducesResponseType(typeof(List<ProductImageResponse>), 200)]
+    [HttpGet("api/{ownerType}/{ownerId:int}/images")]
+    [ProducesResponseType(typeof(List<ImageAssetResponse>), 200)]
     [ProducesResponseType(204)]
-    public async Task<IActionResult> GetProductImages(int productId, CancellationToken ct)
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> GetOwnerImages(string ownerType, int ownerId, CancellationToken ct)
     {
-        var images = await imageService.GetImagesForProductAsync(productId, ct);
+        if (!TryParseOwnerType(ownerType, out var type))
+            return BadRequest($"Invalid owner type '{ownerType}'. Supported types: product, category.");
+
+        var images = await imageService.GetImagesByOwnerAsync(type, ownerId, ct);
         return images.Count > 0 ? Ok(images) : NoContent();
     }
 
     /// <summary>
-    /// Uploads a new image for a product.
+    /// Uploads a new image for an owner.
     /// </summary>
-    /// <param name="productId">The product ID.</param>
-    /// <param name="file">The image file to upload.</param>
-    /// <param name="ct">Cancellation token.</param>
-    [HttpPost("api/product/{productId:int}/images")]
-    [ProducesResponseType(typeof(ProductImageResponse), 201)]
+    [HttpPost("api/{ownerType}/{ownerId:int}/images")]
+    [ProducesResponseType(typeof(ImageAssetResponse), 201)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
     [ProducesResponseType(409)]
     [RequestSizeLimit(MaxFileSizeBytes)]
-    public async Task<IActionResult> UploadImage(int productId, IFormFile file, CancellationToken ct)
+    public async Task<IActionResult> UploadImage(string ownerType, int ownerId, IFormFile file, CancellationToken ct)
     {
+        if (!TryParseOwnerType(ownerType, out var type))
+            return BadRequest($"Invalid owner type '{ownerType}'. Supported types: product, category.");
+
         // Validate file
         if (file is null || file.Length == 0)
             return BadRequest("No file provided.");
@@ -104,9 +120,10 @@ public class ProductImageController(
         if (!AllowedContentTypes.Contains(file.ContentType.ToLowerInvariant()))
             return BadRequest($"Invalid file type. Allowed types: {string.Join(", ", AllowedContentTypes)}");
 
-        // Generate object key: products/{productId}/{guid}-{filename}
+        // Generate object key: {ownerType}/{ownerId}/{guid}-{filename}
         var sanitizedFileName = Path.GetFileName(file.FileName);
-        var objectKey = $"products/{productId}/{Guid.NewGuid()}-{sanitizedFileName}";
+        var folderName = type == ImageAssetType.Product ? "products" : "categories";
+        var objectKey = $"{folderName}/{ownerId}/{Guid.NewGuid()}-{sanitizedFileName}";
 
         // Upload to storage
         await using var stream = file.OpenReadStream();
@@ -114,7 +131,8 @@ public class ProductImageController(
 
         // Create metadata record
         var (result, image) = await imageService.CreateImageAsync(
-            productId,
+            type,
+            ownerId,
             objectKey,
             sanitizedFileName,
             file.ContentType,
@@ -137,9 +155,7 @@ public class ProductImageController(
     /// <summary>
     /// Deletes an image.
     /// </summary>
-    /// <param name="id">The image ID.</param>
-    /// <param name="ct">Cancellation token.</param>
-    [HttpDelete("api/productimage/{id:guid}")]
+    [HttpDelete("api/imageasset/{id:guid}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> DeleteImage(Guid id, CancellationToken ct)
@@ -148,7 +164,6 @@ public class ProductImageController(
 
         if (result == DbResultOption.Success && objectKey is not null)
         {
-            // Delete from storage (fire-and-forget is ok, but we'll await for consistency)
             await storageService.DeleteAsync(objectKey, ct);
         }
 
@@ -156,11 +171,9 @@ public class ProductImageController(
     }
 
     /// <summary>
-    /// Sets an image as the primary image for its product.
+    /// Sets an image as the primary image for its owner.
     /// </summary>
-    /// <param name="id">The image ID.</param>
-    /// <param name="ct">Cancellation token.</param>
-    [HttpPut("api/productimage/{id:guid}/primary")]
+    [HttpPut("api/imageasset/{id:guid}/primary")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> SetPrimary(Guid id, CancellationToken ct)
@@ -170,21 +183,21 @@ public class ProductImageController(
     }
 
     /// <summary>
-    /// Reorders images for a product.
+    /// Reorders images for an owner.
     /// </summary>
-    /// <param name="productId">The product ID.</param>
-    /// <param name="request">The reorder request containing image IDs in desired order.</param>
-    /// <param name="ct">Cancellation token.</param>
-    [HttpPut("api/product/{productId:int}/images/reorder")]
+    [HttpPut("api/{ownerType}/{ownerId:int}/images/reorder")]
     [ProducesResponseType(204)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> ReorderImages(int productId, [FromBody] ReorderImagesRequest request, CancellationToken ct)
+    public async Task<IActionResult> ReorderImages(string ownerType, int ownerId, [FromBody] ReorderImagesRequest request, CancellationToken ct)
     {
+        if (!TryParseOwnerType(ownerType, out var type))
+            return BadRequest($"Invalid owner type '{ownerType}'. Supported types: product, category.");
+
         if (request.ImageIds is null || request.ImageIds.Count == 0)
             return BadRequest("Image IDs are required.");
 
-        var result = await imageService.ReorderImagesAsync(productId, request.ImageIds, ct);
+        var result = await imageService.ReorderImagesAsync(type, ownerId, request.ImageIds, ct);
         return this.ToActionResult(result, NoContent);
     }
 }

@@ -5,7 +5,7 @@ namespace Commerce.Services.Mappers;
 
 public static class ProductMapper
 {
-    public static ProductResponse ToResponse(Product product) =>
+    public static ProductResponse ToResponse(Product product, IEnumerable<ImageAsset>? imageAssets = null) =>
         new()
         {
             Id = product.Id,
@@ -25,18 +25,20 @@ public static class ProductMapper
                     IsFeatured = product.Category.IsFeatured
                 }
                 : null,
-            Images = ProductImageMapper.ToResponseList(product.Images),
-            PrimaryImageUrl = GetPrimaryImageUrl(product.Images)
+            Images = imageAssets != null
+                ? ImageAssetMapper.ToResponseList([.. imageAssets])
+                : [],
+            PrimaryImageUrl = GetPrimaryImageUrl(imageAssets)
         };
 
-    private static string? GetPrimaryImageUrl(ICollection<ProductImage> images)
+    private static string? GetPrimaryImageUrl(IEnumerable<ImageAsset>? images)
     {
-        if (images == null || images.Count == 0) return null;
+        if (images is null || !images.Any()) return null;
 
         // Find primary image, or fall back to first by DisplayOrder
         var primary = images.FirstOrDefault(i => i.IsPrimary)
                       ?? images.OrderBy(i => i.DisplayOrder).First();
 
-        return $"/api/productimage/{primary.Id}";
+        return $"/api/imageasset/{primary.Id}";
     }
 }

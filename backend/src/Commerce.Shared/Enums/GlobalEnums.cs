@@ -10,3 +10,9 @@ public enum DbResultOption
     Conflict,
     Error
 }
+
+public enum ImageAssetType
+{
+    Product,
+    Category
+}

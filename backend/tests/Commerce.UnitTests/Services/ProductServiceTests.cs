@@ -14,7 +14,7 @@ public class ProductServiceTests
     {
         var productsRepo = new FakeProductsRepository { ProductById = null };
         var categoriesRepo = new FakeCategoryRepository();
-        var imagesRepo = new FakeProductImageRepository();
+        var imagesRepo = new FakeImageAssetRepository();
 
         var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
@@ -41,7 +41,7 @@ public class ProductServiceTests
             }
         };
         var categoriesRepo = new FakeCategoryRepository();
-        var imagesRepo = new FakeProductImageRepository();
+        var imagesRepo = new FakeImageAssetRepository();
 
         var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
@@ -73,7 +73,7 @@ public class ProductServiceTests
                 TotalCount: 2)
         };
         var categoriesRepo = new FakeCategoryRepository();
-        var imagesRepo = new FakeProductImageRepository();
+        var imagesRepo = new FakeImageAssetRepository();
 
         var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
         var queryParams = new GetProductsQueryParams { Page = 1, PageSize = 10 };
@@ -98,7 +98,7 @@ public class ProductServiceTests
     {
         var productsRepo = new FakeProductsRepository();
         var categoriesRepo = new FakeCategoryRepository { CategoryById = null };
-        var imagesRepo = new FakeProductImageRepository();
+        var imagesRepo = new FakeImageAssetRepository();
 
         var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
@@ -128,7 +128,7 @@ public class ProductServiceTests
         {
             CategoryById = new Category { Id = 1, Name = "Cat", IsActive = false }
         };
-        var imagesRepo = new FakeProductImageRepository();
+        var imagesRepo = new FakeImageAssetRepository();
 
         var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
@@ -159,7 +159,7 @@ public class ProductServiceTests
         {
             CategoryById = new Category { Id = 1, Name = "Cat", IsActive = true }
         };
-        var imagesRepo = new FakeProductImageRepository();
+        var imagesRepo = new FakeImageAssetRepository();
 
         var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
@@ -185,7 +185,7 @@ public class ProductServiceTests
     {
         var productsRepo = new FakeProductsRepository();
         var categoriesRepo = new FakeCategoryRepository { CategoryById = null };
-        var imagesRepo = new FakeProductImageRepository();
+        var imagesRepo = new FakeImageAssetRepository();
 
         var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
@@ -213,7 +213,7 @@ public class ProductServiceTests
         {
             CategoryById = new Category { Id = 2, Name = "Cat", IsActive = false }
         };
-        var imagesRepo = new FakeProductImageRepository();
+        var imagesRepo = new FakeImageAssetRepository();
 
         var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
@@ -244,7 +244,7 @@ public class ProductServiceTests
         {
             CategoryById = new Category { Id = 2, Name = "Cat", IsActive = true }
         };
-        var imagesRepo = new FakeProductImageRepository();
+        var imagesRepo = new FakeImageAssetRepository();
 
         var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
@@ -283,7 +283,7 @@ public class ProductServiceTests
         {
             CategoryById = new Category { Id = 2, Name = "Cat", IsActive = true }
         };
-        var imagesRepo = new FakeProductImageRepository();
+        var imagesRepo = new FakeImageAssetRepository();
 
         var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
@@ -312,7 +312,7 @@ public class ProductServiceTests
     {
         var productsRepo = new FakeProductsRepository { ToggleResult = DbResultOption.Success };
         var categoriesRepo = new FakeCategoryRepository();
-        var imagesRepo = new FakeProductImageRepository();
+        var imagesRepo = new FakeImageAssetRepository();
 
         var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
 
@@ -381,9 +381,6 @@ public class ProductServiceTests
         public Category? CategoryById { get; set; }
         public int? LastGetByIdCategoryId { get; private set; }
 
-        // NOTE: your real interface in this convo doesn't show GetByIdAsync,
-        // but your ProductService uses categoriesRepo.GetByIdAsync(...).
-        // Implement whatever your interface method signature is.
         public Task<Category?> GetByIdAsync(int categoryId, CancellationToken ct = default)
         {
             LastGetByIdCategoryId = categoryId;
@@ -419,23 +416,23 @@ public class ProductServiceTests
             => throw new NotImplementedException();
     }
 
-    private sealed class FakeProductImageRepository : IProductImageRepository
+    private sealed class FakeImageAssetRepository : IImageAssetRepository
     {
-        public List<ProductImage> Images { get; set; } = [];
+        public List<ImageAsset> Images { get; set; } = [];
 
-        public Task<ProductImage?> GetByIdAsync(Guid imageId, CancellationToken ct = default)
+        public Task<ImageAsset?> GetByIdAsync(Guid imageId, CancellationToken ct = default)
             => Task.FromResult(Images.FirstOrDefault(i => i.Id == imageId));
 
-        public Task<List<ProductImage>> GetByProductIdAsync(int productId, CancellationToken ct = default)
-            => Task.FromResult(Images.Where(i => i.ProductId == productId).ToList());
+        public Task<List<ImageAsset>> GetByTypeAndOwnerIdAsync(ImageAssetType type, int ownerId, CancellationToken ct = default)
+            => Task.FromResult(Images.Where(i => i.Type == type && i.OwnerId == ownerId).ToList());
 
-        public Task<List<ProductImage>> GetByProductsIdsAsync(IEnumerable<int> productIds, CancellationToken ct = default)
-            => Task.FromResult(Images.Where(i => productIds.Contains(i.ProductId)).ToList());
+        public Task<List<ImageAsset>> GetByTypeAndOwnersIdsAsync(ImageAssetType type, List<int> ownerIds, CancellationToken ct = default)
+            => Task.FromResult(Images.Where(i => i.Type == type && ownerIds.Contains(i.OwnerId)).ToList());
 
-        public Task<ProductImage?> GetPrimaryByProductIdAsync(int productId, CancellationToken ct = default)
-            => Task.FromResult(Images.FirstOrDefault(i => i.ProductId == productId && i.IsPrimary));
+        public Task<ImageAsset?> GetPrimaryByTypeAndOwnerIdAsync(ImageAssetType type, int ownerId, CancellationToken ct = default)
+            => Task.FromResult(Images.FirstOrDefault(i => i.Type == type && i.OwnerId == ownerId && i.IsPrimary));
 
-        public Task<ProductImage> AddAsync(ProductImage image, CancellationToken ct = default)
+        public Task<ImageAsset> AddAsync(ImageAsset image, CancellationToken ct = default)
             => Task.FromResult(image);
 
         public Task<bool> DeleteAsync(Guid imageId, CancellationToken ct = default)
@@ -444,10 +441,10 @@ public class ProductServiceTests
         public Task<bool> SetPrimaryAsync(Guid imageId, CancellationToken ct = default)
             => Task.FromResult(true);
 
-        public Task<bool> UpdateDisplayOrderAsync(int productId, IList<Guid> orderedImageIds, CancellationToken ct = default)
+        public Task<bool> UpdateDisplayOrderAsync(ImageAssetType type, int ownerId, IList<Guid> orderedImageIds, CancellationToken ct = default)
             => Task.FromResult(true);
 
-        public Task<int> GetCountByProductIdAsync(int productId, CancellationToken ct = default)
-            => Task.FromResult(Images.Count(i => i.ProductId == productId));
+        public Task<int> GetCountByOwnerIdAsync(ImageAssetType type, int ownerId, CancellationToken ct = default)
+            => Task.FromResult(Images.Count(i => i.Type == type && i.OwnerId == ownerId));
     }
 }

@@ -19,7 +19,7 @@ public class ProductResponse
     /// <summary>
     /// Images associated with this product, ordered by DisplayOrder.
     /// </summary>
-    public List<ProductImageResponse> Images { get; set; } = [];
+    public List<ImageAssetResponse> Images { get; set; } = [];
 
     /// <summary>
     /// URL to the primary image, or null if no primary image is set.

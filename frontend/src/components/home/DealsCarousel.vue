@@ -39,7 +39,7 @@ onMounted(async () => {
         <h2
           :class="[
             mdAndUp ? 'text-h4' : 'text-h5',
-            'font-weight-bold d-flex justify-space-between mb-4 align-center',
+            'font-weight-bold d-flex justify-space-between mb-1 align-center',
           ]"
         >
           <div class="text-truncate">{{ t("home.deals.title") }}</div>

@@ -1,22 +1,26 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
+using Commerce.Shared.Enums;
 
 namespace Commerce.Shared.Responses;
 
-/// <summary>
-/// Response DTO for a product image.
-/// </summary>
 [ExcludeFromCodeCoverage]
-public class ProductImageResponse
+public class ImageAssetResponse
 {
     /// <summary>
-    /// Unique identifier for the image.
+    /// Image id.
     /// </summary>
-    public Guid Id { get; init; }
+    public Guid Id { get; set; }
 
     /// <summary>
-    /// The product this image belongs to.
+    /// Type of image asset. <see cref="ImageAssetType"/>
     /// </summary>
-    public int ProductId { get; init; }
+    public ImageAssetType Type { get; set; }
+
+    /// <summary>
+    /// ID of the product or category this image belongs to.
+    /// </summary>
+    public int OwnerId { get; set; }
 
     /// <summary>
     /// Original filename uploaded by the user.
