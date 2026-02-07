@@ -22,6 +22,7 @@ public static class ApplicationServicesExtensions
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IImageAssetRepository, ImageAssetRepository>();
+        services.AddScoped<IEntityTranslationRepository, EntityTranslationRepository>();
         #endregion
         #region Validators Registration
         services.AddValidatorsFromAssemblyContaining<GetProductsQueryParams>();

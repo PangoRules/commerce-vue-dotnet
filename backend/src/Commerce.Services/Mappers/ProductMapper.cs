@@ -5,13 +5,16 @@ namespace Commerce.Services.Mappers;
 
 public static class ProductMapper
 {
-    public static ProductResponse ToResponse(Product product, IEnumerable<ImageAsset>? imageAssets = null) =>
+    public static ProductResponse ToResponse(
+        Product product,
+        IEnumerable<ImageAsset>? imageAssets = null,
+        EntityTranslation? translation = null) =>
         new()
         {
             Id = product.Id,
             CategoryId = product.CategoryId,
-            Name = product.Name,
-            Description = product.Description,
+            Name = translation?.Name ?? product.Name,
+            Description = translation?.Description ?? product.Description,
             Price = product.Price,
             SalePrice = product.SalePrice,
             StockQuantity = product.StockQuantity,

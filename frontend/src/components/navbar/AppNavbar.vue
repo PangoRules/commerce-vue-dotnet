@@ -64,7 +64,6 @@ watch(isSmall, (value) => {
       <!-- LEFT -->
       <div class="nav-left">
         <button
-          v-if="isSmall"
           type="button"
           class="nav-menu-btn"
           :class="{ 'nav-menu-btn--active': isDrawerOpen }"

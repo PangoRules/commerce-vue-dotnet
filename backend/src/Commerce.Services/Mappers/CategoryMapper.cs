@@ -5,12 +5,15 @@ namespace Commerce.Services.Mappers;
 
 public static class CategoryMapper
 {
-    public static CategoryResponse ToResponse(Category category, IEnumerable<ImageAsset>? imageAssets = null) =>
+    public static CategoryResponse ToResponse(
+        Category category,
+        IEnumerable<ImageAsset>? imageAssets = null,
+        EntityTranslation? translation = null) =>
         new()
         {
             Id = category.Id,
-            Name = category.Name,
-            Description = category.Description,
+            Name = translation?.Name ?? category.Name,
+            Description = translation?.Description ?? category.Description,
             IsFeatured = category.IsFeatured,
             Images = imageAssets != null
                 ? ImageAssetMapper.ToResponseList([.. imageAssets])

@@ -11,17 +11,19 @@ public interface IProductService
     /// Gets a product by its identifier.
     /// </summary>
     /// <param name="productId">The unique identifier of the product to retrieve.</param>
+    /// <param name="language">Optional language code for translated content.</param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>The product response if found, otherwise null.</returns>
-    public Task<ProductResponse?> GetProductByIdAsync(int productId, CancellationToken ct = default);
+    public Task<ProductResponse?> GetProductByIdAsync(int productId, string? language = null, CancellationToken ct = default);
 
     /// <summary>
     /// Gets all products filtered by query parameters.
     /// </summary>
     /// <param name="queryParams">The query parameters to filter products.</param>
+    /// <param name="language">Optional language code for translated content.</param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A paged result of product responses.</returns>
-    public Task<PagedResult<ProductResponse>> GetAllProductsAsync(GetProductsQueryParams queryParams, CancellationToken ct = default);
+    public Task<PagedResult<ProductResponse>> GetAllProductsAsync(GetProductsQueryParams queryParams, string? language = null, CancellationToken ct = default);
 
     /// <summary>
     /// Adds a new product.
@@ -52,10 +54,11 @@ public interface IProductService
 public class ProductService(
     IProductRepository productsRepo,
     ICategoryRepository categoriesRepo,
-    IImageAssetRepository imagesRepo
+    IImageAssetRepository imagesRepo,
+    IEntityTranslationRepository translationsRepo
 ) : IProductService
 {
-    public async Task<ProductResponse?> GetProductByIdAsync(int productId, CancellationToken ct = default)
+    public async Task<ProductResponse?> GetProductByIdAsync(int productId, string? language = null, CancellationToken ct = default)
     {
         var product = await productsRepo.GetProductByIdAsync(productId, ct);
         if (product is null) return null;
@@ -63,19 +66,26 @@ public class ProductService(
         // Fetch images for this product via the generic image asset repo
         var images = await imagesRepo.GetByTypeAndOwnerIdAsync(ImageAssetType.Product, productId, ct);
 
-        return Mappers.ProductMapper.ToResponse(product, images);
+        var translation = await GetTranslationIfNeeded(TranslatableEntityType.Product, productId, language, ct);
+
+        return Mappers.ProductMapper.ToResponse(product, images, translation);
     }
 
-    public async Task<PagedResult<ProductResponse>> GetAllProductsAsync(GetProductsQueryParams queryParams, CancellationToken ct = default)
+    public async Task<PagedResult<ProductResponse>> GetAllProductsAsync(GetProductsQueryParams queryParams, string? language = null, CancellationToken ct = default)
     {
         var paged = await productsRepo.GetAllProductsAsync(queryParams, ct);
 
         var productIds = paged.Items.Select(p => p.Id).ToList();
         var images = await imagesRepo.GetByTypeAndOwnersIdsAsync(ImageAssetType.Product, productIds, ct);
 
+        var translations = await GetTranslationsIfNeeded(TranslatableEntityType.Product, productIds, language, ct);
+
         return new PagedResult<ProductResponse>(
             [.. paged.Items.Select(p =>
-                Mappers.ProductMapper.ToResponse(p, [.. images.Where(i => i.OwnerId == p.Id)]))],
+                Mappers.ProductMapper.ToResponse(
+                    p,
+                    [.. images.Where(i => i.OwnerId == p.Id)],
+                    translations?.FirstOrDefault(t => t.EntityId == p.Id)))],
             paged.Page,
             paged.PageSize,
             paged.TotalCount
@@ -106,4 +116,21 @@ public class ProductService(
 
     public Task<DbResultOption> ToggleProductAsync(int productId, CancellationToken ct = default)
         => productsRepo.ToggleProductAsync(productId, ct);
+
+    private static bool ShouldTranslate(string? language)
+        => !string.IsNullOrWhiteSpace(language) && !language.Equals("en", StringComparison.OrdinalIgnoreCase);
+
+    private async Task<Repositories.Entities.EntityTranslation?> GetTranslationIfNeeded(
+        TranslatableEntityType entityType, int entityId, string? language, CancellationToken ct)
+    {
+        if (!ShouldTranslate(language)) return null;
+        return await translationsRepo.GetTranslationAsync(entityType, entityId, language!, ct);
+    }
+
+    private async Task<IReadOnlyList<Repositories.Entities.EntityTranslation>?> GetTranslationsIfNeeded(
+        TranslatableEntityType entityType, IEnumerable<int> entityIds, string? language, CancellationToken ct)
+    {
+        if (!ShouldTranslate(language)) return null;
+        return await translationsRepo.GetTranslationsAsync(entityType, entityIds, language!, ct);
+    }
 }
