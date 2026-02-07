@@ -11,7 +11,7 @@ public interface ICategoryService
     /// <summary>
     /// Retrieve a paginated list of categories based on query parameters.
     /// </summary>
-    Task<PagedResult<CategoryResponse>> GetCategoriesAsync(GetCategoriesQueryParams queryParams, CancellationToken ct = default);
+    Task<PagedResult<CategoryResponse>> GetCategoriesAsync(GetCategoriesQueryParams queryParams, string? language = null, CancellationToken ct = default);
 
     /// <summary>
     /// Get admin category details (includes parents/children id+name) by id.
@@ -23,13 +23,14 @@ public interface ICategoryService
     /// </summary>
     /// <param name="includeInactive">Whether to include inactive categories.</param>
     /// <param name="featuredOnly">Whether to return only featured categories.</param>
+    /// <param name="language">Optional language code for translated content.</param>
     /// <param name="ct">The cancellation token.</param>
-    Task<IReadOnlyList<CategoryResponse>> GetRootsAsync(bool includeInactive = false, bool featuredOnly = false, CancellationToken ct = default);
+    Task<IReadOnlyList<CategoryResponse>> GetRootsAsync(bool includeInactive = false, bool featuredOnly = false, string? language = null, CancellationToken ct = default);
 
     /// <summary>
     /// Get children categories for a parent (active-only by default).
     /// </summary>
-    Task<IReadOnlyList<CategoryResponse>> GetChildrenAsync(int parentCategoryId, bool includeInactive = false, CancellationToken ct = default);
+    Task<IReadOnlyList<CategoryResponse>> GetChildrenAsync(int parentCategoryId, bool includeInactive = false, string? language = null, CancellationToken ct = default);
 
     /// <summary>
     /// Add a new category (reuses existing by name) and optionally attach it under parent(s).
@@ -59,19 +60,24 @@ public interface ICategoryService
 
 public class CategoryService(
     ICategoryRepository categoriesRepository,
-    IImageAssetRepository imagesRepo
+    IImageAssetRepository imagesRepo,
+    IEntityTranslationRepository translationsRepo
 ) : ICategoryService
 {
-    public async Task<PagedResult<CategoryResponse>> GetCategoriesAsync(GetCategoriesQueryParams queryParams, CancellationToken ct = default)
+    public async Task<PagedResult<CategoryResponse>> GetCategoriesAsync(GetCategoriesQueryParams queryParams, string? language = null, CancellationToken ct = default)
     {
         var paged = await categoriesRepository.GetAllCategoriesAsync(queryParams, ct);
 
         var categoryIds = paged.Items.Select(c => c.Id).ToList();
         var images = await imagesRepo.GetByTypeAndOwnersIdsAsync(ImageAssetType.Category, categoryIds, ct);
+        var translations = await GetTranslationsIfNeeded(categoryIds, language, ct);
 
         return new PagedResult<CategoryResponse>(
             [.. paged.Items.Select(c =>
-                Mappers.CategoryMapper.ToResponse(c, images.Where(i => i.OwnerId == c.Id)))],
+                Mappers.CategoryMapper.ToResponse(
+                    c,
+                    images.Where(i => i.OwnerId == c.Id),
+                    translations?.FirstOrDefault(t => t.EntityId == c.Id)))],
             paged.Page,
             paged.PageSize,
             paged.TotalCount);
@@ -85,26 +91,34 @@ public class CategoryService(
         return ToAdminDetailsResponse(category);
     }
 
-    public async Task<IReadOnlyList<CategoryResponse>> GetRootsAsync(bool includeInactive = false, bool featuredOnly = false, CancellationToken ct = default)
+    public async Task<IReadOnlyList<CategoryResponse>> GetRootsAsync(bool includeInactive = false, bool featuredOnly = false, string? language = null, CancellationToken ct = default)
     {
         var roots = await categoriesRepository.GetRootsAsync(includeInactive, featuredOnly, ct);
 
         var categoryIds = roots.Select(c => c.Id).ToList();
         var images = await imagesRepo.GetByTypeAndOwnersIdsAsync(ImageAssetType.Category, categoryIds, ct);
+        var translations = await GetTranslationsIfNeeded(categoryIds, language, ct);
 
         return [.. roots.Select(c =>
-            Mappers.CategoryMapper.ToResponse(c, images.Where(i => i.OwnerId == c.Id)))];
+            Mappers.CategoryMapper.ToResponse(
+                c,
+                images.Where(i => i.OwnerId == c.Id),
+                translations?.FirstOrDefault(t => t.EntityId == c.Id)))];
     }
 
-    public async Task<IReadOnlyList<CategoryResponse>> GetChildrenAsync(int parentCategoryId, bool includeInactive = false, CancellationToken ct = default)
+    public async Task<IReadOnlyList<CategoryResponse>> GetChildrenAsync(int parentCategoryId, bool includeInactive = false, string? language = null, CancellationToken ct = default)
     {
         var children = await categoriesRepository.GetChildrenAsync(parentCategoryId, includeInactive, ct);
 
         var categoryIds = children.Select(c => c.Id).ToList();
         var images = await imagesRepo.GetByTypeAndOwnersIdsAsync(ImageAssetType.Category, categoryIds, ct);
+        var translations = await GetTranslationsIfNeeded(categoryIds, language, ct);
 
         return [.. children.Select(c =>
-            Mappers.CategoryMapper.ToResponse(c, images.Where(i => i.OwnerId == c.Id)))];
+            Mappers.CategoryMapper.ToResponse(
+                c,
+                images.Where(i => i.OwnerId == c.Id),
+                translations?.FirstOrDefault(t => t.EntityId == c.Id)))];
     }
 
     public Task<(DbResultOption Result, int CategoryId)> AddCategoryAsync(CreateCategoryRequest categoryRequest, CancellationToken ct = default)
@@ -144,5 +158,15 @@ public class CategoryService(
             parents,
             children
         );
+    }
+
+    private static bool ShouldTranslate(string? language)
+        => !string.IsNullOrWhiteSpace(language) && !language.Equals("en", StringComparison.OrdinalIgnoreCase);
+
+    private async Task<IReadOnlyList<EntityTranslation>?> GetTranslationsIfNeeded(
+        List<int> entityIds, string? language, CancellationToken ct)
+    {
+        if (!ShouldTranslate(language)) return null;
+        return await translationsRepo.GetTranslationsAsync(TranslatableEntityType.Category, entityIds, language!, ct);
     }
 }

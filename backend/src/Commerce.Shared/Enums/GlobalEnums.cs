@@ -19,3 +19,10 @@ public enum ImageAssetType
     Product,
     Category
 }
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum TranslatableEntityType
+{
+    Product,
+    Category
+}

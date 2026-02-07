@@ -15,8 +15,9 @@ public class ProductServiceTests
         var productsRepo = new FakeProductsRepository { ProductById = null };
         var categoriesRepo = new FakeCategoryRepository();
         var imagesRepo = new FakeImageAssetRepository();
+        var translationsRepo = new FakeEntityTranslationRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo, translationsRepo);
 
         var result = await sut.GetProductByIdAsync(productId: 123);
 
@@ -42,8 +43,9 @@ public class ProductServiceTests
         };
         var categoriesRepo = new FakeCategoryRepository();
         var imagesRepo = new FakeImageAssetRepository();
+        var translationsRepo = new FakeEntityTranslationRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo, translationsRepo);
 
         var result = await sut.GetProductByIdAsync(productId: 10);
 
@@ -55,6 +57,104 @@ public class ProductServiceTests
         Assert.Equal(1199.99m, result.Price);
         Assert.Equal(20, result.StockQuantity);
         Assert.True(result.IsActive);
+    }
+
+    [Fact]
+    public async Task GetProductByIdAsync_WithLanguage_ReturnsTranslatedResponse()
+    {
+        var productsRepo = new FakeProductsRepository
+        {
+            ProductById = new Product
+            {
+                Id = 10,
+                CategoryId = 2,
+                Name = "Laptop",
+                Description = "Lightweight laptop",
+                Price = 1199.99m,
+                StockQuantity = 20,
+                IsActive = true
+            }
+        };
+        var categoriesRepo = new FakeCategoryRepository();
+        var imagesRepo = new FakeImageAssetRepository();
+        var translationsRepo = new FakeEntityTranslationRepository
+        {
+            SingleTranslation = new EntityTranslation
+            {
+                Id = 1,
+                EntityType = TranslatableEntityType.Product,
+                EntityId = 10,
+                LanguageCode = "es",
+                Name = "Portátil",
+                Description = "Portátil ligero"
+            }
+        };
+
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo, translationsRepo);
+
+        var result = await sut.GetProductByIdAsync(productId: 10, language: "es");
+
+        Assert.NotNull(result);
+        Assert.Equal("Portátil", result!.Name);
+        Assert.Equal("Portátil ligero", result.Description);
+    }
+
+    [Fact]
+    public async Task GetProductByIdAsync_WithEnglishLanguage_SkipsTranslationLookup()
+    {
+        var productsRepo = new FakeProductsRepository
+        {
+            ProductById = new Product
+            {
+                Id = 10,
+                CategoryId = 2,
+                Name = "Laptop",
+                Description = "Lightweight laptop",
+                Price = 1199.99m,
+                StockQuantity = 20,
+                IsActive = true
+            }
+        };
+        var categoriesRepo = new FakeCategoryRepository();
+        var imagesRepo = new FakeImageAssetRepository();
+        var translationsRepo = new FakeEntityTranslationRepository();
+
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo, translationsRepo);
+
+        var result = await sut.GetProductByIdAsync(productId: 10, language: "en");
+
+        Assert.NotNull(result);
+        Assert.Equal("Laptop", result!.Name);
+        Assert.False(translationsRepo.GetTranslationCalled);
+    }
+
+    [Fact]
+    public async Task GetProductByIdAsync_WithNullLanguage_SkipsTranslationLookup()
+    {
+        var productsRepo = new FakeProductsRepository
+        {
+            ProductById = new Product
+            {
+                Id = 10,
+                CategoryId = 2,
+                Name = "Laptop",
+                Description = "Lightweight laptop",
+                Price = 1199.99m,
+                StockQuantity = 20,
+                IsActive = true
+            }
+        };
+        var categoriesRepo = new FakeCategoryRepository();
+        var imagesRepo = new FakeImageAssetRepository();
+        var translationsRepo = new FakeEntityTranslationRepository();
+
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo, translationsRepo);
+
+        var result = await sut.GetProductByIdAsync(productId: 10);
+
+        Assert.NotNull(result);
+        Assert.Equal("Laptop", result!.Name);
+        Assert.False(translationsRepo.GetTranslationCalled);
     }
 
     [Fact]
@@ -74,8 +174,9 @@ public class ProductServiceTests
         };
         var categoriesRepo = new FakeCategoryRepository();
         var imagesRepo = new FakeImageAssetRepository();
+        var translationsRepo = new FakeEntityTranslationRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo, translationsRepo);
         var queryParams = new GetProductsQueryParams { Page = 1, PageSize = 10 };
 
         var results = await sut.GetAllProductsAsync(queryParams);
@@ -94,13 +195,49 @@ public class ProductServiceTests
     }
 
     [Fact]
+    public async Task GetAllProductsAsync_WithLanguage_ReturnsTranslatedResponses()
+    {
+        var productsRepo = new FakeProductsRepository
+        {
+            PagedProducts = new PagedResult<Product>(
+                Items:
+                [
+                    new Product { Id = 1, CategoryId = 1, Name = "Laptop", Price = 1m, StockQuantity = 1, IsActive = true },
+                    new Product { Id = 2, CategoryId = 1, Name = "Phone", Price = 2m, StockQuantity = 2, IsActive = true },
+                ],
+                Page: 1,
+                PageSize: 10,
+                TotalCount: 2)
+        };
+        var categoriesRepo = new FakeCategoryRepository();
+        var imagesRepo = new FakeImageAssetRepository();
+        var translationsRepo = new FakeEntityTranslationRepository
+        {
+            BulkTranslations =
+            [
+                new EntityTranslation { Id = 1, EntityType = TranslatableEntityType.Product, EntityId = 1, LanguageCode = "es", Name = "Portátil" },
+                new EntityTranslation { Id = 2, EntityType = TranslatableEntityType.Product, EntityId = 2, LanguageCode = "es", Name = "Teléfono" },
+            ]
+        };
+
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo, translationsRepo);
+        var queryParams = new GetProductsQueryParams { Page = 1, PageSize = 10 };
+
+        var results = await sut.GetAllProductsAsync(queryParams, language: "es");
+
+        Assert.Equal("Portátil", results.Items[0].Name);
+        Assert.Equal("Teléfono", results.Items[1].Name);
+    }
+
+    [Fact]
     public async Task AddProductAsync_WhenCategoryNotFound_ReturnsNotFound_AndDoesNotCallRepo()
     {
         var productsRepo = new FakeProductsRepository();
         var categoriesRepo = new FakeCategoryRepository { CategoryById = null };
         var imagesRepo = new FakeImageAssetRepository();
+        var translationsRepo = new FakeEntityTranslationRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo, translationsRepo);
 
         var request = new CreateProductRequest
         {
@@ -129,8 +266,9 @@ public class ProductServiceTests
             CategoryById = new Category { Id = 1, Name = "Cat", IsActive = false }
         };
         var imagesRepo = new FakeImageAssetRepository();
+        var translationsRepo = new FakeEntityTranslationRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo, translationsRepo);
 
         var request = new CreateProductRequest
         {
@@ -160,8 +298,9 @@ public class ProductServiceTests
             CategoryById = new Category { Id = 1, Name = "Cat", IsActive = true }
         };
         var imagesRepo = new FakeImageAssetRepository();
+        var translationsRepo = new FakeEntityTranslationRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo, translationsRepo);
 
         var request = new CreateProductRequest
         {
@@ -186,8 +325,9 @@ public class ProductServiceTests
         var productsRepo = new FakeProductsRepository();
         var categoriesRepo = new FakeCategoryRepository { CategoryById = null };
         var imagesRepo = new FakeImageAssetRepository();
+        var translationsRepo = new FakeEntityTranslationRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo, translationsRepo);
 
         var request = new UpdateProductRequest
         {
@@ -214,8 +354,9 @@ public class ProductServiceTests
             CategoryById = new Category { Id = 2, Name = "Cat", IsActive = false }
         };
         var imagesRepo = new FakeImageAssetRepository();
+        var translationsRepo = new FakeEntityTranslationRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo, translationsRepo);
 
         var request = new UpdateProductRequest
         {
@@ -245,8 +386,9 @@ public class ProductServiceTests
             CategoryById = new Category { Id = 2, Name = "Cat", IsActive = true }
         };
         var imagesRepo = new FakeImageAssetRepository();
+        var translationsRepo = new FakeEntityTranslationRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo, translationsRepo);
 
         var request = new UpdateProductRequest
         {
@@ -284,8 +426,9 @@ public class ProductServiceTests
             CategoryById = new Category { Id = 2, Name = "Cat", IsActive = true }
         };
         var imagesRepo = new FakeImageAssetRepository();
+        var translationsRepo = new FakeEntityTranslationRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo, translationsRepo);
 
         var request = new UpdateProductRequest
         {
@@ -313,8 +456,9 @@ public class ProductServiceTests
         var productsRepo = new FakeProductsRepository { ToggleResult = DbResultOption.Success };
         var categoriesRepo = new FakeCategoryRepository();
         var imagesRepo = new FakeImageAssetRepository();
+        var translationsRepo = new FakeEntityTranslationRepository();
 
-        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo);
+        var sut = new ProductService(productsRepo, categoriesRepo, imagesRepo, translationsRepo);
 
         var result = await sut.ToggleProductAsync(productId: 77);
 
@@ -446,5 +590,29 @@ public class ProductServiceTests
 
         public Task<int> GetCountByOwnerIdAsync(ImageAssetType type, int ownerId, CancellationToken ct = default)
             => Task.FromResult(Images.Count(i => i.Type == type && i.OwnerId == ownerId));
+    }
+
+    private sealed class FakeEntityTranslationRepository : IEntityTranslationRepository
+    {
+        public EntityTranslation? SingleTranslation { get; set; }
+        public List<EntityTranslation> BulkTranslations { get; set; } = [];
+        public bool GetTranslationCalled { get; private set; }
+        public bool GetTranslationsCalled { get; private set; }
+
+        public Task<EntityTranslation?> GetTranslationAsync(
+            TranslatableEntityType entityType, int entityId,
+            string languageCode, CancellationToken ct = default)
+        {
+            GetTranslationCalled = true;
+            return Task.FromResult(SingleTranslation);
+        }
+
+        public Task<IReadOnlyList<EntityTranslation>> GetTranslationsAsync(
+            TranslatableEntityType entityType, IEnumerable<int> entityIds,
+            string languageCode, CancellationToken ct = default)
+        {
+            GetTranslationsCalled = true;
+            return Task.FromResult<IReadOnlyList<EntityTranslation>>(BulkTranslations);
+        }
     }
 }

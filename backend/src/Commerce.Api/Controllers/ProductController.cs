@@ -26,7 +26,8 @@ public class ProductController(IProductService productService) : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetProductById(int productId, CancellationToken ct)
     {
-        var product = await productService.GetProductByIdAsync(productId, ct);
+        var language = Request.Headers.AcceptLanguage.FirstOrDefault()?.Split(',')[0]?.Trim();
+        var product = await productService.GetProductByIdAsync(productId, language, ct);
         return product is not null ? Ok(product) : NotFound();
     }
 
@@ -38,7 +39,8 @@ public class ProductController(IProductService productService) : ControllerBase
     [ProducesResponseType(204)]
     public async Task<IActionResult> GetAllProducts([FromQuery] GetProductsQueryParams queryParams, CancellationToken ct)
     {
-        var page = await productService.GetAllProductsAsync(queryParams, ct);
+        var language = Request.Headers.AcceptLanguage.FirstOrDefault()?.Split(',')[0]?.Trim();
+        var page = await productService.GetAllProductsAsync(queryParams, language, ct);
 
         HttpContext.SetPaging(page);
 

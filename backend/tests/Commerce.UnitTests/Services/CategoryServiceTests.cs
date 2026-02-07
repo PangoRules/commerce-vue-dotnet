@@ -26,7 +26,7 @@ public class CategoryServiceTests
             PageSize = 10
         };
 
-        var sut = new CategoryService(repo, new FakeImageAssetRepository());
+        var sut = new CategoryService(repo, new FakeImageAssetRepository(), new FakeEntityTranslationRepository());
         var queryParams = new GetCategoriesQueryParams { Page = 1, PageSize = 10 };
 
         // Act
@@ -62,7 +62,7 @@ public class CategoryServiceTests
             PageSize = 10
         };
 
-        var sut = new CategoryService(repo, new FakeImageAssetRepository());
+        var sut = new CategoryService(repo, new FakeImageAssetRepository(), new FakeEntityTranslationRepository());
 
         // Act
         var results = await sut.GetCategoriesAsync(new GetCategoriesQueryParams());
@@ -75,6 +75,41 @@ public class CategoryServiceTests
     }
 
     [Fact]
+    public async Task GetCategoriesAsync_WithLanguage_ReturnsTranslatedResponses()
+    {
+        // Arrange
+        var repo = new FakeCategoryRepository
+        {
+            Categories =
+            [
+                new Category { Id = 1, Name = "Electronics", Description = "Electronic gadgets", IsActive = true },
+            ],
+            TotalCount = 1,
+            Page = 1,
+            PageSize = 10
+        };
+
+        var translationsRepo = new FakeEntityTranslationRepository
+        {
+            BulkTranslations =
+            [
+                new EntityTranslation { Id = 1, EntityType = TranslatableEntityType.Category, EntityId = 1, LanguageCode = "es", Name = "Electrónica", Description = "Dispositivos electrónicos" }
+            ]
+        };
+
+        var sut = new CategoryService(repo, new FakeImageAssetRepository(), translationsRepo);
+        var queryParams = new GetCategoriesQueryParams { Page = 1, PageSize = 10 };
+
+        // Act
+        var results = await sut.GetCategoriesAsync(queryParams, language: "es");
+
+        // Assert
+        Assert.Single(results.Items);
+        Assert.Equal("Electrónica", results.Items[0].Name);
+        Assert.Equal("Dispositivos electrónicos", results.Items[0].Description);
+    }
+
+    [Fact]
     public async Task GetCategoryAdminDetailsAsync_WhenRepoReturnsNull_ReturnsNull()
     {
         // Arrange
@@ -83,7 +118,7 @@ public class CategoryServiceTests
             CategoryGraphById = null
         };
 
-        var sut = new CategoryService(repo, new FakeImageAssetRepository());
+        var sut = new CategoryService(repo, new FakeImageAssetRepository(), new FakeEntityTranslationRepository());
 
         // Act
         var result = await sut.GetCategoryAdminDetailsAsync(categoryId: 123);
@@ -122,7 +157,7 @@ public class CategoryServiceTests
             CategoryGraphById = graph
         };
 
-        var sut = new CategoryService(repo, new FakeImageAssetRepository());
+        var sut = new CategoryService(repo, new FakeImageAssetRepository(), new FakeEntityTranslationRepository());
 
         // Act
         var result = await sut.GetCategoryAdminDetailsAsync(categoryId: 2);
@@ -159,7 +194,7 @@ public class CategoryServiceTests
             ]
         };
 
-        var sut = new CategoryService(repo, new FakeImageAssetRepository());
+        var sut = new CategoryService(repo, new FakeImageAssetRepository(), new FakeEntityTranslationRepository());
 
         // Act
         var result = await sut.GetRootsAsync(includeInactive);
@@ -186,7 +221,7 @@ public class CategoryServiceTests
             ]
         };
 
-        var sut = new CategoryService(repo, new FakeImageAssetRepository());
+        var sut = new CategoryService(repo, new FakeImageAssetRepository(), new FakeEntityTranslationRepository());
 
         // Act
         var result = await sut.GetRootsAsync(includeInactive: false, featuredOnly: featuredOnly);
@@ -198,6 +233,37 @@ public class CategoryServiceTests
         Assert.True(result[0].IsFeatured);
 
         Assert.Equal(featuredOnly, repo.LastRootsFeaturedOnly);
+    }
+
+    [Fact]
+    public async Task GetRootsAsync_WithLanguage_ReturnsTranslatedResponses()
+    {
+        // Arrange
+        var repo = new FakeCategoryRepository
+        {
+            Roots =
+            [
+                new Category { Id = 1, Name = "Electronics", Description = "Electronic gadgets", IsActive = true }
+            ]
+        };
+
+        var translationsRepo = new FakeEntityTranslationRepository
+        {
+            BulkTranslations =
+            [
+                new EntityTranslation { Id = 1, EntityType = TranslatableEntityType.Category, EntityId = 1, LanguageCode = "es", Name = "Electrónica", Description = "Dispositivos electrónicos" }
+            ]
+        };
+
+        var sut = new CategoryService(repo, new FakeImageAssetRepository(), translationsRepo);
+
+        // Act
+        var result = await sut.GetRootsAsync(language: "es");
+
+        // Assert
+        Assert.Single(result);
+        Assert.Equal("Electrónica", result[0].Name);
+        Assert.Equal("Dispositivos electrónicos", result[0].Description);
     }
 
     [Theory]
@@ -214,7 +280,7 @@ public class CategoryServiceTests
             ]
         };
 
-        var sut = new CategoryService(repo, new FakeImageAssetRepository());
+        var sut = new CategoryService(repo, new FakeImageAssetRepository(), new FakeEntityTranslationRepository());
 
         // Act
         var result = await sut.GetChildrenAsync(parentCategoryId: 5, includeInactive);
@@ -240,7 +306,7 @@ public class CategoryServiceTests
             AddResult = (repoResult, repoCategoryId)
         };
 
-        var sut = new CategoryService(repo, new FakeImageAssetRepository());
+        var sut = new CategoryService(repo, new FakeImageAssetRepository(), new FakeEntityTranslationRepository());
 
         var request = new CreateCategoryRequest
         {
@@ -271,7 +337,7 @@ public class CategoryServiceTests
             UpdateResult = repoResult
         };
 
-        var sut = new CategoryService(repo, new FakeImageAssetRepository());
+        var sut = new CategoryService(repo, new FakeImageAssetRepository(), new FakeEntityTranslationRepository());
 
         var request = new CreateCategoryRequest
         {
@@ -300,7 +366,7 @@ public class CategoryServiceTests
             ToggleResult = repoResult
         };
 
-        var sut = new CategoryService(repo, new FakeImageAssetRepository());
+        var sut = new CategoryService(repo, new FakeImageAssetRepository(), new FakeEntityTranslationRepository());
 
         // Act
         var result = await sut.ToggleCategoryAsync(categoryId: 77);
@@ -325,7 +391,7 @@ public class CategoryServiceTests
             AttachResult = repoResult
         };
 
-        var sut = new CategoryService(repo, new FakeImageAssetRepository());
+        var sut = new CategoryService(repo, new FakeImageAssetRepository(), new FakeEntityTranslationRepository());
 
         // Act
         var result = await sut.AttachCategoryAsync(parentCategoryId: 1, childCategoryId: 2);
@@ -349,7 +415,7 @@ public class CategoryServiceTests
             DetachResult = repoResult
         };
 
-        var sut = new CategoryService(repo, new FakeImageAssetRepository());
+        var sut = new CategoryService(repo, new FakeImageAssetRepository(), new FakeEntityTranslationRepository());
 
         // Act
         var result = await sut.DetachCategoryAsync(parentCategoryId: 1, childCategoryId: 2);
@@ -510,5 +576,29 @@ public class CategoryServiceTests
 
         public Task<int> GetCountByOwnerIdAsync(ImageAssetType type, int ownerId, CancellationToken ct = default)
             => Task.FromResult(Images.Count(i => i.Type == type && i.OwnerId == ownerId));
+    }
+
+    private sealed class FakeEntityTranslationRepository : IEntityTranslationRepository
+    {
+        public EntityTranslation? SingleTranslation { get; set; }
+        public List<EntityTranslation> BulkTranslations { get; set; } = [];
+        public bool GetTranslationCalled { get; private set; }
+        public bool GetTranslationsCalled { get; private set; }
+
+        public Task<EntityTranslation?> GetTranslationAsync(
+            TranslatableEntityType entityType, int entityId,
+            string languageCode, CancellationToken ct = default)
+        {
+            GetTranslationCalled = true;
+            return Task.FromResult(SingleTranslation);
+        }
+
+        public Task<IReadOnlyList<EntityTranslation>> GetTranslationsAsync(
+            TranslatableEntityType entityType, IEnumerable<int> entityIds,
+            string languageCode, CancellationToken ct = default)
+        {
+            GetTranslationsCalled = true;
+            return Task.FromResult<IReadOnlyList<EntityTranslation>>(BulkTranslations);
+        }
     }
 }

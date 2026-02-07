@@ -11,6 +11,7 @@ public class CommerceDbContext(DbContextOptions<CommerceDbContext> options) : Db
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<ImageAsset> ImageAssets { get; set; }
+    public DbSet<EntityTranslation> EntityTranslations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -23,7 +23,8 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
     [ProducesResponseType(204)]
     public async Task<IActionResult> GetCategories([FromQuery] GetCategoriesQueryParams queryParams, CancellationToken ct)
     {
-        var page = await categoryService.GetCategoriesAsync(queryParams, ct);
+        var language = Request.Headers.AcceptLanguage.FirstOrDefault()?.Split(',')[0]?.Trim();
+        var page = await categoryService.GetCategoriesAsync(queryParams, language, ct);
 
         HttpContext.SetPaging(page);
 
@@ -53,7 +54,8 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
     [ProducesResponseType(204)]
     public async Task<IActionResult> GetRoots([FromQuery] bool includeInactive = false, [FromQuery] bool featuredOnly = false, CancellationToken ct = default)
     {
-        var roots = await categoryService.GetRootsAsync(includeInactive, featuredOnly, ct);
+        var language = Request.Headers.AcceptLanguage.FirstOrDefault()?.Split(',')[0]?.Trim();
+        var roots = await categoryService.GetRootsAsync(includeInactive, featuredOnly, language, ct);
         return roots.Count > 0 ? Ok(roots) : NoContent();
     }
 
@@ -65,7 +67,8 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
     [ProducesResponseType(204)]
     public async Task<IActionResult> GetChildren(int parentCategoryId, [FromQuery] bool includeInactive = false, CancellationToken ct = default)
     {
-        var children = await categoryService.GetChildrenAsync(parentCategoryId, includeInactive, ct);
+        var language = Request.Headers.AcceptLanguage.FirstOrDefault()?.Split(',')[0]?.Trim();
+        var children = await categoryService.GetChildrenAsync(parentCategoryId, includeInactive, language, ct);
         return children.Count > 0 ? Ok(children) : NoContent();
     }
 
