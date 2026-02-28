@@ -47,6 +47,8 @@ lerna-debug.log*
 commerce-vue-dotnet.code-workspace
 commerce-vue-dotnet.codeBackend-workspace.code-workspace
 .claude-code.json
+.nvim.lua
+*/.editorconfig
 
 # =====================
 # OS
