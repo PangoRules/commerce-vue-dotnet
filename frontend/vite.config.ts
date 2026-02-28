@@ -4,7 +4,7 @@ import { loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
 import vuetify from "vite-plugin-vuetify";
 import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
-import VueRouter from "unplugin-vue-router/vite";
+import VueRouter from "vue-router/vite";
 import { fileURLToPath, URL } from "node:url";
 import VueDevTools from "vite-plugin-vue-devtools";
 

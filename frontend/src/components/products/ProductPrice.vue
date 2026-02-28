@@ -3,7 +3,7 @@ import { computed } from "vue";
 
 const props = defineProps<{
   price: number;
-  originalPrice?: number;
+  salePrice?: number;
   size?: "small" | "default" | "large";
   currency?: string;
 }>();
@@ -16,15 +16,15 @@ const formattedPrice = computed(() => {
 });
 
 const formattedOriginalPrice = computed(() => {
-  if (!props.originalPrice) return null;
+  if (!props.salePrice) return null;
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: props.currency ?? "USD",
-  }).format(props.originalPrice);
+  }).format(props.salePrice);
 });
 
 const hasDiscount = computed(() => {
-  return props.originalPrice && props.originalPrice > props.price;
+  return props.salePrice ?? false;
 });
 
 const textClass = computed(() => {
@@ -41,12 +41,18 @@ const textClass = computed(() => {
 
 <template>
   <div class="d-inline-flex align-center ga-2">
-    <span :class="[textClass, 'font-weight-bold text-primary']">
+    <span
+      :class="[
+        hasDiscount
+          ? 'text-disabled text-decoration-line-through'
+          : 'text-primary font-weight-bold ' + textClass,
+      ]"
+    >
       {{ formattedPrice }}
     </span>
     <span
       v-if="hasDiscount"
-      class="text-body-2 text-decoration-line-through text-disabled"
+      :class="['text-primary font-weight-bold', textClass]"
     >
       {{ formattedOriginalPrice }}
     </span>

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { defineComponent, h } from "vue";
 import AppLayout from "./AppLayout.vue";
@@ -31,7 +31,9 @@ describe("AppLayout.vue", () => {
     (import.meta.env as any).DEV = originalDev;
   });
 
-  function mountComponent(options: { isDev?: boolean; slotContent?: string } = {}) {
+  function mountComponent(
+    options: { isDev?: boolean; slotContent?: string } = {},
+  ) {
     if (options.isDev !== undefined) {
       (import.meta.env as any).DEV = options.isDev;
     }

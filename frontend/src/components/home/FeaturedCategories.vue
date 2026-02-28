@@ -78,13 +78,12 @@ onUnmounted(() => {
   <v-container v-else-if="!mdAndUp" class="mx-auto" max-width="100%">
     <v-row>
       <v-col cols="12">
-        <h2
-          class="text-h5 font-weight-bold d-flex justify-space-between mb-4 align-center"
-        >
-          <div class="text-truncate">
+        <div class="d-flex justify-space-between align-center">
+          <h2 class="text-truncate text-h4 font-weight-bold">
             {{ t("categories.featuredCategories") }}
-          </div>
-        </h2>
+          </h2>
+          <v-chip to="/categories">{{ t("common.actions.viewAll") }}</v-chip>
+        </div>
       </v-col>
     </v-row>
 
@@ -97,9 +96,13 @@ onUnmounted(() => {
           class="d-flex flex-column h-100"
           border
           flat
-          :to="`/products?category=${category.id}`"
+          :to="`/categories/${category.id}`"
         >
-          <div v-if="hasImages(category)" class="category-slideshow" style="height: 280px">
+          <div
+            v-if="hasImages(category)"
+            class="category-slideshow"
+            style="height: 280px"
+          >
             <v-img
               v-for="(image, idx) in category.images"
               :key="image.id"
@@ -129,13 +132,12 @@ onUnmounted(() => {
 
   <!-- Desktop: Slide group with multiple visible -->
   <v-container v-else>
-    <h2
-      class="text-h4 font-weight-bold d-flex justify-space-between align-center"
-    >
-      <div class="text-truncate">
+    <div class="d-flex justify-space-between align-center">
+      <h2 class="text-truncate text-h4 font-weight-bold">
         {{ t("categories.featuredCategories") }}
-      </div>
-    </h2>
+      </h2>
+      <v-chip to="/categories">{{ t("common.actions.viewAll") }}</v-chip>
+    </div>
     <v-row>
       <v-col cols="12">
         <v-slide-group show-arrows>
@@ -148,9 +150,13 @@ onUnmounted(() => {
               width="50%"
               border
               flat
-              :to="`/products?category=${category.id}`"
+              :to="`/categories/${category.id}`"
             >
-              <div v-if="hasImages(category)" class="category-slideshow" style="height: 320px">
+              <div
+                v-if="hasImages(category)"
+                class="category-slideshow"
+                style="height: 320px"
+              >
                 <v-img
                   v-for="(image, idx) in category.images"
                   :key="image.id"
@@ -168,9 +174,7 @@ onUnmounted(() => {
                 cover
               />
               <v-card-item class="flex-grow-1">
-                <v-card-title class="text-h5">{{
-                  category.name
-                }}</v-card-title>
+                <v-card-title class="text-h5">{{ category.name }}</v-card-title>
                 <v-card-subtitle class="text-wrap text-body-1">
                   {{ category.description }}
                 </v-card-subtitle>
