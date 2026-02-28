@@ -204,7 +204,7 @@ describe("NavbarUserMenu", () => {
     });
 
     it("hides chevron icon in compact mode", async () => {
-      const { container } = await renderWithPlugins(NavbarUserMenu, {
+      await renderWithPlugins(NavbarUserMenu, {
         render: {
           props: {
             isAuthenticated: true,
@@ -260,7 +260,7 @@ describe("NavbarUserMenu", () => {
     });
 
     it("menu button has correct aria attributes for accessibility", async () => {
-      const { container } = await renderWithPlugins(NavbarUserMenu, {
+      await renderWithPlugins(NavbarUserMenu, {
         routes: testRoutes,
         render: {
           props: {
@@ -289,8 +289,6 @@ describe("NavbarUserMenu", () => {
       });
 
       // The v-menu component should be present
-      const menu = container.querySelector(".v-menu");
-      // Menu may or may not have a wrapper class depending on Vuetify version
       expect(container.querySelector(".navbar-user-menu")).toBeDefined();
     });
   });

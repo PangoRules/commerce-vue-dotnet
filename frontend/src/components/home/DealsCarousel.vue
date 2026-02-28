@@ -79,7 +79,6 @@ onMounted(async () => {
             v-for="(item, i) in items"
             :key="i"
             cols="12"
-            sm="6"
             md="6"
             lg="3"
             class="d-flex"

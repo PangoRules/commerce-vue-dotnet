@@ -5,7 +5,7 @@ import AddToCartButton from "./AddToCartButton.vue";
 import type { ProductResponse } from "@/types/api/productTypes";
 
 const mockProduct = (
-  overrides: Partial<ProductResponse> = {}
+  overrides: Partial<ProductResponse> = {},
 ): ProductResponse => ({
   id: 1,
   name: "Test Product",
@@ -14,7 +14,14 @@ const mockProduct = (
   stockQuantity: 10,
   categoryId: 1,
   isActive: true,
-  category: { id: 1, name: "Test Category", description: null },
+  category: {
+    id: 1,
+    name: "Test Category",
+    description: null,
+    isFeatured: true,
+    images: [],
+    primaryImageUrl: "",
+  },
   images: [],
   primaryImageUrl: null,
   ...overrides,
@@ -34,7 +41,7 @@ describe("AddToCartButton", () => {
     });
 
     const button = screen.getByRole("button");
-    await button.click();
+    button.click();
 
     // Advance past the 300ms delay in the component
     await vi.advanceTimersByTimeAsync(350);
@@ -61,7 +68,7 @@ describe("AddToCartButton", () => {
     });
 
     const button = screen.getByRole("button");
-    await button.click();
+    button.click();
 
     // Wait a bit to ensure no emit happens
     await vi.advanceTimersByTimeAsync(400);
@@ -85,7 +92,7 @@ describe("AddToCartButton", () => {
     const button = screen.getByRole("button");
     expect(
       button.hasAttribute("disabled") ||
-        button.classList.contains("v-btn--disabled")
+        button.classList.contains("v-btn--disabled"),
     ).toBe(true);
   });
 });

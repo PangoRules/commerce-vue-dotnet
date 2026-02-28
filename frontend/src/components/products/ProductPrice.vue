@@ -24,7 +24,7 @@ const formattedOriginalPrice = computed(() => {
 });
 
 const hasDiscount = computed(() => {
-  return props.salePrice ?? false;
+  return props.salePrice != null && props.salePrice < props.price;
 });
 
 const textClass = computed(() => {
