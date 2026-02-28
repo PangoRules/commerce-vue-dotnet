@@ -558,6 +558,9 @@ public class ProductServiceTests
 
         public Task<DbResultOption> DetachCategoryAsync(int parentCategoryId, int childCategoryId, CancellationToken ct = default)
             => throw new NotImplementedException();
+
+        public Task<Dictionary<int, List<int>>> GetProductIdsByCategoryIdsAsync(List<int> categoryIds, CancellationToken ct = default)
+            => throw new NotImplementedException();
     }
 
     private sealed class FakeImageAssetRepository : IImageAssetRepository

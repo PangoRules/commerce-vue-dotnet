@@ -1,29 +1,36 @@
 <script setup lang="ts">
 import { useCategories } from "@/composables/useCategories";
+import { CategoryCard } from "@/components/categories";
 import type { CategoryListQuery } from "@/types/api/categoryTypes";
-import { ref } from "vue";
-import { computed, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { useDisplay } from "vuetify";
 
-//Categories
 const { loadCategoryList, listCategoryResult, isCategoryListLoading } =
   useCategories();
 
+const { smAndDown, lgAndUp } = useDisplay();
+
 const categoryListQuery = ref<CategoryListQuery>({
-  pageSize: 10,
   isActive: true,
 });
+
 const getCategories = async () => {
   if (isLoading.value) return;
-
   await loadCategoryList(categoryListQuery.value);
 };
+
 const categories = computed(() => {
   if (!listCategoryResult.value?.ok) return [];
   return listCategoryResult.value.data;
 });
 
-//Helpers
 const isLoading = computed(() => isCategoryListLoading.value);
+
+const itemsPerPage = computed(() => {
+  if (smAndDown.value) return 4; // 2 cols × 2 rows
+  if (lgAndUp.value) return 8; // 4 cols × 2 rows
+  return 6; // 3 cols × 2 rows
+});
 
 onMounted(async () => {
   await getCategories();
@@ -31,19 +38,18 @@ onMounted(async () => {
 </script>
 
 <template>
-  <v-container class="py-8 mx-auto" fluid>
+  <v-container class="py-8 mx-auto">
     <h1 class="text-h3 text-md-h2 font-weight-bold mb-4">Categories</h1>
-    <v-data-iterator
-      :items="categories"
-      :items-per-page="categoryListQuery.pageSize"
-    >
+
+    <div v-if="isLoading" class="d-flex justify-center pa-8">
+      <v-progress-circular indeterminate />
+    </div>
+
+    <v-data-iterator v-else :items="categories" :items-per-page="itemsPerPage">
       <template v-slot:header="{ page, pageCount, prevPage, nextPage }">
-        <h3
-          class="text-headline-large font-weight-bold d-flex justify-space-between mt-0 mb-4 align-center"
-        >
-          <div class="text-truncate">All Categories</div>
+        <div class="d-flex justify-space-between mt-0 mb-4 align-center">
           <div class="d-flex align-center">
-            <div class="d-inline-flex">
+            <div class="d-inline-flex align-end">
               <v-btn
                 :disabled="page === 1"
                 class="me-2"
@@ -53,8 +59,10 @@ onMounted(async () => {
                 @click="prevPage"
               ></v-btn>
 
+              <span class="mx-2 text-body-2">{{ page }} / {{ pageCount }}</span>
+
               <v-btn
-                :disable="page === pageCount"
+                :disabled="page === pageCount"
                 icon="mdi-arrow-right"
                 size="small"
                 variant="tonal"
@@ -62,13 +70,20 @@ onMounted(async () => {
               ></v-btn>
             </div>
           </div>
-        </h3>
+        </div>
       </template>
 
       <template v-slot:default="{ items }">
         <v-row>
-          <v-col v-for="(item, i) in items" :key="i" cols="12" md="6" xl="3">
-            <v-sheet border></v-sheet>
+          <v-col
+            v-for="(item, i) in items"
+            :key="i"
+            cols="12"
+            sm="6"
+            md="4"
+            lg="3"
+          >
+            <CategoryCard :category="item.raw" />
           </v-col>
         </v-row>
       </template>

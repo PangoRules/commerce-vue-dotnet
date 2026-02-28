@@ -95,6 +95,15 @@ public interface ICategoryRepository
     /// <param name="ct">The cancellation token.</param>
     /// <returns>The result of the operation.</returns>
     Task<DbResultOption> DetachCategoryAsync(int parentCategoryId, int childCategoryId, CancellationToken ct = default);
+
+    /// <summary>
+    /// Returns the active product IDs belonging to each of the given category IDs,
+    /// grouped by category. Categories with no active products are omitted.
+    /// </summary>
+    /// <param name="categoryIds">The category IDs to look up.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A dictionary mapping category ID → list of product IDs.</returns>
+    Task<Dictionary<int, List<int>>> GetProductIdsByCategoryIdsAsync(List<int> categoryIds, CancellationToken ct = default);
 }
 
 [ExcludeFromCodeCoverage]
@@ -328,5 +337,18 @@ public class CategoryRepository(CommerceDbContext context) : ICategoryRepository
         context.Set<CategoryLink>().Remove(existingLink);
         var result = await context.SaveChangesAsync(ct);
         return result > 0 ? DbResultOption.Success : DbResultOption.Error;
+    }
+
+    public async Task<Dictionary<int, List<int>>> GetProductIdsByCategoryIdsAsync(List<int> categoryIds, CancellationToken ct = default)
+    {
+        var pairs = await context.Products
+            .AsNoTracking()
+            .Where(p => categoryIds.Contains(p.CategoryId) && p.IsActive)
+            .Select(p => new { p.CategoryId, p.Id })
+            .ToListAsync(ct);
+
+        return pairs
+            .GroupBy(p => p.CategoryId)
+            .ToDictionary(g => g.Key, g => g.Select(p => p.Id).ToList());
     }
 }

@@ -70,13 +70,14 @@ public class CategoryService(
 
         var categoryIds = paged.Items.Select(c => c.Id).ToList();
         var images = await imagesRepo.GetByTypeAndOwnersIdsAsync(ImageAssetType.Category, categoryIds, ct);
+        var (productImages, productIdsByCategory) = await FetchProductImageFallbacksAsync(categoryIds, images, ct);
         var translations = await GetTranslationsIfNeeded(categoryIds, language, ct);
 
         return new PagedResult<CategoryResponse>(
             [.. paged.Items.Select(c =>
                 Mappers.CategoryMapper.ToResponse(
                     c,
-                    images.Where(i => i.OwnerId == c.Id),
+                    SelectImagesForCategory(c.Id, images, productImages, productIdsByCategory),
                     translations?.FirstOrDefault(t => t.EntityId == c.Id)))],
             paged.Page,
             paged.PageSize,
@@ -97,12 +98,13 @@ public class CategoryService(
 
         var categoryIds = roots.Select(c => c.Id).ToList();
         var images = await imagesRepo.GetByTypeAndOwnersIdsAsync(ImageAssetType.Category, categoryIds, ct);
+        var (productImages, productIdsByCategory) = await FetchProductImageFallbacksAsync(categoryIds, images, ct);
         var translations = await GetTranslationsIfNeeded(categoryIds, language, ct);
 
         return [.. roots.Select(c =>
             Mappers.CategoryMapper.ToResponse(
                 c,
-                images.Where(i => i.OwnerId == c.Id),
+                SelectImagesForCategory(c.Id, images, productImages, productIdsByCategory),
                 translations?.FirstOrDefault(t => t.EntityId == c.Id)))];
     }
 
@@ -112,12 +114,13 @@ public class CategoryService(
 
         var categoryIds = children.Select(c => c.Id).ToList();
         var images = await imagesRepo.GetByTypeAndOwnersIdsAsync(ImageAssetType.Category, categoryIds, ct);
+        var (productImages, productIdsByCategory) = await FetchProductImageFallbacksAsync(categoryIds, images, ct);
         var translations = await GetTranslationsIfNeeded(categoryIds, language, ct);
 
         return [.. children.Select(c =>
             Mappers.CategoryMapper.ToResponse(
                 c,
-                images.Where(i => i.OwnerId == c.Id),
+                SelectImagesForCategory(c.Id, images, productImages, productIdsByCategory),
                 translations?.FirstOrDefault(t => t.EntityId == c.Id)))];
     }
 
@@ -135,6 +138,48 @@ public class CategoryService(
 
     public Task<DbResultOption> DetachCategoryAsync(int parentCategoryId, int childCategoryId, CancellationToken ct = default)
         => categoriesRepository.DetachCategoryAsync(parentCategoryId, childCategoryId, ct);
+
+    /// <summary>
+    /// For each category ID that has no category-owned images, fetches the active product IDs
+    /// for that category and then fetches their product images. Returns an empty pair when
+    /// every category already has at least one image.
+    /// </summary>
+    private async Task<(List<ImageAsset> ProductImages, Dictionary<int, List<int>> ProductIdsByCategory)>
+        FetchProductImageFallbacksAsync(List<int> categoryIds, List<ImageAsset> categoryImages, CancellationToken ct)
+    {
+        var emptyCategoryIds = categoryIds
+            .Where(id => !categoryImages.Any(img => img.OwnerId == id))
+            .ToList();
+
+        if (emptyCategoryIds.Count == 0)
+            return ([], []);
+
+        var productIdsByCategory = await categoriesRepository.GetProductIdsByCategoryIdsAsync(emptyCategoryIds, ct);
+        var allProductIds = productIdsByCategory.Values.SelectMany(ids => ids).Distinct().ToList();
+
+        if (allProductIds.Count == 0)
+            return ([], productIdsByCategory);
+
+        var productImages = await imagesRepo.GetByTypeAndOwnersIdsAsync(ImageAssetType.Product, allProductIds, ct);
+        return (productImages, productIdsByCategory);
+    }
+
+    /// <summary>
+    /// Returns the category's own images when available; otherwise falls back to the
+    /// product images belonging to that category's products.
+    /// </summary>
+    private static IEnumerable<ImageAsset> SelectImagesForCategory(
+        int categoryId,
+        List<ImageAsset> categoryImages,
+        List<ImageAsset> productImages,
+        Dictionary<int, List<int>> productIdsByCategory)
+    {
+        var ownImages = categoryImages.Where(i => i.OwnerId == categoryId).ToList();
+        if (ownImages.Count > 0) return ownImages;
+
+        if (!productIdsByCategory.TryGetValue(categoryId, out var productIds)) return [];
+        return productImages.Where(i => productIds.Contains(i.OwnerId));
+    }
 
     private static CategoryAdminDetailsResponse ToAdminDetailsResponse(Category c)
     {
