@@ -58,3 +58,6 @@ jobs:
 
       - name: Run Vitest
         run: npm run test -- --run
+
+      - name: Build project
+        run: npm build
