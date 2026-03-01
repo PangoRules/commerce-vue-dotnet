@@ -6,7 +6,6 @@
 **/.vite/
 **/dist-ssr/
 **/coverage/
-**/package-lock.json
 
 # Env files
 .env
