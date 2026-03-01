@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { mount, flushPromises } from "@vue/test-utils";
+import { mount } from "@vue/test-utils";
 import { createVuetify } from "vuetify";
 import { createI18n } from "vue-i18n";
 import { createRouter, createMemoryHistory } from "vue-router";
@@ -139,7 +139,7 @@ const NavbarCartStub = defineComponent({
   name: "NavbarCart",
   props: ["count"],
   emits: ["click"],
-  setup(props, { emit }) {
+  setup(_, { emit }) {
     return () =>
       h("button", {
         class: "navbar-cart",
@@ -165,7 +165,8 @@ const NavbarLogoStub = defineComponent({
 const ThemeTogglerStub = defineComponent({
   name: "ThemeToggler",
   setup() {
-    return () => h("div", { class: "theme-toggler", "data-testid": "theme-toggler" });
+    return () =>
+      h("div", { class: "theme-toggler", "data-testid": "theme-toggler" });
   },
 });
 
@@ -173,14 +174,23 @@ const VAppBarStub = defineComponent({
   props: ["density", "flat"],
   setup(_, { slots }) {
     return () =>
-      h("div", { class: "v-app-bar app-navbar", "data-testid": "app-bar" }, slots.default?.());
+      h(
+        "div",
+        { class: "v-app-bar app-navbar", "data-testid": "app-bar" },
+        slots.default?.(),
+      );
   },
 });
 
 const VSheetStub = defineComponent({
   props: ["class", "elevation"],
   setup(_, { slots }) {
-    return () => h("div", { class: "v-sheet", "data-testid": "search-overlay" }, slots.default?.());
+    return () =>
+      h(
+        "div",
+        { class: "v-sheet", "data-testid": "search-overlay" },
+        slots.default?.(),
+      );
   },
 });
 
@@ -363,7 +373,9 @@ describe("AppNavbar", () => {
       expect(menuButton.exists()).toBe(true);
 
       // Initially drawer should be closed
-      expect(wrapper.find("[data-testid='mobile-drawer']").exists()).toBe(false);
+      expect(wrapper.find("[data-testid='mobile-drawer']").exists()).toBe(
+        false,
+      );
 
       // Click to open
       await menuButton.trigger("click");
@@ -375,7 +387,9 @@ describe("AppNavbar", () => {
       await menuButton.trigger("click");
       await nextTick();
 
-      expect(wrapper.find("[data-testid='mobile-drawer']").exists()).toBe(false);
+      expect(wrapper.find("[data-testid='mobile-drawer']").exists()).toBe(
+        false,
+      );
     });
 
     it("calls logout when mobile drawer emits logout", async () => {

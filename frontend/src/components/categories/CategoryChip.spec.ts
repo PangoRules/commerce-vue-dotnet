@@ -5,11 +5,14 @@ import CategoryChip from "./CategoryChip.vue";
 import type { CategoryResponse } from "@/types/api/categoryTypes";
 
 const mockCategory = (
-  overrides: Partial<CategoryResponse> = {}
+  overrides: Partial<CategoryResponse> = {},
 ): CategoryResponse => ({
   id: 1,
   name: "Test Category",
   description: null,
+  isFeatured: true,
+  primaryImageUrl: "",
+  images: [],
   ...overrides,
 });
 

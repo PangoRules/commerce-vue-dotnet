@@ -21,7 +21,7 @@ describe("ProductCard", () => {
       (chip) =>
         chip.classList.contains("text-warning") ||
         chip.classList.contains("bg-warning") ||
-        chip.getAttribute("class")?.includes("warning")
+        chip.getAttribute("class")?.includes("warning"),
     );
     expect(warningChips.length).toBeGreaterThan(0);
   });
@@ -41,7 +41,7 @@ describe("ProductCard", () => {
       (chip) =>
         chip.classList.contains("text-warning") ||
         chip.classList.contains("bg-warning") ||
-        chip.getAttribute("class")?.includes("warning")
+        chip.getAttribute("class")?.includes("warning"),
     );
     expect(warningChips.length).toBe(0);
   });
@@ -60,7 +60,7 @@ describe("ProductCard", () => {
       (chip) =>
         chip.classList.contains("text-error") ||
         chip.classList.contains("bg-error") ||
-        chip.getAttribute("class")?.includes("error")
+        chip.getAttribute("class")?.includes("error"),
     );
     expect(errorChips.length).toBeGreaterThan(0);
   });
@@ -113,7 +113,14 @@ describe("ProductCard", () => {
       render: {
         props: {
           product: createMockProduct({
-            category: { id: 5, name: "Electronics", description: null },
+            category: {
+              id: 5,
+              name: "Electronics",
+              description: null,
+              images: [],
+              isFeatured: false,
+              primaryImageUrl: "",
+            },
           }),
           showCategory: true,
         },
@@ -128,7 +135,14 @@ describe("ProductCard", () => {
       render: {
         props: {
           product: createMockProduct({
-            category: { id: 5, name: "Electronics", description: null },
+            category: {
+              id: 5,
+              name: "Electronics",
+              description: null,
+              images: [],
+              isFeatured: true,
+              primaryImageUrl: "",
+            },
           }),
           showCategory: false,
         },
@@ -153,7 +167,7 @@ describe("ProductCard", () => {
       (chip) =>
         chip.classList.contains("text-warning") ||
         chip.classList.contains("bg-warning") ||
-        chip.getAttribute("class")?.includes("warning")
+        chip.getAttribute("class")?.includes("warning"),
     );
     expect(warningChips.length).toBe(0);
   });

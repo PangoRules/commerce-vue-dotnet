@@ -29,21 +29,21 @@ describe("ProductPrice", () => {
     expect(screen.getByText("€49.50")).toBeDefined();
   });
 
-  it("shows discount when originalPrice > price", async () => {
+  it("shows discount when salePrice < price", async () => {
     await renderWithPlugins(ProductPrice, {
       render: {
         props: {
-          price: 79.99,
-          originalPrice: 99.99,
+          price: 99.99,
+          salePrice: 79.99,
         },
       },
     });
 
-    expect(screen.getByText("$79.99")).toBeDefined();
     expect(screen.getByText("$99.99")).toBeDefined();
+    expect(screen.getByText("$79.99")).toBeDefined();
   });
 
-  it("hides discount when no originalPrice", async () => {
+  it("hides discount when no salePrice", async () => {
     const { container } = await renderWithPlugins(ProductPrice, {
       render: {
         props: {
@@ -55,23 +55,23 @@ describe("ProductPrice", () => {
     expect(screen.getByText("$79.99")).toBeDefined();
     // Only one price element should be present
     const priceElements = container.querySelectorAll("span");
-    // One span for price (no strikethrough span for original price)
+    // One span for price (no strikethrough span for sale price)
     expect(priceElements.length).toBe(1);
   });
 
-  it("hides discount when originalPrice <= price", async () => {
+  it("hides discount when salePrice >= price", async () => {
     const { container } = await renderWithPlugins(ProductPrice, {
       render: {
         props: {
-          price: 99.99,
-          originalPrice: 79.99, // Lower than current price - no discount
+          price: 79.99,
+          salePrice: 99.99, // Higher than price - not a real discount
         },
       },
     });
 
-    expect(screen.getByText("$99.99")).toBeDefined();
-    // Original price should not be shown since it's not greater than current price
-    expect(screen.queryByText("$79.99")).toBeNull();
+    expect(screen.getByText("$79.99")).toBeDefined();
+    // Sale price should not be shown since it's not less than the regular price
+    expect(screen.queryByText("$99.99")).toBeNull();
     const priceElements = container.querySelectorAll("span");
     expect(priceElements.length).toBe(1);
   });

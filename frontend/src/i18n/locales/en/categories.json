@@ -2,5 +2,9 @@
   "title": "Categories",
   "all": "All Categories",
   "empty": "No categories found",
-  "featuredCategories": "Featured Categories"
+  "featuredCategories": "Featured Categories",
+  "loading": "Loading categories...",
+  "failed": "Failed to load categories",
+  "notFoundTitle": "Category Not Found",
+  "notFoundDescription": "The category you are looking for does not exist or an error occurred."
 }

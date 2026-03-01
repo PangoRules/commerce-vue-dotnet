@@ -50,6 +50,11 @@ vi.mock("vuetify", async (importOriginal) => {
   };
 });
 
+const testRoutes = [
+  { path: "/", component: { template: "<div />" } },
+  { path: "/products", component: { template: "<div />" } },
+];
+
 describe("DealsCarousel", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -62,7 +67,7 @@ describe("DealsCarousel", () => {
 
   describe("initialization", () => {
     it("calls loadProductList on mount with onSale filter", async () => {
-      await renderWithPlugins(DealsCarousel, {});
+      await renderWithPlugins(DealsCarousel, { routes: testRoutes });
 
       expect(mockLoadProductList).toHaveBeenCalledTimes(1);
       expect(mockLoadProductList).toHaveBeenCalledWith({ onSale: true });
@@ -73,7 +78,7 @@ describe("DealsCarousel", () => {
     it("shows loading spinner when isProductListLoading is true", async () => {
       mockIsProductListLoading.value = true;
 
-      const { container } = await renderWithPlugins(DealsCarousel, {});
+      const { container } = await renderWithPlugins(DealsCarousel, { routes: testRoutes });
 
       const spinner = container.querySelector(".v-progress-circular");
       expect(spinner).toBeDefined();
@@ -88,7 +93,7 @@ describe("DealsCarousel", () => {
         data: [],
       };
 
-      const { container } = await renderWithPlugins(DealsCarousel, {});
+      const { container } = await renderWithPlugins(DealsCarousel, { routes: testRoutes });
 
       const loadingDiv = container.querySelector(
         ".d-flex.justify-center.pa-8 .v-progress-circular",
@@ -111,7 +116,7 @@ describe("DealsCarousel", () => {
         ],
       };
 
-      await renderWithPlugins(DealsCarousel, {});
+      await renderWithPlugins(DealsCarousel, { routes: testRoutes });
 
       const productCards = screen.getAllByTestId("product-card");
       expect(productCards.length).toBeGreaterThan(0);
@@ -125,7 +130,7 @@ describe("DealsCarousel", () => {
         data: [createMockProduct({ id: 1, name: "Test Product" })],
       };
 
-      await renderWithPlugins(DealsCarousel, {});
+      await renderWithPlugins(DealsCarousel, { routes: testRoutes });
 
       // The mock ProductCard should be rendered
       expect(screen.getByTestId("product-card")).toBeDefined();
@@ -141,7 +146,7 @@ describe("DealsCarousel", () => {
         data: [createMockProduct({ id: 1, name: "Sale Item" })],
       };
 
-      await renderWithPlugins(DealsCarousel, {});
+      await renderWithPlugins(DealsCarousel, { routes: testRoutes });
 
       const heading = screen.getByRole("heading", { level: 2 });
       expect(heading).toBeDefined();
@@ -162,7 +167,7 @@ describe("DealsCarousel", () => {
         ],
       };
 
-      const { container } = await renderWithPlugins(DealsCarousel, {});
+      const { container } = await renderWithPlugins(DealsCarousel, { routes: testRoutes });
 
       // Should have prev/next buttons
       const buttons = container.querySelectorAll(".v-btn");
@@ -177,7 +182,7 @@ describe("DealsCarousel", () => {
         data: [createMockProduct({ id: 1, name: "Product 1" })],
       };
 
-      const { container } = await renderWithPlugins(DealsCarousel, {});
+      const { container } = await renderWithPlugins(DealsCarousel, { routes: testRoutes });
 
       const footer = container.querySelector(".v-footer");
       expect(footer).toBeDefined();
@@ -193,7 +198,7 @@ describe("DealsCarousel", () => {
         data: [],
       };
 
-      const { container } = await renderWithPlugins(DealsCarousel, {});
+      const { container } = await renderWithPlugins(DealsCarousel, { routes: testRoutes });
 
       const productCards = container.querySelectorAll(
         '[data-testid="product-card"]',
@@ -210,7 +215,7 @@ describe("DealsCarousel", () => {
         error: { kind: "http", message: "Server error" },
       };
 
-      const { container } = await renderWithPlugins(DealsCarousel, {});
+      const { container } = await renderWithPlugins(DealsCarousel, { routes: testRoutes });
 
       const productCards = container.querySelectorAll(
         '[data-testid="product-card"]',

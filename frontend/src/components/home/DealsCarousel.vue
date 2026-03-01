@@ -36,25 +36,28 @@ onMounted(async () => {
   <v-container class="mx-auto">
     <v-data-iterator :items="products" :items-per-page="itemsPerPage">
       <template v-slot:header="{ page, pageCount, prevPage, nextPage }">
-        <h2
-          :class="[
-            mdAndUp ? 'text-h4' : 'text-h5',
-            'font-weight-bold d-flex justify-space-between mb-1 align-center',
-          ]"
-        >
-          <div class="text-truncate">{{ t("home.deals.title") }}</div>
+        <div class="d-flex justify-space-between mb-1 align-center">
+          <h2
+            :class="[
+              mdAndUp ? 'text-h4' : 'text-h5',
+              'font-weight-bold d-flex justify-space-between mb-1 align-center',
+            ]"
+          >
+            {{ t("home.deals.title") }}
+          </h2>
 
-          <div class="d-flex align-center">
-            <div class="d-inline-flex">
+          <div class="d-flex flex-column align-cener">
+            <div class="d-inline-flex align-center">
               <v-btn
                 :disabled="page === 1"
-                class="me-2"
                 icon="mdi-arrow-left"
                 size="small"
                 variant="tonal"
                 @click="prevPage"
               ></v-btn>
-
+              <v-chip to="/products" class="mx-1">{{
+                t("common.actions.viewAll")
+              }}</v-chip>
               <v-btn
                 :disabled="page === pageCount"
                 icon="mdi-arrow-right"
@@ -63,8 +66,11 @@ onMounted(async () => {
                 @click="nextPage"
               ></v-btn>
             </div>
+            <div class="text-center">
+              {{ t("home.deals.pagination", { page, pageCount }) }}
+            </div>
           </div>
-        </h2>
+        </div>
       </template>
 
       <template v-slot:default="{ items }">
@@ -73,7 +79,6 @@ onMounted(async () => {
             v-for="(item, i) in items"
             :key="i"
             cols="12"
-            sm="6"
             md="6"
             lg="3"
             class="d-flex"
@@ -85,12 +90,6 @@ onMounted(async () => {
             />
           </v-col>
         </v-row>
-      </template>
-
-      <template v-slot:footer="{ page, pageCount }">
-        <v-footer class="justify-space-between text-body-2 mt-4">
-          <div>{{ t("home.deals.pagination", { page, pageCount }) }}</div>
-        </v-footer>
       </template>
     </v-data-iterator>
   </v-container>

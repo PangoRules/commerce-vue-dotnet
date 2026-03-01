@@ -38,6 +38,12 @@ vi.mock("vuetify", async (importOriginal) => {
   };
 });
 
+const testRoutes = [
+  { path: "/", component: { template: "<div />" } },
+  { path: "/categories", component: { template: "<div />" } },
+  { path: "/categories/:id", component: { template: "<div />" } },
+];
+
 describe("FeaturedCategories", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -48,7 +54,7 @@ describe("FeaturedCategories", () => {
 
   describe("initialization", () => {
     it("calls loadCategoryList on mount with correct params", async () => {
-      await renderWithPlugins(FeaturedCategories, {});
+      await renderWithPlugins(FeaturedCategories, { routes: testRoutes });
 
       expect(mockLoadCategoryList).toHaveBeenCalledTimes(1);
       expect(mockLoadCategoryList).toHaveBeenCalledWith({
@@ -63,7 +69,7 @@ describe("FeaturedCategories", () => {
     it("shows loading spinner when isCategoryListLoading is true", async () => {
       mockIsCategoryListLoading.value = true;
 
-      const { container } = await renderWithPlugins(FeaturedCategories, {});
+      const { container } = await renderWithPlugins(FeaturedCategories, { routes: testRoutes });
 
       const spinner = container.querySelector(".v-progress-circular");
       expect(spinner).toBeDefined();
@@ -78,7 +84,7 @@ describe("FeaturedCategories", () => {
         data: [],
       };
 
-      const { container } = await renderWithPlugins(FeaturedCategories, {});
+      const { container } = await renderWithPlugins(FeaturedCategories, { routes: testRoutes });
 
       const loadingDiv = container.querySelector(
         ".d-flex.justify-center.pa-8 .v-progress-circular",
@@ -99,7 +105,7 @@ describe("FeaturedCategories", () => {
         ],
       };
 
-      await renderWithPlugins(FeaturedCategories, {});
+      await renderWithPlugins(FeaturedCategories, { routes: testRoutes });
 
       expect(screen.getByText("Electronics")).toBeDefined();
       expect(screen.getByText("Clothing")).toBeDefined();
@@ -119,7 +125,7 @@ describe("FeaturedCategories", () => {
         ],
       };
 
-      await renderWithPlugins(FeaturedCategories, {});
+      await renderWithPlugins(FeaturedCategories, { routes: testRoutes });
 
       expect(screen.getByText("All electronic items")).toBeDefined();
     });
@@ -132,7 +138,7 @@ describe("FeaturedCategories", () => {
         data: [createMockCategory({ id: 1, name: "Electronics" })],
       };
 
-      await renderWithPlugins(FeaturedCategories, {});
+      await renderWithPlugins(FeaturedCategories, { routes: testRoutes });
 
       // The heading should use the i18n translation
       const heading = screen.getByRole("heading", { level: 2 });
@@ -149,7 +155,7 @@ describe("FeaturedCategories", () => {
         data: [],
       };
 
-      const { container } = await renderWithPlugins(FeaturedCategories, {});
+      const { container } = await renderWithPlugins(FeaturedCategories, { routes: testRoutes });
 
       // Should render container but no category cards
       const cards = container.querySelectorAll(".v-card");
@@ -158,7 +164,7 @@ describe("FeaturedCategories", () => {
   });
 
   describe("navigation", () => {
-    it("category cards link to products page with category filter", async () => {
+    it("category cards link to the category detail page", async () => {
       mockListCategoryResult.value = {
         ok: true,
         status: 200,
@@ -166,17 +172,12 @@ describe("FeaturedCategories", () => {
         data: [createMockCategory({ id: 5, name: "Gadgets" })],
       };
 
-      const { container } = await renderWithPlugins(FeaturedCategories, {
-        routes: [
-          { path: "/", component: { template: "<div />" } },
-          { path: "/products", component: { template: "<div />" } },
-        ],
-      });
+      const { container } = await renderWithPlugins(FeaturedCategories, { routes: testRoutes });
 
       // Find the card link
       const cardLinks = container.querySelectorAll("a.v-card");
       const gadgetLink = Array.from(cardLinks).find((link) =>
-        link.getAttribute("href")?.includes("category=5"),
+        link.getAttribute("href")?.includes("/categories/5"),
       );
       expect(gadgetLink).toBeDefined();
     });

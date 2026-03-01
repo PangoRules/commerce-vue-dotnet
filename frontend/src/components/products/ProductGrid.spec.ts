@@ -5,7 +5,7 @@ import ProductGrid from "./ProductGrid.vue";
 import type { ProductResponse } from "@/types/api/productTypes";
 
 const mockProduct = (
-  overrides: Partial<ProductResponse> = {}
+  overrides: Partial<ProductResponse> = {},
 ): ProductResponse => ({
   id: 1,
   name: "Test Product",
@@ -14,7 +14,14 @@ const mockProduct = (
   stockQuantity: 10,
   categoryId: 1,
   isActive: true,
-  category: { id: 1, name: "Test Category", description: null },
+  category: {
+    id: 1,
+    name: "Test Category",
+    description: null,
+    images: [],
+    isFeatured: false,
+    primaryImageUrl: "",
+  },
   images: [],
   primaryImageUrl: null,
   ...overrides,
@@ -130,7 +137,14 @@ describe("ProductGrid", () => {
         id: 1,
         name: "Low Stock Item",
         stockQuantity: 2,
-        category: { id: 1, name: "Gadgets", description: null },
+        category: {
+          id: 1,
+          name: "Gadgets",
+          description: null,
+          images: [],
+          isFeatured: false,
+          primaryImageUrl: "",
+        },
       }),
     ];
 
@@ -152,7 +166,7 @@ describe("ProductGrid", () => {
       (chip) =>
         chip.classList.contains("text-warning") ||
         chip.classList.contains("bg-warning") ||
-        chip.getAttribute("class")?.includes("warning")
+        chip.getAttribute("class")?.includes("warning"),
     );
     expect(warningChips.length).toBeGreaterThan(0);
   });

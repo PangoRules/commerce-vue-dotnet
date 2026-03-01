@@ -110,6 +110,180 @@ public class CategoryServiceTests
     }
 
     [Fact]
+    public async Task GetCategoriesAsync_WhenCategoryHasNoImages_FallsBackToProductImages()
+    {
+        // Arrange: category 1 has no category images; product 10 belongs to it and has a product image
+        var productImageId = Guid.NewGuid();
+        var repo = new FakeCategoryRepository
+        {
+            Categories = [new Category { Id = 1, Name = "Tools", IsActive = true }],
+            TotalCount = 1, Page = 1, PageSize = 10,
+            ProductIdsByCategory = new Dictionary<int, List<int>> { [1] = [10] }
+        };
+        var imageRepo = new FakeImageAssetRepository
+        {
+            Images =
+            [
+                new ImageAsset { Id = productImageId, Type = ImageAssetType.Product, OwnerId = 10, IsPrimary = true,
+                    ObjectKey = "p/10/img.jpg", FileName = "img.jpg", ContentType = "image/jpeg", SizeBytes = 1024, UploadedAt = DateTime.UtcNow }
+            ]
+        };
+
+        var sut = new CategoryService(repo, imageRepo, new FakeEntityTranslationRepository());
+
+        // Act
+        var result = await sut.GetCategoriesAsync(new GetCategoriesQueryParams { Page = 1, PageSize = 10 });
+
+        // Assert: the category should have the product image as fallback
+        Assert.Single(result.Items);
+        Assert.Single(result.Items[0].Images);
+        Assert.NotNull(result.Items[0].PrimaryImageUrl);
+
+        // Verify the fallback query was called with category 1
+        Assert.NotNull(repo.LastProductIdsCategoryIds);
+        Assert.Contains(1, repo.LastProductIdsCategoryIds);
+    }
+
+    [Fact]
+    public async Task GetCategoriesAsync_WhenCategoryHasOwnImages_DoesNotUseFallback()
+    {
+        // Arrange: category 1 has its own category image; fallback should never be queried
+        var catImageId = Guid.NewGuid();
+        var repo = new FakeCategoryRepository
+        {
+            Categories = [new Category { Id = 1, Name = "Tools", IsActive = true }],
+            TotalCount = 1, Page = 1, PageSize = 10,
+            ProductIdsByCategory = new Dictionary<int, List<int>> { [1] = [10] }
+        };
+        var imageRepo = new FakeImageAssetRepository
+        {
+            Images =
+            [
+                new ImageAsset { Id = catImageId, Type = ImageAssetType.Category, OwnerId = 1, IsPrimary = true,
+                    ObjectKey = "c/1/img.jpg", FileName = "img.jpg", ContentType = "image/jpeg", SizeBytes = 512, UploadedAt = DateTime.UtcNow }
+            ]
+        };
+
+        var sut = new CategoryService(repo, imageRepo, new FakeEntityTranslationRepository());
+
+        // Act
+        var result = await sut.GetCategoriesAsync(new GetCategoriesQueryParams { Page = 1, PageSize = 10 });
+
+        // Assert: the category image is used and the fallback was NOT queried
+        Assert.Single(result.Items[0].Images);
+        Assert.Null(repo.LastProductIdsCategoryIds); // never called
+    }
+
+    [Fact]
+    public async Task GetCategoriesAsync_MixedCategories_EachGetsCorrectImages()
+    {
+        // Arrange: category 1 has own image; category 2 has no image but has products
+        var catImageId = Guid.NewGuid();
+        var prodImageId = Guid.NewGuid();
+        var repo = new FakeCategoryRepository
+        {
+            Categories =
+            [
+                new Category { Id = 1, Name = "Electronics", IsActive = true },
+                new Category { Id = 2, Name = "Books", IsActive = true }
+            ],
+            TotalCount = 2, Page = 1, PageSize = 10,
+            ProductIdsByCategory = new Dictionary<int, List<int>> { [2] = [20] }
+        };
+        var imageRepo = new FakeImageAssetRepository
+        {
+            Images =
+            [
+                new ImageAsset { Id = catImageId, Type = ImageAssetType.Category, OwnerId = 1, IsPrimary = true,
+                    ObjectKey = "c/1/img.jpg", FileName = "img.jpg", ContentType = "image/jpeg", SizeBytes = 512, UploadedAt = DateTime.UtcNow },
+                new ImageAsset { Id = prodImageId, Type = ImageAssetType.Product, OwnerId = 20, IsPrimary = true,
+                    ObjectKey = "p/20/img.jpg", FileName = "img.jpg", ContentType = "image/jpeg", SizeBytes = 1024, UploadedAt = DateTime.UtcNow }
+            ]
+        };
+
+        var sut = new CategoryService(repo, imageRepo, new FakeEntityTranslationRepository());
+
+        // Act
+        var result = await sut.GetCategoriesAsync(new GetCategoriesQueryParams { Page = 1, PageSize = 10 });
+
+        var electronics = result.Items.First(c => c.Id == 1);
+        var books = result.Items.First(c => c.Id == 2);
+
+        // Electronics has its own category image
+        Assert.Single(electronics.Images);
+        Assert.NotNull(electronics.PrimaryImageUrl);
+
+        // Books falls back to the product image
+        Assert.Single(books.Images);
+        Assert.NotNull(books.PrimaryImageUrl);
+
+        // Fallback was only requested for category 2
+        Assert.NotNull(repo.LastProductIdsCategoryIds);
+        Assert.DoesNotContain(1, repo.LastProductIdsCategoryIds);
+        Assert.Contains(2, repo.LastProductIdsCategoryIds);
+    }
+
+    [Fact]
+    public async Task GetRootsAsync_WhenRootHasNoImages_FallsBackToProductImages()
+    {
+        // Arrange
+        var prodImageId = Guid.NewGuid();
+        var repo = new FakeCategoryRepository
+        {
+            Roots = [new Category { Id = 5, Name = "Sports", IsActive = true }],
+            ProductIdsByCategory = new Dictionary<int, List<int>> { [5] = [50] }
+        };
+        var imageRepo = new FakeImageAssetRepository
+        {
+            Images =
+            [
+                new ImageAsset { Id = prodImageId, Type = ImageAssetType.Product, OwnerId = 50, IsPrimary = true,
+                    ObjectKey = "p/50/img.jpg", FileName = "img.jpg", ContentType = "image/jpeg", SizeBytes = 800, UploadedAt = DateTime.UtcNow }
+            ]
+        };
+
+        var sut = new CategoryService(repo, imageRepo, new FakeEntityTranslationRepository());
+
+        // Act
+        var result = await sut.GetRootsAsync();
+
+        // Assert
+        Assert.Single(result);
+        Assert.Single(result[0].Images);
+        Assert.NotNull(result[0].PrimaryImageUrl);
+    }
+
+    [Fact]
+    public async Task GetChildrenAsync_WhenChildHasNoImages_FallsBackToProductImages()
+    {
+        // Arrange
+        var prodImageId = Guid.NewGuid();
+        var repo = new FakeCategoryRepository
+        {
+            Children = [new Category { Id = 7, Name = "Laptops", IsActive = true }],
+            ProductIdsByCategory = new Dictionary<int, List<int>> { [7] = [70] }
+        };
+        var imageRepo = new FakeImageAssetRepository
+        {
+            Images =
+            [
+                new ImageAsset { Id = prodImageId, Type = ImageAssetType.Product, OwnerId = 70, IsPrimary = true,
+                    ObjectKey = "p/70/img.jpg", FileName = "img.jpg", ContentType = "image/jpeg", SizeBytes = 900, UploadedAt = DateTime.UtcNow }
+            ]
+        };
+
+        var sut = new CategoryService(repo, imageRepo, new FakeEntityTranslationRepository());
+
+        // Act
+        var result = await sut.GetChildrenAsync(parentCategoryId: 3);
+
+        // Assert
+        Assert.Single(result);
+        Assert.Single(result[0].Images);
+        Assert.NotNull(result[0].PrimaryImageUrl);
+    }
+
+    [Fact]
     public async Task GetCategoryAdminDetailsAsync_WhenRepoReturnsNull_ReturnsNull()
     {
         // Arrange
@@ -451,10 +625,14 @@ public class CategoryServiceTests
         public DbResultOption AttachResult { get; set; } = DbResultOption.Error;
         public DbResultOption DetachResult { get; set; } = DbResultOption.Error;
 
+        // Return data for product-image fallback
+        public Dictionary<int, List<int>> ProductIdsByCategory { get; set; } = [];
+
         // Captured args
         public GetCategoriesQueryParams? LastQueryParams { get; private set; }
         public int? LastGraphCategoryId { get; private set; }
         public int? LastSimpleCategoryId {get; private set; }
+        public List<int>? LastProductIdsCategoryIds { get; private set; }
 
         public bool? LastRootsIncludeInactive { get; private set; }
         public bool? LastRootsFeaturedOnly { get; private set; }
@@ -543,6 +721,16 @@ public class CategoryServiceTests
         {
             LastSimpleCategoryId = id;
             return Task.FromResult<Category?>(CategoryGraphById);
+        }
+
+        public Task<Dictionary<int, List<int>>> GetProductIdsByCategoryIdsAsync(List<int> categoryIds, CancellationToken ct = default)
+        {
+            LastProductIdsCategoryIds = categoryIds;
+            // Return only entries whose key is in the requested list
+            var result = ProductIdsByCategory
+                .Where(kv => categoryIds.Contains(kv.Key))
+                .ToDictionary(kv => kv.Key, kv => kv.Value);
+            return Task.FromResult(result);
         }
     }
 

@@ -139,7 +139,10 @@ const handleAddToCart = (e: Event) => {
       <v-spacer />
 
       <!-- Price -->
-      <ProductPrice :price="product.price" />
+      <ProductPrice
+        :price="product.price"
+        :salePrice="product.salePrice ?? undefined"
+      />
     </v-card-text>
 
     <!-- Actions -->
